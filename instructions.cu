@@ -70,9 +70,6 @@ __device__ pfunc dev_func_ptr = get_0;
 
 __device__ pfunc dev_func_ptr_write = testing_output_write;
 
-//__device__ int (*functions[10])(Run *, Program **) =
-//    {
-//        get_0, get_1, get_2, get_3, get_4, get_5, get_6, get_7, get_8, get_9};
 
 Program *copy_to_device(Program *p)
 {
@@ -89,16 +86,18 @@ Program *copy_to_device(Program *p)
             args[i] = copy_to_device(p->args[i]);
         }
 
-        cudaMemcpy(&h_p->args, args, p->n_args*sizeof(Program *), cudaMemcpyHostToDevice);
+        cudaMalloc(&h_p->args, p->n_args*sizeof(Program *));
+        cudaMemcpy(h_p->args, args, p->n_args*sizeof(Program *), cudaMemcpyHostToDevice);
 
         free(args);
     }
 
     Program * p_p;
 
-    cudaMemcpyFromSymbol(&h_p->pointer, p->pointer, sizeof(pfunc));
+    h_p->pointer = p->pointer;
 
-    cudaMemcpy(&p_p, h_p, sizeof(Program), cudaMemcpyHostToDevice);
+    cudaMalloc(&p_p, sizeof(Program));
+    cudaMemcpy(p_p, h_p, sizeof(Program), cudaMemcpyHostToDevice);
 
     return p_p;
 }
@@ -108,20 +107,24 @@ Program *copy_programs_to_gpu(int n_programs)
 
     // Example program creation
     Program program_get = {
-        dev_func_ptr, // progran
+        NULL, // progran
         0,            // arguments
         NULL          // pointer to args
     };
+
+    cudaMemcpyFromSymbol(&program_get.pointer, dev_func_ptr, sizeof(pfunc));
 
     Program **subprogram = new struct Program *[1];
     subprogram[0] = &program_get;
 
     // Example program creation
     Program program = {
-        dev_func_ptr_write, // progran
+        NULL, // progran
         1,                  // arguments
         subprogram          // pointer to args
     };
+
+    cudaMemcpyFromSymbol(&program.pointer, dev_func_ptr_write, sizeof(pfunc));
 
     // Copy programs to device memory
     Program * d_p = copy_to_device(&program);
@@ -131,10 +134,6 @@ Program *copy_programs_to_gpu(int n_programs)
 
     for (int i = 0; i < n_programs; i++)
     {
-        //cudaMemcpyFromSymbol(&programs[i].pointer, dev_func_ptr_write, sizeof(pfunc));
-        //programs[i].pointer = d_p->pointer;
-        //programs[i].args = d_p->args;
-        //programs[i].n_args = d_p->n_args;
         cudaMemcpy(&programs[i], d_p, sizeof(Program), cudaMemcpyDeviceToHost);
     }
 
@@ -147,7 +146,6 @@ Program *copy_programs_to_gpu(int n_programs)
 
     free(programs);
     
-
     return d_programs;
 }
 

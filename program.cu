@@ -102,7 +102,7 @@ int main(void)
 		printf("Error launching kernel: %s\n", cudaGetErrorString(err));
 	}
 
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		std::cout << "Starting kernel " << i << std::endl;
 
