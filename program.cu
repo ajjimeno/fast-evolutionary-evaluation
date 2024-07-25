@@ -85,7 +85,7 @@ int main(void)
 
 	Problems *problems = load_problems();
 
-	int n_programs = 300000;
+	int n_programs = 30000;
 
 	float *d_accuracy;
 	float *accuracy;
@@ -102,7 +102,7 @@ int main(void)
 		printf("Error launching kernel: %s\n", cudaGetErrorString(err));
 	}
 
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		std::cout << "Starting kernel " << i << std::endl;
 
@@ -135,8 +135,6 @@ int main(void)
 	{
 		total += accuracy[i];
 
-		// if (accuracy[i] > 0)
-		//	std::cout << i << std::endl;
 	}
 
 	std::cout << "Total: " << total << " " << n_programs << std::endl;
