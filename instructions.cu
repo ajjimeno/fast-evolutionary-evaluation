@@ -628,7 +628,7 @@ void copy_program(int start_index, int end_index, Program *programs, std::string
     for (int i = start_index; i < end_index; ++i)
     {
         Program *program = getProgram(code[i], map);
-        Program * d_p = copy_to_device(program, pointers);
+        Program *d_p = copy_to_device(program, pointers);
         cudaMemcpy(&programs[i], d_p, sizeof(Program), cudaMemcpyDeviceToHost);
     }
 
@@ -639,29 +639,37 @@ void copy_program(int start_index, int end_index, Program *programs, std::string
 
 Program *copy_programs_to_gpu(int n_programs, std::string *code, std::vector<void *> *pointers)
 {
-    std::string c("prog2(testing_output_write(get0()),testing_output_move_right())");
-
     MAP_INSTRUCTIONS map = get_map();
 
     // Create array of programs in host memory
     Program *programs;
     cudaMallocHost((void **)&programs, n_programs * sizeof(struct Problem));
 
-    int n_threads = std::min(n_programs, 1);
+    int n_threads = std::min(n_programs, 100);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;
+
+    std::vector<void *> v_pointers[n_threads];
 
     for (int i = 0; i < n_threads; ++i)
     {
         int start_index = i * chunk_size;
         int end_index = (i == n_threads - 1) ? n_programs : (i + 1) * chunk_size;
-        threads.emplace_back(copy_program, start_index, end_index, programs, code, pointers, map, sizeof(Program));
+        threads.emplace_back(copy_program, start_index, end_index, programs, code, &v_pointers[i], map, sizeof(Program));
     }
 
     for (auto &t : threads)
     {
         t.join();
+    }
+
+    for (int i = 0; i < n_threads; ++i)
+    {
+        for (int j = 0; j < v_pointers[i].size(); j++)
+        {
+            pointers->push_back(v_pointers[i].at(j));
+        }
     }
 
     // Copy array of programs from host memory to device memory
