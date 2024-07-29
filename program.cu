@@ -6,7 +6,7 @@
 #define N_BLOCKS 50
 #define N_THREADS 100
 
-__device__ float run(Program program, Problems *problems)
+__device__ float run(Program program, Problems *problems, pfunc *pfuncs)
 {
 	float total_accuracy = 0.0;
 
@@ -30,13 +30,16 @@ __device__ float run(Program program, Problems *problems)
 			0,					   // input_y
 			0,					   // output_x
 			0,					   // output_y
+			pfuncs,				   // funcs
 			problems->problems[p], // problem
-			output				   // output
+			output,				   // output
+			0,					   // inner_loop
+			0					   // memory
 		};
 
 		for (int i = 0; i < 100; i++)
 		{
-			program.pointer(r, program.args);
+			pfuncs[program.pointer](r, program.args);
 		}
 
 		total_accuracy += accuracy_calculation(problems->problems[p], output);
@@ -53,7 +56,7 @@ __device__ float run(Program program, Problems *problems)
 }
 
 // Programs, Problems, split programs
-__global__ void create_and_run(Program *programs, int n_programs, Problems *problems, float *accuracy)
+__global__ void create_and_run(Program *programs, int n_programs, Problems *problems, pfunc *pfuncs, float *accuracy)
 {
 	int programs_per_block = n_programs / (N_BLOCKS * N_THREADS);
 
@@ -63,11 +66,11 @@ __global__ void create_and_run(Program *programs, int n_programs, Problems *prob
 	for (int i = start; i < end; i++)
 	{
 
-		accuracy[i] = run(programs[i], problems);
+		accuracy[i] = run(programs[i], problems, pfuncs);
 	}
 }
 
-int main(void)
+int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 {
 	int device_count = 0;
 	// Get the number of CUDA-capable devices
@@ -85,38 +88,47 @@ int main(void)
 
 	Problems *problems = load_problems();
 
-	int n_programs = 30000;
-
 	float *d_accuracy;
-	float *accuracy;
-
-	accuracy = (float *)malloc(n_programs * sizeof(float));
 
 	cudaMalloc(&d_accuracy, n_programs * sizeof(float));
 
-	Program *d_programs = copy_programs_to_gpu(n_programs);
+	pfunc *d_pfuncs;
+	cudaMalloc(&d_pfuncs, 2 * sizeof(pfunc));
+
+	fill_function_pointers<<<1, 1>>>(d_pfuncs);
+
+	std::vector<void *> pointers;
+	Program *d_programs = copy_programs_to_gpu(n_programs, programs, &pointers);
+
+	err = cudaGetLastError();
+	if (err != cudaSuccess)
+	{
+		printf("Error creating programs: %s\n", cudaGetErrorString(err));
+		return 1;
+	}
+
+	std::cout << "Starting kernel " << std::endl;
+
+	create_and_run<<<N_BLOCKS, N_THREADS>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy);
 
 	err = cudaGetLastError();
 	if (err != cudaSuccess)
 	{
 		printf("Error launching kernel: %s\n", cudaGetErrorString(err));
+		// Handle the error (e.g., exit the program)
+		return 1;
 	}
+	cudaDeviceSynchronize();
+	std::cout << "Kernel finished" << std::endl;
 
-	for (int i = 0; i < 1000; i++)
+	free_programs_from_gpu(d_programs, &pointers);
+	err = cudaGetLastError();
+	if (err != cudaSuccess)
 	{
-		std::cout << "Starting kernel " << i << std::endl;
-
-		create_and_run<<<N_BLOCKS, N_THREADS>>>(d_programs, n_programs, problems, d_accuracy);
-
-		err = cudaGetLastError();
-		if (err != cudaSuccess)
-		{
-			printf("Error launching kernel: %s\n", cudaGetErrorString(err));
-			// Handle the error (e.g., exit the program)
-		}
-		cudaDeviceSynchronize();
-		std::cout << "Kernel finished" << std::endl;
+		printf("Error freeing programs: %s\n", cudaGetErrorString(err));
+		return 1;
 	}
+
 	cudaMemcpy(accuracy, d_accuracy, n_programs * sizeof(float), cudaMemcpyDeviceToHost);
 
 	err = cudaGetLastError();
@@ -124,24 +136,20 @@ int main(void)
 	{
 		printf("Error launching kernel: %s\n", cudaGetErrorString(err));
 		// Handle the error (e.g., exit the program)
+		return 1;
 	}
-
-	std::cout << std::fixed;
-	std::cout << "A[0]: " << accuracy[0] << std::endl;
 
 	float total = 0.0;
 
 	for (int i = 0; i < n_programs; i++)
 	{
 		total += accuracy[i];
-
 	}
 
 	std::cout << "Total: " << total << " " << n_programs << std::endl;
 
+	cudaFree(d_pfuncs);
 	cudaFree(d_accuracy);
-	cudaFree(d_programs);
-	free(accuracy);
 
 	return 0;
 }

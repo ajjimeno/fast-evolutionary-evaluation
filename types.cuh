@@ -17,21 +17,26 @@ struct Problems
     int n_problems;
     Problem *problems;
 };
+struct Program
+{
+    int pointer; // int (*pointer)(Run *, Program **);
+    int n_args;
+    struct Program **args;
+};
+
+struct Run; 
+typedef int (*pfunc)(Run *run, Program **p);
 
 struct Run
 {
     int input_x, input_y;
     int output_x, output_y;
-
+    pfunc * pfuncs;
     Problem problem;
     int **output;
-};
-
-struct Program
-{
-    int (*pointer)(Run *, Program **);
-    int n_args;
-    struct Program **args;
+    int inner_loop;
+    int status;
+    int memory;
 };
 
 #endif

@@ -4,8 +4,6 @@
 
 Problems *load_problems()
 {
-    int n_problems = 1;
-
     int in[3][3] = {{0, 0, 5},
                     {0, 5, 0},
                     {5, 0, 0}};
