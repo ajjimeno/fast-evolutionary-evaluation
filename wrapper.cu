@@ -58,6 +58,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         std::cout << "Argument is not a list" << std::endl;
         return NULL;
     }
+
     Py_ssize_t len = PyList_Size(py_list);
     for (Py_ssize_t i = 0; i < len; ++i)
     {
@@ -75,16 +76,9 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
     int n_programs = cpp_strings.size();
 
-    std::string *programs = (std::string *)malloc(n_programs * sizeof(std::string));
-
-    for (int i=0; i < n_programs;i++)
-    {
-        programs[i] = cpp_strings.at(i);
-    }
-
     float *accuracy = (float *)malloc(n_programs * sizeof(float));
 
-    execute_and_evaluate(n_programs, programs, accuracy);
+    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy);
 
     PyObject *list = PyList_New(n_programs);
     if (!list)
