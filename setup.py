@@ -7,7 +7,7 @@ os.environ['LDFLAGS'] = '-O3 -gstabs -march=native'
 
 module1 = Extension('SimulatorGPU',
                     sources = ['wrapper.cu'],
-                    extra_compile_args = ["-O3", "--compiler-options", "-fPIC"])
+                    extra_compile_args = ["-O3", "--compiler-options", "-fPIC", "--compiler-options", "-march=native"])
 
 class CUDA_build_ext(build_ext):
     """

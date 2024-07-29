@@ -583,58 +583,41 @@ Program *getProgram(std::string string, MAP_INSTRUCTIONS map)
     return getProgram(string, map, position);
 }
 
-Program *copy_to_device(Program *p, std::vector<void *> *pointers, cudaStream_t stream)
+Program *copy_to_device(Program *p, std::vector<void *> *pointers)
 {
-    Program *h_p = (Program *)malloc(sizeof(Program));
+    Program *h_p;
+
+    cudaMallocManaged(&h_p, sizeof(Program));
 
     h_p->n_args = p->n_args;
 
     if (p->n_args > 0)
     {
-        Program **args = (Program **)malloc(p->n_args * sizeof(Program *));
+        cudaMallocManaged(&h_p->args, p->n_args * sizeof(Program *));
         // Save the subprograms in device memory
         for (int i = 0; i < p->n_args; i++)
         {
-            args[i] = copy_to_device(p->args[i], pointers, stream);
+            h_p->args[i] = copy_to_device(p->args[i], pointers);
         }
 
-        cudaMallocAsync(&h_p->args, p->n_args * sizeof(Program *), stream);
-        cudaMemcpyAsync(h_p->args, args, p->n_args * sizeof(Program *), cudaMemcpyHostToDevice, stream);
-
         pointers->push_back(h_p->args);
-
-        free(args);
     }
 
-    Program *p_p;
-
     h_p->pointer = p->pointer;
+    
+    pointers -> push_back(h_p);
 
-    cudaMalloc(&p_p, sizeof(Program));
-    cudaMemcpy(p_p, h_p, sizeof(Program), cudaMemcpyHostToDevice);
-
-    free(h_p);
-
-    pointers->push_back(p_p);
-
-    return p_p;
+    return h_p;
 }
 
 void copy_program(int start_index, int end_index, Program *programs, std::string *code, std::vector<void *> *pointers, MAP_INSTRUCTIONS map, size_t size)
 {
-    cudaStream_t stream;
-    cudaStreamCreate(&stream);
-
     for (int i = start_index; i < end_index; ++i)
     {
         Program *program = getProgram(code[i], map);
-        Program *d_p = copy_to_device(program, pointers, stream);
-        cudaMemcpyAsync(&programs[i], d_p, sizeof(Program), cudaMemcpyDeviceToHost, stream);
+        Program *d_p = copy_to_device(program, pointers);
+        programs[i] = d_p[0];
     }
-
-    cudaStreamSynchronize(stream);
-
-    cudaStreamDestroy(stream);
 }
 
 Program *copy_programs_to_gpu(int n_programs, std::string *code, std::vector<void *> *pointers)
@@ -643,9 +626,9 @@ Program *copy_programs_to_gpu(int n_programs, std::string *code, std::vector<voi
 
     // Create array of programs in host memory
     Program *programs;
-    cudaMallocHost((void **)&programs, n_programs * sizeof(struct Problem));
+    cudaMallocManaged((void **)&programs, n_programs * sizeof(struct Problem));
 
-    int n_threads = std::min(n_programs, 100);
+    int n_threads = std::min(n_programs, 20);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;
@@ -672,16 +655,7 @@ Program *copy_programs_to_gpu(int n_programs, std::string *code, std::vector<voi
         }
     }
 
-    // Copy array of programs from host memory to device memory
-    Program *d_programs;
-
-    cudaMalloc(&d_programs, n_programs * sizeof(struct Problem));
-
-    cudaMemcpy(d_programs, programs, n_programs * sizeof(struct Problem), cudaMemcpyHostToDevice);
-
-    cudaFreeHost(programs);
-
-    return d_programs;
+    return programs;
 }
 
 void free_in_stream(std::vector<void *> *pointers, int start, int end, cudaStream_t stream)

@@ -90,12 +90,13 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 
 	float *d_accuracy;
 
-	cudaMalloc(&d_accuracy, n_programs * sizeof(float));
+	cudaMallocManaged(&d_accuracy, n_programs * sizeof(float));
 
 	pfunc *d_pfuncs;
-	cudaMalloc(&d_pfuncs, 2 * sizeof(pfunc));
+	cudaMallocManaged(&d_pfuncs, 2 * sizeof(pfunc));
 
 	fill_function_pointers<<<1, 1>>>(d_pfuncs);
+	cudaDeviceSynchronize();
 
 	std::vector<void *> pointers;
 	Program *d_programs = copy_programs_to_gpu(n_programs, programs, &pointers);
