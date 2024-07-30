@@ -6,7 +6,7 @@
 #define N_BLOCKS 50
 #define N_THREADS 100
 
-__device__ float run(Program program, Problems *problems, pfunc *pfuncs)
+__device__ float run(Programs *programs, int program_id, Problems *problems, pfunc *pfuncs)
 {
 	float total_accuracy = 0.0;
 
@@ -26,20 +26,24 @@ __device__ float run(Program program, Problems *problems, pfunc *pfuncs)
 		Run *r = (Run *)malloc(sizeof(Run));
 
 		r[0] = {
-			0,					   // input_x
-			0,					   // input_y
-			0,					   // output_x
-			0,					   // output_y
-			pfuncs,				   // funcs
-			problems->problems[p], // problem
-			output,				   // output
-			0,					   // inner_loop
-			0					   // memory
+			0,							   // input_x
+			0,							   // input_y
+			0,							   // output_x
+			0,							   // output_y
+			pfuncs,						   // funcs
+			problems->problems[p],		   // problem
+			output,						   // output
+			0,							   // inner_loop
+			0,							   // status
+			0,							   // memory
+			programs,					   // programs
+			programs->programs[program_id] // program_offset
 		};
 
 		for (int i = 0; i < 100; i++)
 		{
-			pfuncs[program.pointer](r, program.args);
+			Node node = programs->nodes[programs->programs[program_id]];
+			pfuncs[node.pointer](r, node.args);
 		}
 
 		total_accuracy += accuracy_calculation(problems->problems[p], output);
@@ -56,7 +60,7 @@ __device__ float run(Program program, Problems *problems, pfunc *pfuncs)
 }
 
 // Programs, Problems, split programs
-__global__ void create_and_run(Program *programs, int n_programs, Problems *problems, pfunc *pfuncs, float *accuracy)
+__global__ void create_and_run(Programs *programs, int n_programs, Problems *problems, pfunc *pfuncs, float *accuracy)
 {
 	int programs_per_block = n_programs / (N_BLOCKS * N_THREADS);
 
@@ -66,7 +70,7 @@ __global__ void create_and_run(Program *programs, int n_programs, Problems *prob
 	for (int i = start; i < end; i++)
 	{
 
-		accuracy[i] = run(programs[i], problems, pfuncs);
+		accuracy[i] = run(programs, i, problems, pfuncs);
 	}
 }
 
@@ -98,8 +102,7 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 	fill_function_pointers<<<1, 1>>>(d_pfuncs);
 	cudaDeviceSynchronize();
 
-	std::vector<void *> pointers;
-	Program *d_programs = copy_programs_to_gpu(n_programs, programs, &pointers);
+	Programs *d_programs = copy_programs_to_gpu(n_programs, programs);
 
 	err = cudaGetLastError();
 	if (err != cudaSuccess)
@@ -107,11 +110,11 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 		printf("Error creating programs: %s\n", cudaGetErrorString(err));
 		return 1;
 	}
-
 	std::cout << "Starting kernel " << std::endl;
 
 	create_and_run<<<N_BLOCKS, N_THREADS>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy);
 
+	cudaDeviceSynchronize();
 	err = cudaGetLastError();
 	if (err != cudaSuccess)
 	{
@@ -119,10 +122,9 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 		// Handle the error (e.g., exit the program)
 		return 1;
 	}
-	cudaDeviceSynchronize();
 	std::cout << "Kernel finished" << std::endl;
 
-	free_programs_from_gpu(d_programs, &pointers);
+	free_programs_from_gpu(d_programs);
 	err = cudaGetLastError();
 	if (err != cudaSuccess)
 	{
@@ -153,4 +155,21 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 	cudaFree(d_accuracy);
 
 	return 0;
+}
+
+int main()
+{
+	int n_programs = 30000;
+	std::vector<std::string> programs;
+
+	for (int i = 0; i < n_programs; i++)
+	{
+		programs.push_back("prog2(testing_output_write(get0()),testing_output_move_right())");
+		// programs.push_back("get0()");
+	}
+
+	float *accuracy;
+	accuracy = (float *)malloc(n_programs * sizeof(float));
+
+	execute_and_evaluate(n_programs, programs.data(), accuracy);
 }

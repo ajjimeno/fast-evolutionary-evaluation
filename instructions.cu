@@ -6,88 +6,88 @@
 #include <unordered_map>
 #include <vector>
 
-__device__ int get0(Run *run, Program **)
+__device__ int get0(Run *run, int *)
 {
     return 0;
 }
-__device__ int get1(Run *run, Program **)
+__device__ int get1(Run *run, int *)
 {
     return 1;
 }
-__device__ int get2(Run *run, Program **)
+__device__ int get2(Run *run, int *)
 {
     return 2;
 }
-__device__ int get3(Run *run, Program **)
+__device__ int get3(Run *run, int *)
 {
     return 3;
 }
-__device__ int get4(Run *run, Program **)
+__device__ int get4(Run *run, int *)
 {
     return 4;
 }
-__device__ int get5(Run *run, Program **)
+__device__ int get5(Run *run, int *)
 {
     return 5;
 }
-__device__ int get6(Run *run, Program **)
+__device__ int get6(Run *run, int *)
 {
     return 6;
 }
-__device__ int get7(Run *run, Program **)
+__device__ int get7(Run *run, int *)
 {
     return 7;
 }
-__device__ int get8(Run *run, Program **)
+__device__ int get8(Run *run, int *)
 {
     return 8;
 }
-__device__ int get9(Run *run, Program **)
+__device__ int get9(Run *run, int *)
 {
     return 9;
 }
 
-__device__ int get_testing_length_input_x(Run *run, Program **)
+__device__ int get_testing_length_input_x(Run *run, int *)
 {
     return run->problem.input_x;
 }
 
-__device__ int get_testing_length_input_y(Run *run, Program **)
+__device__ int get_testing_length_input_y(Run *run, int *)
 {
     return run->problem.input_y;
 }
 
-__device__ int get_testing_length_output_x(Run *run, Program **)
+__device__ int get_testing_length_output_x(Run *run, int *)
 {
     return run->problem.output_x;
 }
 
-__device__ int get_testing_length_output_y(Run *run, Program **)
+__device__ int get_testing_length_output_y(Run *run, int *)
 {
     return run->problem.output_y;
 }
 
-__device__ int get_testing_input_position_y(Run *run, Program **)
+__device__ int get_testing_input_position_y(Run *run, int *)
 {
     return run->input_y;
 }
 
-__device__ int get_testing_input_position_x(Run *run, Program **)
+__device__ int get_testing_input_position_x(Run *run, int *)
 {
     return run->input_x;
 }
 
-__device__ int get_testing_output_position_y(Run *run, Program **)
+__device__ int get_testing_output_position_y(Run *run, int *)
 {
     return run->output_y;
 }
 
-__device__ int get_testing_output_position_x(Run *run, Program **)
+__device__ int get_testing_output_position_x(Run *run, int *)
 {
     return run->output_x;
 }
 
-__device__ int testing_input_max(Run *run, Program **)
+__device__ int testing_input_max(Run *run, int *)
 {
     int *arr = run->problem.input[run->input_y];
     int max = arr[0];
@@ -101,7 +101,7 @@ __device__ int testing_input_max(Run *run, Program **)
     return max;
 }
 
-__device__ int testing_input_min(Run *run, Program **)
+__device__ int testing_input_min(Run *run, int *)
 {
     int *arr = run->problem.input[run->input_y];
     int min = arr[0];
@@ -115,12 +115,12 @@ __device__ int testing_input_min(Run *run, Program **)
     return min;
 }
 
-__device__ int testing_input_read(Run *run, Program **)
+__device__ int testing_input_read(Run *run, int *)
 {
     return run->problem.input[run->input_y][run->input_x];
 }
 
-__device__ int testing_output_read_previous(Run *run, Program **)
+__device__ int testing_output_read_previous(Run *run, int *)
 {
     if (run->output_x > 0)
         return run->output[run->output_y][run->output_x - 1];
@@ -128,57 +128,61 @@ __device__ int testing_output_read_previous(Run *run, Program **)
     return -1;
 }
 
-__device__ int testing_output_read(Run *run, Program **)
+__device__ int testing_output_read(Run *run, int *)
 {
     return run->output[run->output_y][run->output_x];
 }
 
-__device__ int testing_reset_input_position(Run *run, Program **)
+__device__ int testing_reset_input_position(Run *run, int *)
 {
     run->input_x = 0;
     return 0;
 }
 
-__device__ int testing_reset_input_down_position(Run *run, Program **)
+__device__ int testing_reset_input_down_position(Run *run, int *)
 {
     run->input_y = 0;
     return 0;
 }
 
-__device__ int testing_output_write_previous(Run *run, Program **p)
+__device__ int testing_output_write_previous(Run *run, int *p)
 {
 
     if (run->output_x > 0)
     {
-        int value = run->pfuncs[(p[0]->pointer)](run, p[0]->args);
+        int node_id = run->program_offset + p[0];
+        Node node = run->programs->nodes[node_id];
+
+        int value = run->pfuncs[(node.pointer)](run, node.args);
         run->output[run->output_y][run->output_x - 1] = value;
     }
 
     return 0;
 }
 
-__device__ int testing_output_write(Run *run, Program **p)
+__device__ int testing_output_write(Run *run, int *p)
 {
-
-    int value = run->pfuncs[(p[0]->pointer)](run, p[0]->args);
+    int node_id = run->program_offset + p[0];
+    Node node = run->programs->nodes[node_id];
+    int value = run->pfuncs[(node.pointer)](run, node.args);
     run->output[run->output_y][run->output_x] = value;
 
     return 0;
 }
 
-__device__ int testing_reset_output_position(Run *run, Program **)
+__device__ int testing_reset_output_position(Run *run, int *)
 {
     run->output_x = 0;
     return 0;
 }
 
-__device__ int testing_reset_output_down_position(Run *run, Program **)
+__device__ int testing_reset_output_down_position(Run *run, int *)
 {
     run->output_y = 0;
     return 0;
 }
 
-__device__ int testing_output_move_left(Run *run, Program **)
+__device__ int testing_output_move_left(Run *run, int *)
 {
     if (run->output_x > 0)
         run->output_x--;
@@ -186,7 +190,7 @@ __device__ int testing_output_move_left(Run *run, Program **)
     return 0;
 }
 
-__device__ int testing_output_move_right(Run *run, Program **)
+__device__ int testing_output_move_right(Run *run, int *)
 {
     if (run->output_x < (run->problem.output_x - 1))
         run->output_x++;
@@ -194,7 +198,7 @@ __device__ int testing_output_move_right(Run *run, Program **)
     return 0;
 }
 
-__device__ int testing_output_move_down(Run *run, Program **)
+__device__ int testing_output_move_down(Run *run, int *)
 {
     if (run->output_y < (run->problem.output_y - 1))
         run->output_y++;
@@ -203,7 +207,7 @@ __device__ int testing_output_move_down(Run *run, Program **)
     return 0;
 }
 
-__device__ int testing_output_move_up(Run *run, Program **)
+__device__ int testing_output_move_up(Run *run, int *)
 {
     if (run->output_y > 0)
         run->output_y--;
@@ -211,17 +215,17 @@ __device__ int testing_output_move_up(Run *run, Program **)
     return 0;
 }
 
-__device__ int testing_is_output_end(Run *run, Program **)
+__device__ int testing_is_output_end(Run *run, int *)
 {
     return run->output_x == (run->problem.output_x - 1);
 }
 
-__device__ int testing_is_output_down(Run *run, Program **)
+__device__ int testing_is_output_down(Run *run, int *)
 {
     return run->output_y == (run->problem.output_y - 1);
 }
 
-__device__ int testing_input_move_left(Run *run, Program **)
+__device__ int testing_input_move_left(Run *run, int *)
 {
     if (run->input_x > 0)
         run->input_x--;
@@ -229,7 +233,7 @@ __device__ int testing_input_move_left(Run *run, Program **)
     return 0;
 }
 
-__device__ int testing_input_move_right(Run *run, Program **)
+__device__ int testing_input_move_right(Run *run, int *)
 {
     if (run->input_x < (run->problem.input_x - 1))
         run->input_x++;
@@ -237,7 +241,7 @@ __device__ int testing_input_move_right(Run *run, Program **)
     return 0;
 }
 
-__device__ int testing_input_move_down(Run *run, Program **)
+__device__ int testing_input_move_down(Run *run, int *)
 {
     if (run->input_y < (run->problem.input_y - 1))
         run->input_y++;
@@ -245,7 +249,7 @@ __device__ int testing_input_move_down(Run *run, Program **)
     return 0;
 }
 
-__device__ int testing_input_move_up(Run *run, Program **)
+__device__ int testing_input_move_up(Run *run, int *)
 {
     if (run->input_y > 0)
         run->input_y--;
@@ -253,21 +257,28 @@ __device__ int testing_input_move_up(Run *run, Program **)
     return 0;
 }
 
-__device__ int comparison(Run *run, Program **p)
+__device__ int comparison(Run *run, int *p)
 {
-    if (run->pfuncs[(p[0]->pointer)](run, p[0]->args) == 1)
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+
+    if (run->pfuncs[(node_0.pointer)](run, node_0.args) == 1)
     {
-        run->pfuncs[(p[1]->pointer)](run, p[1]->args);
+        int node_1_id = run->program_offset + p[1];
+        Node node_1 = run->programs->nodes[node_1_id];
+        run->pfuncs[(node_1.pointer)](run, node_1.args);
     }
     else
     {
-        run->pfuncs[(p[2]->pointer)](run, p[2]->args);
+        int node_2_id = run->program_offset + p[2];
+        Node node_2 = run->programs->nodes[node_2_id];
+        run->pfuncs[(node_2.pointer)](run, node_2.args);
     }
 
     return 0;
 }
 
-__device__ int bigger_than_output_next(Run *run, Program **p)
+__device__ int bigger_than_output_next(Run *run, int *p)
 {
     /*
     if (output_position_x < (get_length_output_x(NULL) - 1))
@@ -279,7 +290,7 @@ __device__ int bigger_than_output_next(Run *run, Program **p)
     return 0;
 }
 
-__device__ int bigger_than_testing_output_next(Run *run, Program **p)
+__device__ int bigger_than_testing_output_next(Run *run, int *)
 {
     if (run->output_x < (run->problem.output_x - 1))
     {
@@ -290,7 +301,7 @@ __device__ int bigger_than_testing_output_next(Run *run, Program **p)
     return 0;
 }
 
-__device__ int swap_testing_output_next(Run *run, Program **p)
+__device__ int swap_testing_output_next(Run *run, int *)
 {
     if (!testing_is_output_end(run, NULL))
     {
@@ -302,47 +313,73 @@ __device__ int swap_testing_output_next(Run *run, Program **p)
     return 0;
 }
 
-__device__ int bigger_than(Run *run, Program **p)
+__device__ int bigger_than(Run *run, int *p)
 {
-    int output1 = run->pfuncs[(p[0]->pointer)](run, p[0]->args);
-    int output2 = run->pfuncs[(p[1]->pointer)](run, p[1]->args);
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+    int output1 = run->pfuncs[(node_0.pointer)](run, node_0.args);
+
+    int node_1_id = run->program_offset + p[1];
+    Node node_1 = run->programs->nodes[node_1_id];
+    int output2 = run->pfuncs[(node_1.pointer)](run, node_1.args);
     return output1 > output2;
 }
 
-__device__ int equal(Run *run, Program **p)
+__device__ int equal(Run *run, int *p)
 {
-    int output1 = run->pfuncs[(p[0]->pointer)](run, p[0]->args);
-    int output2 = run->pfuncs[(p[1]->pointer)](run, p[1]->args);
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+    int output1 = run->pfuncs[(node_0.pointer)](run, node_0.args);
+
+    int node_1_id = run->program_offset + p[1];
+    Node node_1 = run->programs->nodes[node_1_id];
+    int output2 = run->pfuncs[(node_1.pointer)](run, node_1.args);
     return output1 == output2;
 }
 
-__device__ int no(Run *run, Program **p)
+__device__ int no(Run *run, int *p)
 {
-    int output1 = run->pfuncs[(p[0]->pointer)](run, p[0]->args);
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+    int output1 = run->pfuncs[(node_0.pointer)](run, node_0.args);
     return !output1;
 }
 
-__device__ int prog2(Run *run, Program **p)
+__device__ int prog2(Run *run, int *p)
 {
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+    run->pfuncs[(node_0.pointer)](run, node_0.args);
 
-    run->pfuncs[(p[0]->pointer)](run, p[0]->args);
-    run->pfuncs[(p[1]->pointer)](run, p[1]->args);
+    int node_1_id = run->program_offset + p[1];
+    Node node_1 = run->programs->nodes[node_1_id];
+    run->pfuncs[(node_1.pointer)](run, node_1.args);
     return 0;
 }
 
-__device__ int prog3(Run *run, Program **p)
+__device__ int prog3(Run *run, int *p)
 {
 
-    run->pfuncs[(p[0]->pointer)](run, p[0]->args);
-    run->pfuncs[(p[1]->pointer)](run, p[1]->args);
-    run->pfuncs[(p[2]->pointer)](run, p[2]->args);
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+    run->pfuncs[(node_0.pointer)](run, node_0.args);
+
+    int node_1_id = run->program_offset + p[1];
+    Node node_1 = run->programs->nodes[node_1_id];
+    run->pfuncs[(node_1.pointer)](run, node_1.args);
+
+    int node_2_id = run->program_offset + p[2];
+    Node node_2 = run->programs->nodes[node_2_id];
+    run->pfuncs[(node_2.pointer)](run, node_2.args);
 
     return 0;
 }
 
-int loop(Run *run, Program **p)
+int loop(Run *run, int *p)
 {
-    int v = run->pfuncs[(p[0]->pointer)](run, p[0]->args);
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+    int v = run->pfuncs[(node_0.pointer)](run, node_0.args);
 
     run->inner_loop++;
 
@@ -350,7 +387,9 @@ int loop(Run *run, Program **p)
     {
         for (int i = 0; i < v; i++)
         {
-            run->pfuncs[(p[1]->pointer)](run, p[1]->args);
+            int node_1_id = run->program_offset + p[1];
+            Node node_1 = run->programs->nodes[node_1_id];
+            run->pfuncs[(node_1.pointer)](run, node_1.args);
         }
     }
     else
@@ -363,7 +402,7 @@ int loop(Run *run, Program **p)
     return 0;
 }
 
-__device__ int dowhile(Run *run, Program **p)
+__device__ int dowhile(Run *run, int *p)
 {
     int c = 0;
 
@@ -371,11 +410,14 @@ __device__ int dowhile(Run *run, Program **p)
 
     if (run->inner_loop < 3)
     {
-
-        while (!run->pfuncs[(p[0]->pointer)](run, p[0]->args) && c < 10)
+        int node_0_id = run->program_offset + p[0];
+        Node node_0 = run->programs->nodes[node_0_id];
+        while (!run->pfuncs[(node_0.pointer)](run, node_0.args) && c < 10)
         {
             c++;
-            run->pfuncs[(p[1]->pointer)](run, p[1]->args);
+            int node_1_id = run->program_offset + p[1];
+            Node node_1 = run->programs->nodes[node_1_id];
+            run->pfuncs[(node_1.pointer)](run, node_1.args);
         }
     }
     else
@@ -388,14 +430,16 @@ __device__ int dowhile(Run *run, Program **p)
     return 0;
 }
 
-__device__ int read_memory(Run *run, Program **p)
+__device__ int read_memory(Run *run, int *)
 {
     return run->memory;
 }
 
-__device__ int write_memory(Run *run, Program **p)
+__device__ int write_memory(Run *run, int *p)
 {
-    int value = run->pfuncs[(p[0]->pointer)](run, p[0]->args);
+    int node_0_id = run->program_offset + p[0];
+    Node node_0 = run->programs->nodes[node_0_id];
+    int value = run->pfuncs[(node_0.pointer)](run, node_0.args);
 
     run->memory = value;
 
@@ -519,11 +563,11 @@ MAP_INSTRUCTIONS get_map()
     return map;
 }
 
-Program *getProgram(std::string string, MAP_INSTRUCTIONS map, int &position)
+int getProgram(std::string string, MAP_INSTRUCTIONS map, std::vector<Node> *nodes, int &position)
 {
-    struct Program *program = NULL;
+    int program = -1;
 
-    std::vector<struct Program *> subprograms;
+    std::vector<int> subprograms;
 
     int initial_position = position;
 
@@ -536,8 +580,10 @@ Program *getProgram(std::string string, MAP_INSTRUCTIONS map, int &position)
         if (string[position] == '(')
         {
             // Create new program entry
-            program = new struct Program();
-            program->pointer = map[string.substr(initial_position, position - initial_position)];
+            program = nodes->size();
+            int pointer = map[string.substr(initial_position, position - initial_position)];
+
+            nodes->push_back({pointer, 0, {0, 0, 0}});
 
             position++;
 
@@ -548,7 +594,7 @@ Program *getProgram(std::string string, MAP_INSTRUCTIONS map, int &position)
             }
             else
             {
-                Program *sub = getProgram(string, map, position);
+                int sub = getProgram(string, map, nodes, position);
                 subprograms.push_back(sub);
             }
         }
@@ -556,9 +602,12 @@ Program *getProgram(std::string string, MAP_INSTRUCTIONS map, int &position)
         {
             // Close and return
             position++;
-            program->n_args = subprograms.size();
-            program->args = new struct Program *[subprograms.size()];
-            std::copy(subprograms.begin(), subprograms.end(), program->args);
+            nodes->at(program).n_args = subprograms.size();
+
+            for (int i = 0; i < subprograms.size(); i++)
+            {
+                nodes->at(program).args[i] = subprograms[i];
+            }
 
             return program;
         }
@@ -566,7 +615,7 @@ Program *getProgram(std::string string, MAP_INSTRUCTIONS map, int &position)
         {
             // After this, there is a new program
             position++;
-            subprograms.push_back(getProgram(string, map, position));
+            subprograms.push_back(getProgram(string, map, nodes, position));
         }
         else
         {
@@ -577,69 +626,49 @@ Program *getProgram(std::string string, MAP_INSTRUCTIONS map, int &position)
     return program;
 }
 
-Program *getProgram(std::string string, MAP_INSTRUCTIONS map)
+void getProgram(std::string string, MAP_INSTRUCTIONS map, std::vector<Node> *nodes)
 {
     int position = 0;
-    return getProgram(string, map, position);
+    getProgram(string, map, nodes, position);
 }
 
-Program *copy_to_device(Program *p, std::vector<void *> *pointers)
-{
-    Program *h_p;
-
-    cudaMallocManaged(&h_p, sizeof(Program));
-
-    h_p->n_args = p->n_args;
-
-    if (p->n_args > 0)
-    {
-        cudaMallocManaged(&h_p->args, p->n_args * sizeof(Program *));
-        // Save the subprograms in device memory
-        for (int i = 0; i < p->n_args; i++)
-        {
-            h_p->args[i] = copy_to_device(p->args[i], pointers);
-        }
-
-        pointers->push_back(h_p->args);
-    }
-
-    h_p->pointer = p->pointer;
-    
-    pointers -> push_back(h_p);
-
-    return h_p;
-}
-
-void copy_program(int start_index, int end_index, Program *programs, std::string *code, std::vector<void *> *pointers, MAP_INSTRUCTIONS map, size_t size)
+void copy_program(int start_index, int end_index, std::vector<int> *programs, std::vector<Node> *nodes, std::string *code, MAP_INSTRUCTIONS map)
 {
     for (int i = start_index; i < end_index; ++i)
     {
-        Program *program = getProgram(code[i], map);
-        Program *d_p = copy_to_device(program, pointers);
-        programs[i] = d_p[0];
+        std::vector<Node> subnodes;
+        getProgram(code[i], map, &subnodes);
+
+        programs->push_back(nodes->size());
+
+        for (int i = 0; i < subnodes.size(); i++)
+        {
+            nodes->push_back({subnodes[i].pointer, subnodes[i].n_args, {subnodes[i].args[0], subnodes[i].args[1], subnodes[i].args[2]}});
+        }
     }
 }
 
-Program *copy_programs_to_gpu(int n_programs, std::string *code, std::vector<void *> *pointers)
+Programs *copy_programs_to_gpu(int n_programs, std::string *code)
 {
     MAP_INSTRUCTIONS map = get_map();
 
     // Create array of programs in host memory
-    Program *programs;
-    cudaMallocManaged((void **)&programs, n_programs * sizeof(struct Problem));
+    Programs *d_sprograms;
+    cudaMallocManaged((void **)&d_sprograms, sizeof(struct Problems));
 
-    int n_threads = std::min(n_programs, 20);
+    int n_threads = std::min(n_programs, 1);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;
 
-    std::vector<void *> v_pointers[n_threads];
-
+    std::vector<int> programs;
+    std::vector<Node> nodes;
     for (int i = 0; i < n_threads; ++i)
     {
         int start_index = i * chunk_size;
         int end_index = (i == n_threads - 1) ? n_programs : (i + 1) * chunk_size;
-        threads.emplace_back(copy_program, start_index, end_index, programs, code, &v_pointers[i], map, sizeof(Program));
+
+        threads.emplace_back(copy_program, start_index, end_index, &programs, &nodes, code, map);
     }
 
     for (auto &t : threads)
@@ -647,34 +676,23 @@ Program *copy_programs_to_gpu(int n_programs, std::string *code, std::vector<voi
         t.join();
     }
 
-    for (int i = 0; i < n_threads; ++i)
-    {
-        for (int j = 0; j < v_pointers[i].size(); j++)
-        {
-            pointers->push_back(v_pointers[i].at(j));
-        }
-    }
+    d_sprograms->n_nodes = nodes.size();
+    d_sprograms->n_programs = programs.size();
 
-    return programs;
+    cudaMalloc(&d_sprograms->nodes, nodes.size() * sizeof(Node));
+    cudaMemcpy(d_sprograms->nodes, nodes.data(), nodes.size() * sizeof(Node), cudaMemcpyHostToDevice);
+
+    cudaMalloc(&d_sprograms->programs, programs.size() * sizeof(int));
+    cudaMemcpy(d_sprograms->programs, programs.data(), programs.size() * sizeof(int), cudaMemcpyHostToDevice);
+
+    return d_sprograms;
 }
 
-void free_in_stream(std::vector<void *> *pointers, int start, int end, cudaStream_t stream)
+int free_programs_from_gpu(Programs *programs)
 {
-    for (int i = start; i < end; --i)
-    {
-        cudaFreeAsync(pointers->at(i), stream);
-    }
-}
-
-int free_programs_from_gpu(Program *d_programs, std::vector<void *> *pointers)
-{
-    cudaFree(d_programs);
-
-    for (int i = pointers->size() - 1; i >= 0; --i)
-    {
-        cudaFree(pointers->at(i));
-    }
-
+    cudaFree(programs->nodes);
+    cudaFree(programs->programs);
+    cudaFree(programs);
     return 0;
 }
 
