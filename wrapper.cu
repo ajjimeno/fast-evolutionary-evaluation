@@ -17,13 +17,10 @@
  */
 typedef struct RunnerSimulatorWrapper
 {
-    // PyObject_HEAD
-    //     Runner *mInnerClass;
-    // Program *program;
-    // std::unordered_map<std::string, int (Runner::*)(Program **)> map;
+    PyObject_HEAD
     Instances *data;
 
-    // RunnerSimulatorWrapper() : program(NULL){};
+    RunnerSimulatorWrapper() : data(nullptr) {}
 } RunnerSimulatorWrapper;
 
 static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject *args, PyObject *kwargs)
@@ -32,9 +29,6 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
     PyObject *repr = PyObject_Str(obj); // Alternatively use PyObject_Repr, but it adds single quotes
     PyObject *str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
     const char *bytes = PyBytes_AS_STRING(str);
-
-    // self->mInnerClass = new Runner();
-    // self->map = getFunctionMap();
 
     self->data = load_data(bytes);
 
@@ -135,7 +129,7 @@ static void RunnerSimulatorWrapperDealloc(RunnerSimulatorWrapper *self)
 }
 
 static PyTypeObject PyRunnerSimulatorWrapper_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0) "Simulator.Runner" /* tp_name */
+    PyVarObject_HEAD_INIT(NULL, 0) "SimulatorGPU.Runner" /* tp_name */
 };
 
 PyMODINIT_FUNC PyInit_SimulatorGPU()

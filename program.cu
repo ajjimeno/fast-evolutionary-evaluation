@@ -65,17 +65,17 @@ __device__ float run(Programs *programs, int program_id, Instances *problems, pf
 }
 
 // Programs, Problems, split programs
-__global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, pfunc *pfuncs, float *accuracy)
+__global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, pfunc *pfuncs, float *accuracy, int blocks, int threads)
 {
-	int programs_per_block = n_programs / (N_BLOCKS * N_THREADS);
+	int programs_per_block = n_programs / (blocks * threads);
 
 	int start = (blockIdx.x * blockDim.x + threadIdx.x) * programs_per_block;
 	int end = start + programs_per_block;
 
 	for (int i = start; i < end; i++)
 	{
-
-		accuracy[i] = run(programs, i, problems, pfuncs);
+		if (i < n_programs)
+			accuracy[i] = run(programs, i, problems, pfuncs);
 	}
 }
 
@@ -116,7 +116,11 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
 
 	std::cout << "Starting kernel" << std::endl;
 
-	create_and_run<<<N_BLOCKS, N_THREADS>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy);
+	int threads = N_THREADS;
+
+	int blocks = std::min((int)(n_programs / threads), N_BLOCKS);
+
+	create_and_run<<<blocks, threads>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy, blocks, threads);
 
 	cudaDeviceSynchronize();
 	err = cudaGetLastError();

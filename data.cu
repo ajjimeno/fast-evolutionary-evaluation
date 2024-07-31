@@ -163,7 +163,7 @@ Instance read_file(string file_name)
     return ins;
 }
 
-static Instances *read_dir(const char *path)
+Instances *read_dir(const char *path)
 {
     Instances *output;
 
