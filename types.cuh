@@ -1,7 +1,9 @@
 #ifndef PROGRAM_TYPES_H
 #define PROGRAM_TYPES_H
 
-struct Problem
+using namespace std;
+
+/*struct Problem
 {
     int **input;
     int input_x, input_y;
@@ -16,6 +18,29 @@ struct Problems
 {
     int n_problems;
     Problem *problems;
+};*/
+
+struct Array
+{
+    int y;
+    int x;
+    int **array;
+};
+
+struct Instance
+{
+    Array ** training;
+    int n_training;
+    Array input;
+    Array output;
+    Array gt;
+    Array initial;
+};
+
+struct Instances
+{
+    int n_instances;
+    Instance *instances;
 };
 
 struct Node
@@ -42,13 +67,16 @@ struct Run
     int input_x, input_y;
     int output_x, output_y;
     pfunc *pfuncs;
-    Problem problem;
+    Instance problem;
     int **output;
     int inner_loop;
     int status;
     int memory;
     Programs *programs;
     int program_offset;
+    int training_id;
+    int training_input_x, training_input_y;
+    int training_output_x, training_output_y;
 };
 
 #endif

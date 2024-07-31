@@ -6,38 +6,43 @@
 #define N_BLOCKS 50
 #define N_THREADS 100
 
-__device__ float run(Programs *programs, int program_id, Problems *problems, pfunc *pfuncs)
+__device__ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
 {
 	float total_accuracy = 0.0;
 
-	for (int p = 0; p < problems->n_problems; p++)
+	for (int p = 0; p < problems->n_instances; p++)
 	{
-		int **output = (int **)malloc(problems->problems[p].output_y * sizeof(int *));
+		int **output = (int **)malloc(problems->instances[p].output.y * sizeof(int *));
 
-		for (int i = 0; i < problems->problems[p].output_y; i++)
+		for (int i = 0; i < problems->instances[p].output.y; i++)
 		{
-			output[i] = (int *)malloc(problems->problems[p].output_x * sizeof(int));
-			for (int j = 0; j < problems->problems[p].output_x; j++)
+			output[i] = (int *)malloc(problems->instances[p].output.x * sizeof(int));
+			for (int j = 0; j < problems->instances[p].output.x; j++)
 			{
-				output[i][j] = problems->problems[p].output[i][j];
+				output[i][j] = problems->instances[p].output.array[i][j];
 			}
 		}
 
 		Run *r = (Run *)malloc(sizeof(Run));
 
 		r[0] = {
-			0,							   // input_x
-			0,							   // input_y
-			0,							   // output_x
-			0,							   // output_y
-			pfuncs,						   // funcs
-			problems->problems[p],		   // problem
-			output,						   // output
-			0,							   // inner_loop
-			0,							   // status
-			0,							   // memory
-			programs,					   // programs
-			programs->programs[program_id] // program_offset
+			0,								// input_x
+			0,								// input_y
+			0,								// output_x
+			0,								// output_y
+			pfuncs,							// funcs
+			problems->instances[p],			// problem
+			output,							// output
+			0,								// inner_loop
+			0,								// status
+			0,								// memory
+			programs,						// programs
+			programs->programs[program_id], // program_offset
+			0,								// training_id
+			0,								// training_input_x
+			0,								// training_input_y
+			0,								// training_output_x
+			0								// training_output_y
 		};
 
 		for (int i = 0; i < 100; i++)
@@ -46,21 +51,21 @@ __device__ float run(Programs *programs, int program_id, Problems *problems, pfu
 			pfuncs[node.pointer](r, node.args);
 		}
 
-		total_accuracy += accuracy_calculation(problems->problems[p], output);
+		total_accuracy += accuracy_calculation(problems->instances[p], output);
 
 		free(r);
 
-		for (int i = 0; i < problems->problems[p].output_y; i++)
+		for (int i = 0; i < problems->instances[p].output.y; i++)
 		{
 			free(output[i]);
 		}
 		free(output);
 	}
-	return total_accuracy / (float)problems->n_problems;
+	return total_accuracy / (float)problems->n_instances;
 }
 
 // Programs, Problems, split programs
-__global__ void create_and_run(Programs *programs, int n_programs, Problems *problems, pfunc *pfuncs, float *accuracy)
+__global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, pfunc *pfuncs, float *accuracy)
 {
 	int programs_per_block = n_programs / (N_BLOCKS * N_THREADS);
 
@@ -74,7 +79,7 @@ __global__ void create_and_run(Programs *programs, int n_programs, Problems *pro
 	}
 }
 
-int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
+int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems)
 {
 	int device_count = 0;
 	// Get the number of CUDA-capable devices
@@ -89,8 +94,6 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 	{
 		std::cout << "Device count: " << device_count << std::endl;
 	}
-
-	Problems *problems = load_problems();
 
 	float *d_accuracy;
 
@@ -110,7 +113,8 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 		printf("Error creating programs: %s\n", cudaGetErrorString(err));
 		return 1;
 	}
-	std::cout << "Starting kernel " << std::endl;
+
+	std::cout << "Starting kernel" << std::endl;
 
 	create_and_run<<<N_BLOCKS, N_THREADS>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy);
 
@@ -157,6 +161,7 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy)
 	return 0;
 }
 
+/*
 int main()
 {
 	int n_programs = 30000;
@@ -172,4 +177,4 @@ int main()
 	accuracy = (float *)malloc(n_programs * sizeof(float));
 
 	execute_and_evaluate(n_programs, programs.data(), accuracy);
-}
+}*/

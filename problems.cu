@@ -2,7 +2,7 @@
 #ifndef PROGRAM_PROBLEMS_C
 #define PROGRAM_PROBLEMS_C
 
-Problems *load_problems()
+/*Instances *load_problems()
 {
     int in[3][3] = {{0, 0, 5},
                     {0, 5, 0},
@@ -78,18 +78,18 @@ Problems *load_problems()
     cudaMemcpy(d_problems, &h_problems, sizeof(Problems), cudaMemcpyHostToDevice);
 
     return d_problems;
-}
+}*/
 
-__device__ float accuracy_calculation(Problem problem, int **output)
+__device__ float accuracy_calculation(Instance problem, int **output)
 {
     float tp = 0.0;
 
     // Count number of equal entries
-    for (int i = 0; i < problem.output_y; i++)
+    for (int i = 0; i < problem.output.y; i++)
     {
-        for (int j = 0; j < problem.output_x; j++)
+        for (int j = 0; j < problem.output.x; j++)
         {
-            if (problem.out_gt[i][j] == output[i][j])
+            if (problem.gt.array[i][j] == output[i][j])
             {
                 tp++;
             }
@@ -97,7 +97,7 @@ __device__ float accuracy_calculation(Problem problem, int **output)
     }
 
     // Total number of entries
-    int total = problem.output_y * problem.output_x;
+    int total = problem.output.y * problem.output.x;
 
     return (float)tp / (float)total;
 }

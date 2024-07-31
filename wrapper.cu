@@ -2,6 +2,7 @@
 #include <Python.h>
 #include <vector>
 
+#include "data.cu"
 #include "program.cu"
 
 #if PY_MAJOR_VERSION >= 3
@@ -20,22 +21,22 @@ typedef struct RunnerSimulatorWrapper
     //     Runner *mInnerClass;
     // Program *program;
     // std::unordered_map<std::string, int (Runner::*)(Program **)> map;
-    // Instance *data;
+    Instances *data;
 
     // RunnerSimulatorWrapper() : program(NULL){};
 } RunnerSimulatorWrapper;
 
 static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject *args, PyObject *kwargs)
 {
-    // PyObject *obj = PyTuple_GetItem(args, 0);
-    // PyObject *repr = PyObject_Str(obj); // Alternatively use PyObject_Repr, but it adds single quotes
-    // PyObject *str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
-    // const char *bytes = PyBytes_AS_STRING(str);
+    PyObject *obj = PyTuple_GetItem(args, 0);
+    PyObject *repr = PyObject_Str(obj); // Alternatively use PyObject_Repr, but it adds single quotes
+    PyObject *str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+    const char *bytes = PyBytes_AS_STRING(str);
 
     // self->mInnerClass = new Runner();
     // self->map = getFunctionMap();
 
-    // self->data = read_dir(bytes);
+    self->data = load_data(bytes);
 
     return 0;
 }
@@ -78,7 +79,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
     float *accuracy = (float *)malloc(n_programs * sizeof(float));
 
-    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy);
+    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data);
 
     PyObject *list = PyList_New(n_programs);
     if (!list)
