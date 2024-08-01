@@ -251,14 +251,22 @@ Instances *load_data(const char *dir)
                        instances->instances[i].gt.y,
                        instances->instances[i].gt.x);
 
+        output->instances[i].initial.x = instances->instances[i].initial.x;
+        output->instances[i].initial.y = instances->instances[i].initial.y;
+
+        output->instances[i].initial.array =
+            push_array(instances->instances[i].initial.array,
+                       instances->instances[i].initial.y,
+                       instances->instances[i].initial.x);
+
         cudaMallocManaged(&output->instances[i].training, output->instances[i].n_training * sizeof(Array *));
 
         for (int j = 0; j < output->instances[i].n_training; j++)
         {
+            cudaMallocManaged(&output->instances[i].training[j], 2*sizeof(Array));
+            
             for (int k = 0; k < 2; k++)
             {
-                cudaMallocManaged(&output->instances[i].training[j], 2*sizeof(Array));
-
                 output->instances[i].training[j][k].x = instances->instances[i].training[j][k].x;
                 output->instances[i].training[j][k].y = instances->instances[i].training[j][k].y;
 

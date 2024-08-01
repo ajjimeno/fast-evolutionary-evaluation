@@ -2,6 +2,7 @@
 #define PROGRAM_INSTRUCTIONS_C
 
 #include "types.cuh"
+#include <map>
 #include <thread>
 #include <unordered_map>
 #include <vector>
@@ -159,11 +160,11 @@ __device__ int input_next(Run *run, int *)
 {
     if (run->training_id < (run->problem.n_training - 1))
     {
-        run->training_id += 1;
-        run->training_input_x=0;
-        run->training_input_y=0;
-        run->training_output_x=0;
-        run->training_output_y=0;
+        run->training_id++;
+        run->training_input_x = 0;
+        run->training_input_y = 0;
+        run->training_output_x = 0;
+        run->training_output_y = 0;
     }
 
     return 0;
@@ -174,10 +175,10 @@ __device__ int input_previous(Run *run, int *)
     if (run->training_id > 0)
     {
         run->training_id--;
-        run->training_input_x=0;
-        run->training_input_y=0;
-        run->training_output_x=0;
-        run->training_output_y=0;
+        run->training_input_x = 0;
+        run->training_input_y = 0;
+        run->training_output_x = 0;
+        run->training_output_y = 0;
     }
 
     return 0;
@@ -243,7 +244,7 @@ __device__ int input_max(Run *run, int *)
 }
 
 __device__ int input_min(Run *run, int *)
-{ 
+{
     int *arr = run->problem.training[run->training_id][0].array[run->training_input_y];
 
     int min = arr[0];
@@ -324,7 +325,7 @@ __device__ int testing_input_max(Run *run, int *)
 {
     int *arr = run->problem.input.array[run->input_y];
     int max = arr[0];
-    for (int i = 1; i < run->problem.output.x; i++)
+    for (int i = 1; i < run->problem.input.x; i++)
     {
         if (arr[i] > max)
         {
@@ -338,7 +339,7 @@ __device__ int testing_input_min(Run *run, int *)
 {
     int *arr = run->problem.input.array[run->input_y];
     int min = arr[0];
-    for (int i = 1; i < run->problem.output.x; i++)
+    for (int i = 1; i < run->problem.input.x; i++)
     {
         if (arr[i] < min)
         {
@@ -364,6 +365,8 @@ __device__ int testing_output_read_previous(Run *run, int *)
 __device__ int testing_output_read(Run *run, int *)
 {
     return run->output[run->output_y][run->output_x];
+
+    return 0;
 }
 
 __device__ int testing_reset_input_position(Run *run, int *)
@@ -380,7 +383,6 @@ __device__ int testing_reset_input_down_position(Run *run, int *)
 
 __device__ int testing_output_write_previous(Run *run, int *p)
 {
-
     if (run->output_x > 0)
     {
         int node_id = run->program_offset + p[0];
@@ -467,9 +469,9 @@ __device__ int testing_input_move_left(Run *run, int *)
 }
 
 __device__ int testing_input_move_right(Run *run, int *)
-{
-    if (run->input_x < (run->problem.input.x - 1))
-        run->input_x++;
+{ 
+     if (run->input_x < (run->problem.input.x - 1))
+         run->input_x++;
 
     return 0;
 }
@@ -535,7 +537,7 @@ __device__ int bigger_than_testing_output_next(Run *run, int *)
 
 __device__ int swap_testing_output_next(Run *run, int *)
 {
-    if (!testing_is_output_end(run, NULL))
+    if (run->output_x < (run->problem.output.x - 1))
     {
         int tmp = run->output[run->output_y][run->output_x];
         run->output[run->output_y][run->output_x] = run->output[run->output_y][run->output_x + 1];
@@ -591,7 +593,6 @@ __device__ int prog2(Run *run, int *p)
 
 __device__ int prog3(Run *run, int *p)
 {
-
     int node_0_id = run->program_offset + p[0];
     Node node_0 = run->programs->nodes[node_0_id];
     run->pfuncs[(node_0.pointer)](run, node_0.args);
@@ -692,47 +693,79 @@ __global__ void fill_function_pointers(pfunc *pfuncs)
     pfuncs[7] = get7;
     pfuncs[8] = get8;
     pfuncs[9] = get9;
-    pfuncs[10] = get_testing_length_input_x;
-    pfuncs[11] = get_testing_length_input_y;
-    pfuncs[12] = get_testing_length_output_x;
-    pfuncs[13] = get_testing_length_output_y;
-    pfuncs[14] = get_testing_input_position_y;
-    pfuncs[15] = get_testing_input_position_x;
-    pfuncs[16] = get_testing_output_position_y;
-    pfuncs[17] = get_testing_output_position_x;
-    pfuncs[18] = testing_input_max;
-    pfuncs[19] = testing_input_min;
-    pfuncs[20] = testing_input_read;
-    pfuncs[21] = testing_output_read_previous;
-    pfuncs[22] = testing_output_read;
-    pfuncs[23] = testing_reset_input_position;
-    pfuncs[24] = testing_reset_input_down_position;
-    pfuncs[25] = testing_output_write_previous;
-    pfuncs[26] = testing_output_write;
-    pfuncs[27] = testing_reset_output_position;
-    pfuncs[28] = testing_reset_output_down_position;
-    pfuncs[29] = testing_output_move_left;
-    pfuncs[30] = testing_output_move_right;
-    pfuncs[31] = testing_output_move_down;
-    pfuncs[32] = testing_output_move_up;
-    pfuncs[33] = testing_is_output_end;
-    pfuncs[34] = testing_is_output_down;
-    pfuncs[35] = testing_input_move_left;
-    pfuncs[36] = testing_input_move_right;
-    pfuncs[37] = testing_input_move_down;
-    pfuncs[38] = testing_input_move_up;
-    pfuncs[39] = comparison;
-    pfuncs[40] = bigger_than_output_next;
-    pfuncs[41] = bigger_than_testing_output_next;
-    pfuncs[42] = swap_testing_output_next;
-    pfuncs[43] = bigger_than;
-    pfuncs[44] = equal;
-    pfuncs[45] = no;
-    pfuncs[46] = prog2;
-    pfuncs[47] = prog3;
-    pfuncs[48] = dowhile;
-    pfuncs[49] = read_memory;
-    pfuncs[50] = write_memory;
+    pfuncs[10] = input_end;
+    pfuncs[11] = input_beginning;
+    pfuncs[12] = input_down_end;
+    pfuncs[13] = output_end;
+    pfuncs[14] = output_beginning;
+    pfuncs[15] = output_down_end;
+    pfuncs[16] = output_move_left;
+    pfuncs[17] = output_move_right;
+    pfuncs[18] = output_move_down;
+    pfuncs[19] = output_move_up;
+    pfuncs[20] = get_input_position_x;
+    pfuncs[21] = get_input_position_y;
+    pfuncs[22] = get_output_position_x;
+    pfuncs[23] = get_output_position_y;
+    pfuncs[24] = get_length_input_x;
+    pfuncs[25] = get_length_input_y;
+    pfuncs[26] = get_length_output_x;
+    pfuncs[27] = get_length_output_y;
+    pfuncs[28] = input_next;
+    pfuncs[29] = input_previous;
+    pfuncs[30] = input_move_left;
+    pfuncs[31] = input_move_right;
+    pfuncs[32] = input_move_down;
+    pfuncs[33] = input_move_up;
+    pfuncs[34] = reset_input_position;
+    pfuncs[35] = reset_input_down_position;
+    pfuncs[36] = input_max;
+    pfuncs[37] = input_min;
+    pfuncs[38] = input_read;
+    pfuncs[39] = output_read;
+    pfuncs[40] = reset_output_position;
+    pfuncs[41] = reset_output_down_position;
+    pfuncs[42] = get_testing_length_input_x;
+    pfuncs[43] = get_testing_length_input_y;
+    pfuncs[44] = get_testing_length_output_x;
+    pfuncs[45] = get_testing_length_output_y;
+    pfuncs[46] = get_testing_input_position_y;
+    pfuncs[47] = get_testing_input_position_x;
+    pfuncs[48] = get_testing_output_position_y;
+    pfuncs[49] = get_testing_output_position_x;
+    pfuncs[50] = testing_input_max;
+    pfuncs[51] = testing_input_min;
+    pfuncs[52] = testing_input_read;
+    pfuncs[53] = testing_output_read_previous;
+    pfuncs[54] = testing_output_read;
+    pfuncs[55] = testing_reset_input_position;
+    pfuncs[56] = testing_reset_input_down_position;
+    pfuncs[57] = testing_output_write_previous;
+    pfuncs[58] = testing_output_write;
+    pfuncs[59] = testing_reset_output_position;
+    pfuncs[60] = testing_reset_output_down_position;
+    pfuncs[61] = testing_output_move_left;
+    pfuncs[62] = testing_output_move_right;
+    pfuncs[63] = testing_output_move_down;
+    pfuncs[64] = testing_output_move_up;
+    pfuncs[65] = testing_is_output_end;
+    pfuncs[66] = testing_is_output_down;
+    pfuncs[67] = testing_input_move_left;
+    pfuncs[68] = testing_input_move_right;
+    pfuncs[69] = testing_input_move_down;
+    pfuncs[70] = testing_input_move_up;
+    pfuncs[71] = comparison;
+    pfuncs[72] = bigger_than_output_next;
+    pfuncs[73] = bigger_than_testing_output_next;
+    pfuncs[74] = swap_testing_output_next;
+    pfuncs[75] = bigger_than;
+    pfuncs[76] = equal;
+    pfuncs[77] = no;
+    pfuncs[78] = prog2;
+    pfuncs[79] = prog3;
+    pfuncs[80] = dowhile;
+    pfuncs[81] = read_memory;
+    pfuncs[82] = write_memory;
 }
 
 MAP_INSTRUCTIONS get_map()
@@ -750,52 +783,88 @@ MAP_INSTRUCTIONS get_map()
     map["get7"] = 7;
     map["get8"] = 8;
     map["get9"] = 9;
-    map["get_testing_length_input_x"] = 10;
-    map["get_testing_length_input_y"] = 11;
-    map["get_testing_length_output_x"] = 12;
-    map["get_testing_length_output_y"] = 13;
-    map["get_testing_input_position_y"] = 14;
-    map["get_testing_input_position_x"] = 15;
-    map["get_testing_output_position_y"] = 16;
-    map["get_testing_output_position_x"] = 17;
-    map["testing_input_max"] = 18;
-    map["testing_input_min"] = 19;
-    map["testing_input_read"] = 20;
-    map["testing_output_read_previous"] = 21;
-    map["testing_output_read"] = 22;
-    map["testing_reset_input_position"] = 23;
-    map["testing_reset_input_down_position"] = 24;
-    map["testing_output_write_previous"] = 25;
-    map["testing_output_write"] = 26;
-    map["testing_reset_output_position"] = 27;
-    map["testing_reset_output_down_position"] = 28;
-    map["testing_output_move_left"] = 29;
-    map["testing_output_move_right"] = 30;
-    map["testing_output_move_down"] = 31;
-    map["testing_output_move_up"] = 32;
-    map["testing_is_output_end"] = 33;
-    map["testing_is_output_down"] = 34;
-    map["testing_input_move_left"] = 35;
-    map["testing_input_move_right"] = 36;
-    map["testing_input_move_down"] = 37;
-    map["testing_input_move_up"] = 38;
-    map["comparison"] = 39;
-    map["bigger_than_output_next"] = 40;
-    map["bigger_than_testing_output_next"] = 41;
-    map["swap_testing_output_next"] = 42;
-    map["bigger_than"] = 43;
-    map["equal"] = 44;
-    map["no"] = 45;
-    map["prog2"] = 46;
-    map["prog3"] = 47;
-    map["dowhile"] = 48;
-    map["read_memory"] = 49;
-    map["write_memory"] = 50;
+    map["input_end"] = 10;
+    map["input_beginning"] = 11;
+    map["input_down_end"] = 12;
+    map["output_end"] = 13;
+    map["output_beginning"] = 14;
+    map["output_down_end"] = 15;
+    map["output_move_left"] = 16;
+    map["output_move_right"] = 17;
+    map["output_move_down"] = 18;
+    map["output_move_up"] = 19;
+    map["get_input_position_x"] = 20;
+    map["get_input_position_y"] = 21;
+    map["get_output_position_x"] = 22;
+    map["get_output_position_y"] = 23;
+    map["get_length_input_x"] = 24;
+    map["get_length_input_y"] = 25;
+    map["get_length_output_x"] = 26;
+    map["get_length_output_y"] = 27;
+    map["input_next"] = 28;
+    map["input_previous"] = 29;
+    map["input_move_left"] = 30;
+    map["input_move_right"] = 31;
+    map["input_move_down"] = 32;
+    map["input_move_up"] = 33;
+    map["reset_input_position"] = 34;
+    map["reset_input_down_position"] = 35;
+    map["input_max"] = 36;
+    map["input_min"] = 37;
+    map["input_read"] = 38;
+    map["output_read"] = 39;
+    map["reset_output_position"] = 40;
+    map["reset_output_down_position"] = 41;
+    map["get_testing_length_input_x"] = 42;
+    map["get_testing_length_input_y"] = 43;
+    map["get_testing_length_output_x"] = 44;
+    map["get_testing_length_output_y"] = 45;
+    map["get_testing_input_position_y"] = 46;
+    map["get_testing_input_position_x"] = 47;
+    map["get_testing_output_position_y"] = 48;
+    map["get_testing_output_position_x"] = 49;
+    map["testing_input_max"] = 50;
+    map["testing_input_min"] = 51;
+    map["testing_input_read"] = 52;
+    map["testing_output_read_previous"] = 53;
+    map["testing_output_read"] = 54;
+    map["testing_reset_input_position"] = 55;
+    map["testing_reset_input_down_position"] = 56;
+    map["testing_output_write_previous"] = 57;
+    map["testing_output_write"] = 58;
+    map["testing_reset_output_position"] = 59;
+    map["testing_reset_output_down_position"] = 60;
+    map["testing_output_move_left"] = 61;
+    map["testing_output_move_right"] = 62;
+    map["testing_output_move_down"] = 63;
+    map["testing_output_move_up"] = 64;
+    map["testing_is_output_end"] = 65;
+    map["testing_is_output_down"] = 66;
+    map["testing_input_move_left"] = 67;
+    map["testing_input_move_right"] = 68;
+    map["testing_input_move_down"] = 69;
+    map["testing_input_move_up"] = 70;
+    map["comparison"] = 71;
+    map["bigger_than_output_next"] = 72;
+    map["bigger_than_testing_output_next"] = 73;
+    map["swap_testing_output_next"] = 74;
+    map["bigger_than"] = 75;
+    map["bigger_thanR"] = 75;
+    map["bigger_thanW"] = 75;
+    map["equal"] = 76;
+    map["equalR"] = 76;
+    map["equalW"] = 76;
+    map["no"] = 77;
+    map["prog2"] = 78;
+    map["prog3"] = 79;
+    map["dowhile"] = 80;
+    map["read_memory"] = 81;
+    map["write_memory"] = 82;
 
     return map;
 }
 
-int getProgram(std::string string, MAP_INSTRUCTIONS map, std::vector<Node> *nodes, int &position)
+int getProgram(std::string string, MAP_INSTRUCTIONS map, std::map<int, Node> *nodes, int &position)
 {
     int program = -1;
 
@@ -815,7 +884,7 @@ int getProgram(std::string string, MAP_INSTRUCTIONS map, std::vector<Node> *node
             program = nodes->size();
             int pointer = map[string.substr(initial_position, position - initial_position)];
 
-            nodes->push_back({pointer, 0, {0, 0, 0}});
+            nodes->insert({program, {pointer, 0, {0, 0, 0}}});
 
             position++;
 
@@ -858,7 +927,7 @@ int getProgram(std::string string, MAP_INSTRUCTIONS map, std::vector<Node> *node
     return program;
 }
 
-void getProgram(std::string string, MAP_INSTRUCTIONS map, std::vector<Node> *nodes)
+void getProgram(std::string string, MAP_INSTRUCTIONS map, std::map<int, Node> *nodes)
 {
     int position = 0;
     getProgram(string, map, nodes, position);
@@ -868,7 +937,7 @@ void copy_program(int start_index, int end_index, std::vector<int> *programs, st
 {
     for (int i = start_index; i < end_index; ++i)
     {
-        std::vector<Node> subnodes;
+        std::map<int, Node> subnodes;
         getProgram(code[i], map, &subnodes);
 
         programs->push_back(nodes->size());
@@ -886,7 +955,7 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
 
     // Create array of programs in host memory
     Programs *d_sprograms;
-    cudaMallocManaged((void **)&d_sprograms, sizeof(struct Programs));
+    cudaMallocManaged(&d_sprograms, sizeof(Programs));
 
     int n_threads = std::min(n_programs, 1);
     int chunk_size = n_programs / n_threads;

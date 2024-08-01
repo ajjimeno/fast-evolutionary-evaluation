@@ -12,14 +12,14 @@ __device__ float run(Programs *programs, int program_id, Instances *problems, pf
 
 	for (int p = 0; p < problems->n_instances; p++)
 	{
-		int **output = (int **)malloc(problems->instances[p].output.y * sizeof(int *));
+		int **output = (int **)malloc(problems->instances[p].initial.y * sizeof(int *));
 
-		for (int i = 0; i < problems->instances[p].output.y; i++)
+		for (int i = 0; i < problems->instances[p].initial.y; i++)
 		{
-			output[i] = (int *)malloc(problems->instances[p].output.x * sizeof(int));
-			for (int j = 0; j < problems->instances[p].output.x; j++)
+			output[i] = (int *)malloc(problems->instances[p].initial.x * sizeof(int));
+			for (int j = 0; j < problems->instances[p].initial.x; j++)
 			{
-				output[i][j] = problems->instances[p].output.array[i][j];
+				output[i][j] = problems->instances[p].initial.array[i][j];
 			}
 		}
 
@@ -55,7 +55,7 @@ __device__ float run(Programs *programs, int program_id, Instances *problems, pf
 
 		free(r);
 
-		for (int i = 0; i < problems->instances[p].output.y; i++)
+		for (int i = 0; i < problems->instances[p].initial.y; i++)
 		{
 			free(output[i]);
 		}
@@ -67,7 +67,7 @@ __device__ float run(Programs *programs, int program_id, Instances *problems, pf
 // Programs, Problems, split programs
 __global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, pfunc *pfuncs, float *accuracy, int blocks, int threads)
 {
-	int programs_per_block = n_programs / (blocks * threads);
+	int programs_per_block = (n_programs / (blocks * threads)) + 1;
 
 	int start = (blockIdx.x * blockDim.x + threadIdx.x) * programs_per_block;
 	int end = start + programs_per_block;
@@ -113,6 +113,15 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
 		printf("Error creating programs: %s\n", cudaGetErrorString(err));
 		return 1;
 	}
+
+	size_t stackSize = 10 * 1024;
+
+	err = cudaThreadSetLimit(cudaLimitStackSize, stackSize);
+	if (err != cudaSuccess) {
+        // Handle error
+        fprintf(stderr, "Error setting stack size: %s\n", cudaGetErrorString(err));
+        return 1;
+    }
 
 	std::cout << "Starting kernel" << std::endl;
 

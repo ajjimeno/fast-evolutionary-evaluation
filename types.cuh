@@ -73,7 +73,7 @@ struct Run
     int status;
     int memory;
     Programs *programs;
-    int program_offset;
+    long program_offset;
     int training_id;
     int training_input_x, training_input_y;
     int training_output_x, training_output_y;
