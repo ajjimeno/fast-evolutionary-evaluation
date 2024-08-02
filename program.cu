@@ -3,8 +3,8 @@
 #include "problems.cu"
 #include "types.cuh"
 
-#define N_BLOCKS 50
-#define N_THREADS 100
+#define N_BLOCKS 10
+#define N_THREADS 10
 
 __device__ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
 {
@@ -72,10 +72,9 @@ __global__ void create_and_run(Programs *programs, int n_programs, Instances *pr
 	int start = (blockIdx.x * blockDim.x + threadIdx.x) * programs_per_block;
 	int end = start + programs_per_block;
 
-	for (int i = start; i < end; i++)
+	for (int i = start; i < end && i < n_programs; i++)
 	{
-		if (i < n_programs)
-			accuracy[i] = run(programs, i, problems, pfuncs);
+		accuracy[i] = run(programs, i, problems, pfuncs);
 	}
 }
 
@@ -100,7 +99,7 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
 	cudaMallocManaged(&d_accuracy, n_programs * sizeof(float));
 
 	pfunc *d_pfuncs;
-	cudaMallocManaged(&d_pfuncs, 2 * sizeof(pfunc));
+	cudaMallocManaged(&d_pfuncs, 200 * sizeof(pfunc));
 
 	fill_function_pointers<<<1, 1>>>(d_pfuncs);
 	cudaDeviceSynchronize();
@@ -123,11 +122,11 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
         return 1;
     }
 
-	std::cout << "Starting kernel" << std::endl;
+	std::cout << "Starting kernel " << n_programs << std::endl;
 
 	int threads = N_THREADS;
 
-	int blocks = std::min((int)(n_programs / threads), N_BLOCKS);
+	int blocks = std::min((int)(n_programs / threads), 10);
 
 	create_and_run<<<blocks, threads>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy, blocks, threads);
 

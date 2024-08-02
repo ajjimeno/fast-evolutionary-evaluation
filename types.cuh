@@ -3,23 +3,6 @@
 
 using namespace std;
 
-/*struct Problem
-{
-    int **input;
-    int input_x, input_y;
-
-    int **out_gt;
-
-    int **output;
-    int output_x, output_y;
-};
-
-struct Problems
-{
-    int n_problems;
-    Problem *problems;
-};*/
-
 struct Array
 {
     int y;

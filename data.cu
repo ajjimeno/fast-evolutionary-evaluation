@@ -264,7 +264,7 @@ Instances *load_data(const char *dir)
         for (int j = 0; j < output->instances[i].n_training; j++)
         {
             cudaMallocManaged(&output->instances[i].training[j], 2*sizeof(Array));
-            
+
             for (int k = 0; k < 2; k++)
             {
                 output->instances[i].training[j][k].x = instances->instances[i].training[j][k].x;

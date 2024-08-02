@@ -51,7 +51,10 @@ __device__ int get9(Run *run, int *)
 // Training
 __device__ int input_end(Run *run, int *)
 {
-    return run->training_input_x == (run->problem.training[run->training_id][0].x - 1);
+    if (run->problem.n_training > 0)
+        return run->training_input_x == (run->problem.training[run->training_id][0].x - 1);
+
+    return 0;
 }
 
 __device__ int input_beginning(Run *run, int *)
@@ -61,12 +64,17 @@ __device__ int input_beginning(Run *run, int *)
 
 __device__ int input_down_end(Run *run, int *)
 {
-    return run->training_input_y == (run->problem.training[run->training_id][0].y - 1);
+    if (run->problem.n_training > 0)
+        return run->training_input_y == (run->problem.training[run->training_id][0].y - 1);
+    return 0;
 }
 
 __device__ int output_end(Run *run, int *)
 {
-    return run->training_output_x == (run->problem.training[run->training_id][1].x - 1);
+    if (run->problem.n_training > 0)
+        return run->training_output_x == (run->problem.training[run->training_id][1].x - 1);
+
+    return 0;
 }
 
 __device__ int output_beginning(Run *run, int *)
@@ -76,7 +84,10 @@ __device__ int output_beginning(Run *run, int *)
 
 __device__ int output_down_end(Run *run, int *)
 {
-    return run->training_output_y == (run->problem.training[run->training_id][1].y - 1);
+    if (run->problem.n_training > 0)
+        return run->training_output_y == (run->problem.training[run->training_id][1].y - 1);
+
+    return 0;
 }
 
 __device__ int output_move_left(Run *run, int *)
@@ -89,17 +100,21 @@ __device__ int output_move_left(Run *run, int *)
 
 __device__ int output_move_right(Run *run, int *)
 {
-    if (run->training_output_x < (run->problem.training[run->training_id][1].x - 1))
-        run->training_output_x++;
-
+    if (run->problem.n_training > 0)
+    {
+        if (run->training_output_x < (run->problem.training[run->training_id][1].x - 1))
+            run->training_output_x++;
+    }
     return 0;
 }
 
 __device__ int output_move_down(Run *run, int *)
 {
-    if (run->training_output_y < (run->problem.training[run->training_id][1].y - 1))
-        run->training_output_y++;
-
+    if (run->problem.n_training > 0)
+    {
+        if (run->training_output_y < (run->problem.training[run->training_id][1].y - 1))
+            run->training_output_y++;
+    }
     return 0;
 }
 
@@ -133,26 +148,42 @@ __device__ int get_output_position_y(Run *run, int *)
 
 __device__ int get_length_input_x(Run *run, int *)
 {
-    Array m = run->problem.training[run->training_id][0];
-    return m.x;
+    if (run->problem.n_training > 0)
+    {
+        Array m = run->problem.training[run->training_id][0];
+        return m.x;
+    }
+    return 0;
 }
 
 __device__ int get_length_input_y(Run *run, int *)
 {
-    Array m = run->problem.training[run->training_id][0];
-    return m.y;
+    if (run->problem.n_training > 0)
+    {
+        Array m = run->problem.training[run->training_id][0];
+        return m.y;
+    }
+    return 0;
 }
 
 __device__ int get_length_output_x(Run *run, int *)
 {
-    Array m = run->problem.training[run->training_id][1];
-    return m.x;
+    if (run->problem.n_training > 0)
+    {
+        Array m = run->problem.training[run->training_id][1];
+        return m.x;
+    }
+    return 0;
 }
 
 __device__ int get_length_output_y(Run *run, int *)
 {
-    Array m = run->problem.training[run->training_id][1];
-    return m.y;
+    if (run->problem.n_training > 0)
+    {
+        Array m = run->problem.training[run->training_id][1];
+        return m.y;
+    }
+    return 0;
 }
 
 // Training Input
@@ -194,17 +225,21 @@ __device__ int input_move_left(Run *run, int *)
 
 __device__ int input_move_right(Run *run, int *)
 {
-    if (run->training_input_x < (run->problem.training[run->training_id][0].x - 1))
-        run->training_input_x++;
-
+    if (run->problem.n_training > 0)
+    {
+        if (run->training_input_x < (run->problem.training[run->training_id][0].x - 1))
+            run->training_input_x++;
+    }
     return 0;
 }
 
 __device__ int input_move_down(Run *run, int *)
 {
-    if (run->training_input_y < (run->problem.training[run->training_id][0].y - 1))
-        run->training_input_y++;
-
+    if (run->problem.n_training > 0)
+    {
+        if (run->training_input_y < (run->problem.training[run->training_id][0].y - 1))
+            run->training_input_y++;
+    }
     return 0;
 }
 
@@ -230,42 +265,58 @@ __device__ int reset_input_down_position(Run *run, int *)
 
 __device__ int input_max(Run *run, int *)
 {
-    int *arr = run->problem.training[run->training_id][0].array[run->training_input_y];
-
-    int max = arr[0];
-    for (int i = 1; i < run->problem.training[run->training_id][0].x; i++)
+    if (run->problem.n_training > 0)
     {
-        if (arr[i] > max)
+        int *arr = run->problem.training[run->training_id][0].array[run->training_input_y];
+
+        int max = arr[0];
+        for (int i = 1; i < run->problem.training[run->training_id][0].x; i++)
         {
-            max = arr[i];
+            if (arr[i] > max)
+            {
+                max = arr[i];
+            }
         }
+        return max;
     }
-    return max;
+
+    return 0;
 }
 
 __device__ int input_min(Run *run, int *)
 {
-    int *arr = run->problem.training[run->training_id][0].array[run->training_input_y];
-
-    int min = arr[0];
-    for (int i = 1; i < run->problem.training[run->training_id][0].x; i++)
+    if (run->problem.n_training > 0)
     {
-        if (arr[i] < min)
+        int *arr = run->problem.training[run->training_id][0].array[run->training_input_y];
+
+        int min = arr[0];
+        for (int i = 1; i < run->problem.training[run->training_id][0].x; i++)
         {
-            min = arr[i];
+            if (arr[i] < min)
+            {
+                min = arr[i];
+            }
         }
+        return min;
     }
-    return min;
+
+    return 0;
 }
 
 __device__ int input_read(Run *run, int *)
 {
-    return run->problem.training[run->training_id][0].array[run->training_input_y][run->training_input_x];
+    if (run->problem.n_training > 0)
+        return run->problem.training[run->training_id][0].array[run->training_input_y][run->training_input_x];
+
+    return 0;
 }
 
 __device__ int output_read(Run *run, int *)
 {
-    return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x];
+    if (run->problem.n_training > 0)
+        return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x];
+
+    return 0;
 }
 
 __device__ int reset_output_position(Run *run, int *)
@@ -469,9 +520,9 @@ __device__ int testing_input_move_left(Run *run, int *)
 }
 
 __device__ int testing_input_move_right(Run *run, int *)
-{ 
-     if (run->input_x < (run->problem.input.x - 1))
-         run->input_x++;
+{
+    if (run->input_x < (run->problem.input.x - 1))
+        run->input_x++;
 
     return 0;
 }
@@ -515,11 +566,12 @@ __device__ int comparison(Run *run, int *p)
 
 __device__ int bigger_than_output_next(Run *run, int *p)
 {
-    if (run->training_output_x < (run->problem.training[run->training_id][1].x - 1))
-    {
-        return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x] >
-               run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x + 1];
-    }
+    if (run->problem.n_training > 0)
+        if (run->training_output_x < (run->problem.training[run->training_id][1].x - 1))
+        {
+            return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x] >
+                   run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x + 1];
+        }
 
     return 0;
 }
