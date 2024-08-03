@@ -1009,7 +1009,7 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
     Programs *d_sprograms;
     cudaMallocManaged(&d_sprograms, sizeof(Programs));
 
-    int n_threads = std::min(n_programs, 1);
+    int n_threads = std::min(n_programs, 20);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;
@@ -1044,18 +1044,20 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
 
     cudaMallocManaged(&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
 
-    size_t offset = 0;
+    size_t offset_nodes = 0;
+    size_t offset_programs = 0;
     for (int i = 0; i < n_threads; i++)
     {
-        std::copy(nodes[i].begin(), nodes[i].end(), d_sprograms->nodes + offset);
+        std::copy(nodes[i].begin(), nodes[i].end(), d_sprograms->nodes + offset_nodes);
 
         for (int j = 0; j < programs[i].size(); j++)
         {
-            programs[i][j] += offset;
+            programs[i][j] += offset_nodes;
         }
-        std::copy(programs[i].begin(), programs[i].end(), d_sprograms->programs + offset);
+        std::copy(programs[i].begin(), programs[i].end(), d_sprograms->programs + offset_programs);
 
-        offset += nodes[i].size();
+        offset_nodes += nodes[i].size();
+        offset_programs += programs[i].size();
     }
     return d_sprograms;
 }
