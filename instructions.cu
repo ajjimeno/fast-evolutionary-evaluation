@@ -1009,19 +1009,19 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
     Programs *d_sprograms;
     cudaMallocManaged(&d_sprograms, sizeof(Programs));
 
-    int n_threads = std::min(n_programs, 1);
+    int n_threads = std::min(n_programs, 20);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;
 
-    std::vector<int> programs;
-    std::vector<Node> nodes;
+    std::vector<std::vector<int>> programs(n_threads);
+    std::vector<std::vector<Node>> nodes(n_threads);
     for (int i = 0; i < n_threads; ++i)
     {
         int start_index = i * chunk_size;
         int end_index = (i == n_threads - 1) ? n_programs : (i + 1) * chunk_size;
 
-        threads.emplace_back(copy_program, start_index, end_index, &programs, &nodes, code, map);
+        threads.emplace_back(copy_program, start_index, end_index, &programs[i], &nodes[i], code, map);
     }
 
     for (auto &t : threads)
@@ -1029,15 +1029,36 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
         t.join();
     }
 
-    d_sprograms->n_nodes = nodes.size();
-    d_sprograms->n_programs = programs.size();
+    size_t total_nodes = 0;
+    size_t total_programs = 0;
+    for (int i = 0; i < n_threads; i++)
+    {
+        total_nodes += nodes[i].size();
+        total_programs += programs[i].size();
+    }
 
-    cudaMalloc(&d_sprograms->nodes, nodes.size() * sizeof(Node));
-    cudaMemcpy(d_sprograms->nodes, nodes.data(), nodes.size() * sizeof(Node), cudaMemcpyHostToDevice);
+    d_sprograms->n_nodes = total_nodes;
+    d_sprograms->n_programs = total_programs;
 
-    cudaMalloc(&d_sprograms->programs, programs.size() * sizeof(int));
-    cudaMemcpy(d_sprograms->programs, programs.data(), programs.size() * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMallocManaged(&d_sprograms->nodes, d_sprograms->n_nodes * sizeof(Node));
 
+    cudaMallocManaged(&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
+
+    size_t offset_nodes = 0;
+    size_t offset_programs = 0;
+    for (int i = 0; i < n_threads; i++)
+    {
+        std::copy(nodes[i].begin(), nodes[i].end(), d_sprograms->nodes + offset_nodes);
+
+        for (int j = 0; j < programs[i].size(); j++)
+        {
+            programs[i][j] += offset_nodes;
+        }
+        std::copy(programs[i].begin(), programs[i].end(), d_sprograms->programs + offset_programs);
+
+        offset_nodes += nodes[i].size();
+        offset_programs += programs[i].size();
+    }
     return d_sprograms;
 }
 
