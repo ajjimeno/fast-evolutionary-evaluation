@@ -1009,7 +1009,7 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
     Programs *d_sprograms;
     cudaMallocManaged(&d_sprograms, sizeof(Programs));
 
-    int n_threads = std::min(n_programs, 20);
+    int n_threads = std::min(n_programs, 1);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;
