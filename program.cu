@@ -3,29 +3,31 @@
 #include "problems.cu"
 #include "types.cuh"
 
-#define N_BLOCKS 10
-#define N_THREADS 10
+#define N_BLOCKS 500
+#define N_THREADS 1024
 
 __device__ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
 {
 	float total_accuracy = 0.0;
 
+	int myArray[20][20];
+	int* output[20];
+    for (int i = 0; i < 20; i++) {
+        output[i] = myArray[i];
+    }
+
 	for (int p = 0; p < problems->n_instances; p++)
 	{
-		int **output = (int **)malloc(problems->instances[p].initial.y * sizeof(int *));
-
 		for (int i = 0; i < problems->instances[p].initial.y; i++)
 		{
-			output[i] = (int *)malloc(problems->instances[p].initial.x * sizeof(int));
+			//output[i] = (int *)malloc(problems->instances[p].initial.x * sizeof(int));
 			for (int j = 0; j < problems->instances[p].initial.x; j++)
 			{
 				output[i][j] = problems->instances[p].initial.array[i][j];
 			}
 		}
 
-		Run *r = (Run *)malloc(sizeof(Run));
-
-		r[0] = {
+		Run r = {
 			0,								// input_x
 			0,								// input_y
 			0,								// output_x
@@ -48,18 +50,12 @@ __device__ float run(Programs *programs, int program_id, Instances *problems, pf
 		for (int i = 0; i < 100; i++)
 		{
 			Node node = programs->nodes[programs->programs[program_id]];
-			pfuncs[node.pointer](r, node.args);
+			pfuncs[node.pointer](&r, node.args);
 		}
 
 		total_accuracy += accuracy_calculation(problems->instances[p], output);
 
-		free(r);
-
-		for (int i = 0; i < problems->instances[p].initial.y; i++)
-		{
-			free(output[i]);
-		}
-		free(output);
+		//free(r);
 	}
 	return total_accuracy / (float)problems->n_instances;
 }
@@ -113,20 +109,11 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
 		return 1;
 	}
 
-	size_t stackSize = 10 * 1024;
-
-	err = cudaThreadSetLimit(cudaLimitStackSize, stackSize);
-	if (err != cudaSuccess) {
-        // Handle error
-        fprintf(stderr, "Error setting stack size: %s\n", cudaGetErrorString(err));
-        return 1;
-    }
-
 	std::cout << "Starting kernel " << n_programs << std::endl;
 
-	int threads = N_THREADS;
+	int threads = std::min(N_THREADS, n_programs);
 
-	int blocks = std::min((int)(n_programs / threads), 10);
+	int blocks = std::min((int)(n_programs / threads), N_BLOCKS);
 
 	create_and_run<<<blocks, threads>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy, blocks, threads);
 

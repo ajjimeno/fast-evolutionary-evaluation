@@ -17,8 +17,7 @@
  */
 typedef struct RunnerSimulatorWrapper
 {
-    PyObject_HEAD
-    Instances *data;
+    PyObject_HEAD Instances *data;
 
     RunnerSimulatorWrapper() : data(nullptr) {}
 } RunnerSimulatorWrapper;
@@ -31,6 +30,27 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
     const char *bytes = PyBytes_AS_STRING(str);
 
     self->data = load_data(bytes);
+
+    size_t stackSize = 10 * 1024;
+
+    cudaError_t err = cudaThreadSetLimit(cudaLimitStackSize, stackSize);
+    if (err != cudaSuccess)
+    {
+        // Handle error
+        fprintf(stderr, "Error setting stack size: %s\n", cudaGetErrorString(err));
+        return 1;
+    }
+
+    size_t newMallocHeapSize = 1024 * 1024 * 1024; // 1 GB
+    cudaDeviceSetLimit(cudaLimitMallocHeapSize, newMallocHeapSize);
+    if (err != cudaSuccess)
+    {
+        // Handle error
+        fprintf(stderr, "Error setting malloc size: %s\n", cudaGetErrorString(err));
+        return 1;
+    }
+
+    cudaDeviceSynchronize();
 
     return 0;
 }
@@ -57,7 +77,8 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     {
         PyObject *py_item = PyList_GetItem(py_list, i);
 
-        if (PyObject_HasAttrString(py_item, "__str__")) {
+        if (PyObject_HasAttrString(py_item, "__str__"))
+        {
             PyObject *str_method = PyObject_GetAttrString(py_item, "__str__");
             PyObject *str_obj = PyObject_CallObject(str_method, NULL);
             const char *str = PyUnicode_AsUTF8(str_obj);
