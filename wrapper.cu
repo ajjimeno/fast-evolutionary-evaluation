@@ -31,7 +31,7 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
 
     self->data = load_data(bytes);
 
-    size_t stackSize = 10 * 1024;
+    size_t stackSize = 50 * 1024;
 
     cudaError_t err = cudaThreadSetLimit(cudaLimitStackSize, stackSize);
     if (err != cudaSuccess)

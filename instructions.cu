@@ -7,49 +7,49 @@
 #include <unordered_map>
 #include <vector>
 
-__device__ int get0(Run *run, int *)
+__forceinline__ __device__ int get0(Run *run, int *)
 {
     return 0;
 }
-__device__ int get1(Run *run, int *)
+__forceinline__ __device__ int get1(Run *run, int *)
 {
     return 1;
 }
-__device__ int get2(Run *run, int *)
+__forceinline__ __device__ int get2(Run *run, int *)
 {
     return 2;
 }
-__device__ int get3(Run *run, int *)
+__forceinline__ __device__ int get3(Run *run, int *)
 {
     return 3;
 }
-__device__ int get4(Run *run, int *)
+__forceinline__ __device__ int get4(Run *run, int *)
 {
     return 4;
 }
-__device__ int get5(Run *run, int *)
+__forceinline__ __device__ int get5(Run *run, int *)
 {
     return 5;
 }
-__device__ int get6(Run *run, int *)
+__forceinline__ __device__ int get6(Run *run, int *)
 {
     return 6;
 }
-__device__ int get7(Run *run, int *)
+__forceinline__ __device__ int get7(Run *run, int *)
 {
     return 7;
 }
-__device__ int get8(Run *run, int *)
+__forceinline__ __device__ int get8(Run *run, int *)
 {
     return 8;
 }
-__device__ int get9(Run *run, int *)
+__forceinline__ __device__ int get9(Run *run, int *)
 {
     return 9;
 }
 
 // Training
-__device__ int input_end(Run *run, int *)
+__forceinline__ __device__ int input_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_input_x == (run->problem.training[run->training_id][0].x - 1);
@@ -57,19 +57,19 @@ __device__ int input_end(Run *run, int *)
     return 0;
 }
 
-__device__ int input_beginning(Run *run, int *)
+__forceinline__ __device__ int input_beginning(Run *run, int *)
 {
     return run->training_input_x == 0;
 }
 
-__device__ int input_down_end(Run *run, int *)
+__forceinline__ __device__ int input_down_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_input_y == (run->problem.training[run->training_id][0].y - 1);
     return 0;
 }
 
-__device__ int output_end(Run *run, int *)
+__forceinline__ __device__ int output_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_output_x == (run->problem.training[run->training_id][1].x - 1);
@@ -77,12 +77,12 @@ __device__ int output_end(Run *run, int *)
     return 0;
 }
 
-__device__ int output_beginning(Run *run, int *)
+__forceinline__ __device__ int output_beginning(Run *run, int *)
 {
     return run->training_output_x == 0;
 }
 
-__device__ int output_down_end(Run *run, int *)
+__forceinline__ __device__ int output_down_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_output_y == (run->problem.training[run->training_id][1].y - 1);
@@ -90,7 +90,7 @@ __device__ int output_down_end(Run *run, int *)
     return 0;
 }
 
-__device__ int output_move_left(Run *run, int *)
+__forceinline__ __device__ int output_move_left(Run *run, int *)
 {
     if (run->training_output_x > 0)
         run->training_output_x--;
@@ -98,7 +98,7 @@ __device__ int output_move_left(Run *run, int *)
     return 0;
 }
 
-__device__ int output_move_right(Run *run, int *)
+__forceinline__ __device__ int output_move_right(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -108,7 +108,7 @@ __device__ int output_move_right(Run *run, int *)
     return 0;
 }
 
-__device__ int output_move_down(Run *run, int *)
+__forceinline__ __device__ int output_move_down(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -118,7 +118,7 @@ __device__ int output_move_down(Run *run, int *)
     return 0;
 }
 
-__device__ int output_move_up(Run *run, int *)
+__forceinline__ __device__ int output_move_up(Run *run, int *)
 {
     if (run->training_output_y > 0)
         run->training_output_y--;
@@ -126,27 +126,27 @@ __device__ int output_move_up(Run *run, int *)
     return 0;
 }
 
-__device__ int get_input_position_x(Run *run, int *)
+__forceinline__ __device__ int get_input_position_x(Run *run, int *)
 {
     return run->training_input_x;
 }
 
-__device__ int get_input_position_y(Run *run, int *)
+__forceinline__ __device__ int get_input_position_y(Run *run, int *)
 {
     return run->training_input_y;
 }
 
-__device__ int get_output_position_x(Run *run, int *)
+__forceinline__ __device__ int get_output_position_x(Run *run, int *)
 {
     return run->training_output_x;
 }
 
-__device__ int get_output_position_y(Run *run, int *)
+__forceinline__ __device__ int get_output_position_y(Run *run, int *)
 {
     return run->training_output_y;
 }
 
-__device__ int get_length_input_x(Run *run, int *)
+__forceinline__ __device__ int get_length_input_x(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -156,7 +156,7 @@ __device__ int get_length_input_x(Run *run, int *)
     return 0;
 }
 
-__device__ int get_length_input_y(Run *run, int *)
+__forceinline__ __device__ int get_length_input_y(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -166,7 +166,7 @@ __device__ int get_length_input_y(Run *run, int *)
     return 0;
 }
 
-__device__ int get_length_output_x(Run *run, int *)
+__forceinline__ __device__ int get_length_output_x(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -176,7 +176,7 @@ __device__ int get_length_output_x(Run *run, int *)
     return 0;
 }
 
-__device__ int get_length_output_y(Run *run, int *)
+__forceinline__ __device__ int get_length_output_y(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -187,7 +187,7 @@ __device__ int get_length_output_y(Run *run, int *)
 }
 
 // Training Input
-__device__ int input_next(Run *run, int *)
+__forceinline__ __device__ int input_next(Run *run, int *)
 {
     if (run->training_id < (run->problem.n_training - 1))
     {
@@ -201,7 +201,7 @@ __device__ int input_next(Run *run, int *)
     return 0;
 }
 
-__device__ int input_previous(Run *run, int *)
+__forceinline__ __device__ int input_previous(Run *run, int *)
 {
     if (run->training_id > 0)
     {
@@ -215,7 +215,7 @@ __device__ int input_previous(Run *run, int *)
     return 0;
 }
 
-__device__ int input_move_left(Run *run, int *)
+__forceinline__ __device__ int input_move_left(Run *run, int *)
 {
     if (run->training_input_x > 0)
         run->training_input_x--;
@@ -223,7 +223,7 @@ __device__ int input_move_left(Run *run, int *)
     return 0;
 }
 
-__device__ int input_move_right(Run *run, int *)
+__forceinline__ __device__ int input_move_right(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -233,7 +233,7 @@ __device__ int input_move_right(Run *run, int *)
     return 0;
 }
 
-__device__ int input_move_down(Run *run, int *)
+__forceinline__ __device__ int input_move_down(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -243,7 +243,7 @@ __device__ int input_move_down(Run *run, int *)
     return 0;
 }
 
-__device__ int input_move_up(Run *run, int *)
+__forceinline__ __device__ int input_move_up(Run *run, int *)
 {
     if (run->training_input_y > 0)
         run->training_input_y--;
@@ -251,19 +251,19 @@ __device__ int input_move_up(Run *run, int *)
     return 0;
 }
 
-__device__ int reset_input_position(Run *run, int *)
+__forceinline__ __device__ int reset_input_position(Run *run, int *)
 {
     run->training_input_x = 0;
     return 0;
 }
 
-__device__ int reset_input_down_position(Run *run, int *)
+__forceinline__ __device__ int reset_input_down_position(Run *run, int *)
 {
     run->training_input_y = 0;
     return 0;
 }
 
-__device__ int input_max(Run *run, int *)
+__forceinline__ __device__ int input_max(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -283,7 +283,7 @@ __device__ int input_max(Run *run, int *)
     return 0;
 }
 
-__device__ int input_min(Run *run, int *)
+__forceinline__ __device__ int input_min(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -303,7 +303,7 @@ __device__ int input_min(Run *run, int *)
     return 0;
 }
 
-__device__ int input_read(Run *run, int *)
+__forceinline__ __device__ int input_read(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->problem.training[run->training_id][0].array[run->training_input_y][run->training_input_x];
@@ -311,7 +311,7 @@ __device__ int input_read(Run *run, int *)
     return 0;
 }
 
-__device__ int output_read(Run *run, int *)
+__forceinline__ __device__ int output_read(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x];
@@ -319,60 +319,60 @@ __device__ int output_read(Run *run, int *)
     return 0;
 }
 
-__device__ int reset_output_position(Run *run, int *)
+__forceinline__ __device__ int reset_output_position(Run *run, int *)
 {
     run->training_output_x = 0;
     return 0;
 }
 
-__device__ int reset_output_down_position(Run *run, int *)
+__forceinline__ __device__ int reset_output_down_position(Run *run, int *)
 {
     run->training_output_y = 0;
     return 0;
 }
 
 // Testing
-__device__ int get_testing_length_input_x(Run *run, int *)
+__forceinline__ __device__ int get_testing_length_input_x(Run *run, int *)
 {
     return run->problem.input.x;
 }
 
-__device__ int get_testing_length_input_y(Run *run, int *)
+__forceinline__ __device__ int get_testing_length_input_y(Run *run, int *)
 {
     return run->problem.input.y;
 }
 
-__device__ int get_testing_length_output_x(Run *run, int *)
+__forceinline__ __device__ int get_testing_length_output_x(Run *run, int *)
 {
     return run->problem.output.x;
 }
 
-__device__ int get_testing_length_output_y(Run *run, int *)
+__forceinline__ __device__ int get_testing_length_output_y(Run *run, int *)
 {
     return run->problem.output.y;
 }
 
-__device__ int get_testing_input_position_y(Run *run, int *)
+__forceinline__ __device__ int get_testing_input_position_y(Run *run, int *)
 {
     return run->input_y;
 }
 
-__device__ int get_testing_input_position_x(Run *run, int *)
+__forceinline__ __device__ int get_testing_input_position_x(Run *run, int *)
 {
     return run->input_x;
 }
 
-__device__ int get_testing_output_position_y(Run *run, int *)
+__forceinline__ __device__ int get_testing_output_position_y(Run *run, int *)
 {
     return run->output_y;
 }
 
-__device__ int get_testing_output_position_x(Run *run, int *)
+__forceinline__ __device__ int get_testing_output_position_x(Run *run, int *)
 {
     return run->output_x;
 }
 
-__device__ int testing_input_max(Run *run, int *)
+__forceinline__ __device__ int testing_input_max(Run *run, int *)
 {
     int *arr = run->problem.input.array[run->input_y];
     int max = arr[0];
@@ -386,7 +386,7 @@ __device__ int testing_input_max(Run *run, int *)
     return max;
 }
 
-__device__ int testing_input_min(Run *run, int *)
+__forceinline__ __device__ int testing_input_min(Run *run, int *)
 {
     int *arr = run->problem.input.array[run->input_y];
     int min = arr[0];
@@ -400,12 +400,12 @@ __device__ int testing_input_min(Run *run, int *)
     return min;
 }
 
-__device__ int testing_input_read(Run *run, int *)
+__forceinline__ __device__ int testing_input_read(Run *run, int *)
 {
     return run->problem.input.array[run->input_y][run->input_x];
 }
 
-__device__ int testing_output_read_previous(Run *run, int *)
+__forceinline__ __device__ int testing_output_read_previous(Run *run, int *)
 {
     if (run->output_x > 0)
         return run->output[run->output_y][run->output_x - 1];
@@ -413,62 +413,59 @@ __device__ int testing_output_read_previous(Run *run, int *)
     return -1;
 }
 
-__device__ int testing_output_read(Run *run, int *)
+__forceinline__ __device__ int testing_output_read(Run *run, int *)
 {
     return run->output[run->output_y][run->output_x];
 
     return 0;
 }
 
-__device__ int testing_reset_input_position(Run *run, int *)
+__forceinline__ __device__ int testing_reset_input_position(Run *run, int *)
 {
     run->input_x = 0;
     return 0;
 }
 
-__device__ int testing_reset_input_down_position(Run *run, int *)
+__forceinline__ __device__ int testing_reset_input_down_position(Run *run, int *)
 {
     run->input_y = 0;
     return 0;
 }
 
-__device__ int testing_output_write_previous(Run *run, int *p)
+__forceinline__ __device__ int testing_output_write_previous(Run *run, int *p)
 {
     if (run->output_x > 0)
     {
-        int node_id = run->program_offset + p[0];
-        Node node = run->programs->nodes[node_id];
+        int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
-        int value = run->pfuncs[(node.pointer)](run, node.args);
         run->output[run->output_y][run->output_x - 1] = value;
     }
 
     return 0;
 }
 
-__device__ int testing_output_write(Run *run, int *p)
+__forceinline__ __device__ int testing_output_write(Run *run, int *p)
 {
-    int node_id = run->program_offset + p[0];
-    Node node = run->programs->nodes[node_id];
-    int value = run->pfuncs[(node.pointer)](run, node.args);
+    int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
+
     run->output[run->output_y][run->output_x] = value;
 
     return 0;
 }
 
-__device__ int testing_reset_output_position(Run *run, int *)
+__forceinline__ __device__ int testing_reset_output_position(Run *run, int *)
 {
     run->output_x = 0;
     return 0;
 }
 
-__device__ int testing_reset_output_down_position(Run *run, int *)
+__forceinline__ __device__ int testing_reset_output_down_position(Run *run, int *)
 {
     run->output_y = 0;
     return 0;
 }
 
-__device__ int testing_output_move_left(Run *run, int *)
+__forceinline__ __device__ int testing_output_move_left(Run *run, int *)
 {
     if (run->output_x > 0)
         run->output_x--;
@@ -476,7 +473,7 @@ __device__ int testing_output_move_left(Run *run, int *)
     return 0;
 }
 
-__device__ int testing_output_move_right(Run *run, int *)
+__forceinline__ __device__ int testing_output_move_right(Run *run, int *)
 {
     if (run->output_x < (run->problem.output.x - 1))
         run->output_x++;
@@ -484,7 +481,7 @@ __device__ int testing_output_move_right(Run *run, int *)
     return 0;
 }
 
-__device__ int testing_output_move_down(Run *run, int *)
+__forceinline__ __device__ int testing_output_move_down(Run *run, int *)
 {
     if (run->output_y < (run->problem.output.y - 1))
         run->output_y++;
@@ -493,7 +490,7 @@ __device__ int testing_output_move_down(Run *run, int *)
     return 0;
 }
 
-__device__ int testing_output_move_up(Run *run, int *)
+__forceinline__ __device__ int testing_output_move_up(Run *run, int *)
 {
     if (run->output_y > 0)
         run->output_y--;
@@ -501,17 +498,17 @@ __device__ int testing_output_move_up(Run *run, int *)
     return 0;
 }
 
-__device__ int testing_is_output_end(Run *run, int *)
+__forceinline__ __device__ int testing_is_output_end(Run *run, int *)
 {
     return run->output_x == (run->problem.output.x - 1);
 }
 
-__device__ int testing_is_output_down(Run *run, int *)
+__forceinline__ __device__ int testing_is_output_down(Run *run, int *)
 {
     return run->output_y == (run->problem.output.y - 1);
 }
 
-__device__ int testing_input_move_left(Run *run, int *)
+__forceinline__ __device__ int testing_input_move_left(Run *run, int *)
 {
     if (run->input_x > 0)
         run->input_x--;
@@ -519,7 +516,7 @@ __device__ int testing_input_move_left(Run *run, int *)
     return 0;
 }
 
-__device__ int testing_input_move_right(Run *run, int *)
+__forceinline__ __device__ int testing_input_move_right(Run *run, int *)
 {
     if (run->input_x < (run->problem.input.x - 1))
         run->input_x++;
@@ -527,7 +524,7 @@ __device__ int testing_input_move_right(Run *run, int *)
     return 0;
 }
 
-__device__ int testing_input_move_down(Run *run, int *)
+__forceinline__ __device__ int testing_input_move_down(Run *run, int *)
 {
     if (run->input_y < (run->problem.input.y - 1))
         run->input_y++;
@@ -535,7 +532,7 @@ __device__ int testing_input_move_down(Run *run, int *)
     return 0;
 }
 
-__device__ int testing_input_move_up(Run *run, int *)
+__forceinline__ __device__ int testing_input_move_up(Run *run, int *)
 {
     if (run->input_y > 0)
         run->input_y--;
@@ -543,28 +540,21 @@ __device__ int testing_input_move_up(Run *run, int *)
     return 0;
 }
 
-__device__ int comparison(Run *run, int *p)
+__forceinline__ __device__ int comparison(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-
-    if (run->pfuncs[(node_0.pointer)](run, node_0.args) == 1)
+    if (run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args) == 1)
     {
-        int node_1_id = run->program_offset + p[1];
-        Node node_1 = run->programs->nodes[node_1_id];
-        run->pfuncs[(node_1.pointer)](run, node_1.args);
+        run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
     }
     else
     {
-        int node_2_id = run->program_offset + p[2];
-        Node node_2 = run->programs->nodes[node_2_id];
-        run->pfuncs[(node_2.pointer)](run, node_2.args);
+        run->pfuncs[(run->nodes[p[2]].pointer)](run, run->nodes[p[2]].args);
     }
 
     return 0;
 }
 
-__device__ int bigger_than_output_next(Run *run, int *p)
+__forceinline__ __device__ int bigger_than_output_next(Run *run, int *p)
 {
     if (run->problem.n_training > 0)
         if (run->training_output_x < (run->problem.training[run->training_id][1].x - 1))
@@ -576,7 +566,7 @@ __device__ int bigger_than_output_next(Run *run, int *p)
     return 0;
 }
 
-__device__ int bigger_than_testing_output_next(Run *run, int *)
+__forceinline__ __device__ int bigger_than_testing_output_next(Run *run, int *)
 {
     if (run->output_x < (run->problem.output.x - 1))
     {
@@ -587,7 +577,7 @@ __device__ int bigger_than_testing_output_next(Run *run, int *)
     return 0;
 }
 
-__device__ int swap_testing_output_next(Run *run, int *)
+__forceinline__ __device__ int swap_testing_output_next(Run *run, int *)
 {
     if (run->output_x < (run->problem.output.x - 1))
     {
@@ -599,82 +589,60 @@ __device__ int swap_testing_output_next(Run *run, int *)
     return 0;
 }
 
-__device__ int bigger_than(Run *run, int *p)
+__forceinline__ __device__ int bigger_than(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-    int output1 = run->pfuncs[(node_0.pointer)](run, node_0.args);
+    int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
-    int node_1_id = run->program_offset + p[1];
-    Node node_1 = run->programs->nodes[node_1_id];
-    int output2 = run->pfuncs[(node_1.pointer)](run, node_1.args);
+    int output2 = run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
     return output1 > output2;
 }
 
-__device__ int equal(Run *run, int *p)
+__forceinline__ __device__ int equal(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-    int output1 = run->pfuncs[(node_0.pointer)](run, node_0.args);
+    int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
-    int node_1_id = run->program_offset + p[1];
-    Node node_1 = run->programs->nodes[node_1_id];
-    int output2 = run->pfuncs[(node_1.pointer)](run, node_1.args);
+    int output2 = run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
+
     return output1 == output2;
 }
 
-__device__ int no(Run *run, int *p)
+__forceinline__ __device__ int no(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-    int output1 = run->pfuncs[(node_0.pointer)](run, node_0.args);
+    int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
+
     return !output1;
 }
 
-__device__ int prog2(Run *run, int *p)
+__forceinline__ __device__ int prog2(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-    run->pfuncs[(node_0.pointer)](run, node_0.args);
+    run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
-    int node_1_id = run->program_offset + p[1];
-    Node node_1 = run->programs->nodes[node_1_id];
-    run->pfuncs[(node_1.pointer)](run, node_1.args);
+    run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
     return 0;
 }
 
-__device__ int prog3(Run *run, int *p)
+__forceinline__ __device__ int prog3(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-    run->pfuncs[(node_0.pointer)](run, node_0.args);
+    run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
-    int node_1_id = run->program_offset + p[1];
-    Node node_1 = run->programs->nodes[node_1_id];
-    run->pfuncs[(node_1.pointer)](run, node_1.args);
+    run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
 
-    int node_2_id = run->program_offset + p[2];
-    Node node_2 = run->programs->nodes[node_2_id];
-    run->pfuncs[(node_2.pointer)](run, node_2.args);
+    run->pfuncs[(run->nodes[p[2]].pointer)](run, run->nodes[p[2]].args);
 
     return 0;
 }
 
-int loop(Run *run, int *p)
+__forceinline__ __device__ int loop(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-    int v = run->pfuncs[(node_0.pointer)](run, node_0.args);
-
     run->inner_loop++;
+
+    int v = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
     if (run->inner_loop < 5 && v > 0 && v <= 30)
     {
         for (int i = 0; i < v; i++)
         {
-            int node_1_id = run->program_offset + p[1];
-            Node node_1 = run->programs->nodes[node_1_id];
-            run->pfuncs[(node_1.pointer)](run, node_1.args);
+            run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
         }
     }
     else
@@ -687,7 +655,7 @@ int loop(Run *run, int *p)
     return 0;
 }
 
-__device__ int dowhile(Run *run, int *p)
+__forceinline__ __device__ int dowhile(Run *run, int *p)
 {
     int c = 0;
 
@@ -695,14 +663,10 @@ __device__ int dowhile(Run *run, int *p)
 
     if (run->inner_loop < 3)
     {
-        int node_0_id = run->program_offset + p[0];
-        Node node_0 = run->programs->nodes[node_0_id];
-        while (!run->pfuncs[(node_0.pointer)](run, node_0.args) && c < 10)
+        while (!run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args) && c < 10)
         {
             c++;
-            int node_1_id = run->program_offset + p[1];
-            Node node_1 = run->programs->nodes[node_1_id];
-            run->pfuncs[(node_1.pointer)](run, node_1.args);
+            run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
         }
     }
     else
@@ -715,16 +679,14 @@ __device__ int dowhile(Run *run, int *p)
     return 0;
 }
 
-__device__ int read_memory(Run *run, int *)
+__forceinline__ __device__ int read_memory(Run *run, int *)
 {
     return run->memory;
 }
 
-__device__ int write_memory(Run *run, int *p)
+__forceinline__ __device__ int write_memory(Run *run, int *p)
 {
-    int node_0_id = run->program_offset + p[0];
-    Node node_0 = run->programs->nodes[node_0_id];
-    int value = run->pfuncs[(node_0.pointer)](run, node_0.args);
+    int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
     run->memory = value;
 
@@ -818,6 +780,7 @@ __global__ void fill_function_pointers(pfunc *pfuncs)
     pfuncs[80] = dowhile;
     pfuncs[81] = read_memory;
     pfuncs[82] = write_memory;
+    pfuncs[83] = loop;
 }
 
 MAP_INSTRUCTIONS get_map()
@@ -912,6 +875,7 @@ MAP_INSTRUCTIONS get_map()
     map["dowhile"] = 80;
     map["read_memory"] = 81;
     map["write_memory"] = 82;
+    map["loop"] = 83;
 
     return map;
 }

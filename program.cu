@@ -6,21 +6,35 @@
 #define N_BLOCKS 500
 #define N_THREADS 1024
 
-__device__ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
+__forceinline__ __device__ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
 {
 	float total_accuracy = 0.0;
 
+	// Limit program size to 1000 nodes
+	Node program[1000];
+
+	int pointer_end;
+	if ((program_id + 1) == programs->n_programs)
+		pointer_end = programs->n_nodes;
+	else
+		pointer_end = programs->programs[program_id + 1];
+
+	for (int i = 0; i < pointer_end - programs->programs[program_id]; i++)
+	{
+		program[i] = programs->nodes[programs->programs[program_id] + i];
+	}
+
 	int myArray[20][20];
-	int* output[20];
-    for (int i = 0; i < 20; i++) {
-        output[i] = myArray[i];
-    }
+	int *output[20];
+	for (int i = 0; i < 20; i++)
+	{
+		output[i] = myArray[i];
+	}
 
 	for (int p = 0; p < problems->n_instances; p++)
 	{
 		for (int i = 0; i < problems->instances[p].initial.y; i++)
 		{
-			//output[i] = (int *)malloc(problems->instances[p].initial.x * sizeof(int));
 			for (int j = 0; j < problems->instances[p].initial.x; j++)
 			{
 				output[i][j] = problems->instances[p].initial.array[i][j];
@@ -28,34 +42,34 @@ __device__ float run(Programs *programs, int program_id, Instances *problems, pf
 		}
 
 		Run r = {
-			0,								// input_x
-			0,								// input_y
-			0,								// output_x
-			0,								// output_y
-			pfuncs,							// funcs
-			problems->instances[p],			// problem
-			output,							// output
-			0,								// inner_loop
-			0,								// status
-			0,								// memory
-			programs,						// programs
-			programs->programs[program_id], // program_offset
-			0,								// training_id
-			0,								// training_input_x
-			0,								// training_input_y
-			0,								// training_output_x
-			0								// training_output_y
-		};
+			0,						// input_x
+			0,						// input_y
+			0,						// output_x
+			0,						// output_y
+			pfuncs,					// funcs
+			problems->instances[p], // problem
+			output,					// output
+			0,						// inner_loop
+			0,						// status
+			0,						// memory
+			0,						// training_id
+			0,						// training_input_x
+			0,						// training_input_y
+			0,						// training_output_x
+			0,						// training_output_y
+			program};
 
-		for (int i = 0; i < 100; i++)
+		for (int i = 0; i < 200; i++)
 		{
-			Node node = programs->nodes[programs->programs[program_id]];
-			pfuncs[node.pointer](&r, node.args);
+			pfuncs[program[0].pointer](&r, program[0].args);
+
+			if (r.status != 0)
+				break;
 		}
 
 		total_accuracy += accuracy_calculation(problems->instances[p], output);
 
-		//free(r);
+		// free(r);
 	}
 	return total_accuracy / (float)problems->n_instances;
 }
