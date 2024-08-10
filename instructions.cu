@@ -643,6 +643,9 @@ __forceinline__ __device__ int loop(Run *run, int *p)
         for (int i = 0; i < v; i++)
         {
             run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
+
+            if (run->status != 0)
+                break;
         }
     }
     else

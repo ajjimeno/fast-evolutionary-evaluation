@@ -88,31 +88,12 @@ __global__ void create_and_run(Programs *programs, int n_programs, Instances *pr
 	}
 }
 
-int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems)
+int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems, pfunc *d_pfuncs)
 {
-	int device_count = 0;
-	// Get the number of CUDA-capable devices
-	cudaError_t err = cudaGetDeviceCount(&device_count);
-
-	if (err != cudaSuccess)
-	{
-		std::cerr << "CUDA error: " << cudaGetErrorString(err) << std::endl;
-		return 1;
-	}
-	else
-	{
-		std::cout << "Device count: " << device_count << std::endl;
-	}
-
+	cudaError_t err;
 	float *d_accuracy;
 
 	cudaMallocManaged(&d_accuracy, n_programs * sizeof(float));
-
-	pfunc *d_pfuncs;
-	cudaMallocManaged(&d_pfuncs, 200 * sizeof(pfunc));
-
-	fill_function_pointers<<<1, 1>>>(d_pfuncs);
-	cudaDeviceSynchronize();
 
 	Programs *d_programs = copy_programs_to_gpu(n_programs, programs);
 
@@ -141,14 +122,6 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
 	}
 	std::cout << "Kernel finished" << std::endl;
 
-	free_programs_from_gpu(d_programs);
-	err = cudaGetLastError();
-	if (err != cudaSuccess)
-	{
-		printf("Error freeing programs: %s\n", cudaGetErrorString(err));
-		return 1;
-	}
-
 	cudaMemcpy(accuracy, d_accuracy, n_programs * sizeof(float), cudaMemcpyDeviceToHost);
 
 	err = cudaGetLastError();
@@ -168,8 +141,15 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
 
 	std::cout << "Total: " << total << " " << n_programs << std::endl;
 
-	cudaFree(d_pfuncs);
 	cudaFree(d_accuracy);
+
+	free_programs_from_gpu(d_programs);
+	err = cudaGetLastError();
+	if (err != cudaSuccess)
+	{
+		printf("Error freeing programs: %s\n", cudaGetErrorString(err));
+		return 1;
+	}
 
 	return 0;
 }

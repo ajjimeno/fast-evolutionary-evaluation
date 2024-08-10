@@ -18,6 +18,7 @@
 typedef struct RunnerSimulatorWrapper
 {
     PyObject_HEAD Instances *data;
+    pfunc * d_pfuncs;
 
     RunnerSimulatorWrapper() : data(nullptr) {}
 } RunnerSimulatorWrapper;
@@ -41,6 +42,11 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
         return 1;
     }
 
+	cudaMallocManaged(&self->d_pfuncs, 200 * sizeof(pfunc));
+    fill_function_pointers<<<1, 1>>>(self->d_pfuncs);
+	cudaDeviceSynchronize();
+
+    /*
     size_t newMallocHeapSize = 1024 * 1024 * 1024; // 1 GB
     cudaDeviceSetLimit(cudaLimitMallocHeapSize, newMallocHeapSize);
     if (err != cudaSuccess)
@@ -48,7 +54,7 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
         // Handle error
         fprintf(stderr, "Error setting malloc size: %s\n", cudaGetErrorString(err));
         return 1;
-    }
+    }*/
 
     cudaDeviceSynchronize();
 
@@ -104,7 +110,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
     float *accuracy = (float *)malloc(n_programs * sizeof(float));
 
-    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data);
+    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data, self->d_pfuncs);
 
     PyObject *list = PyList_New(n_programs);
     if (!list)
