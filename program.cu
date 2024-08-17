@@ -6,6 +6,8 @@
 #define N_BLOCKS 500
 #define N_THREADS 1024
 
+#define MAX_OUTPUT_SIZE 40
+
 __forceinline__ __device__ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
 {
 	float total_accuracy = 0.0;
@@ -24,9 +26,9 @@ __forceinline__ __device__ float run(Programs *programs, int program_id, Instanc
 		program[i] = programs->nodes[programs->programs[program_id] + i];
 	}
 
-	int myArray[20][20];
-	int *output[20];
-	for (int i = 0; i < 20; i++)
+	int myArray[MAX_OUTPUT_SIZE][MAX_OUTPUT_SIZE];
+	int *output[MAX_OUTPUT_SIZE];
+	for (int i = 0; i < MAX_OUTPUT_SIZE; i++)
 	{
 		output[i] = myArray[i];
 	}

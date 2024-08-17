@@ -469,6 +469,8 @@ __forceinline__ __device__ int testing_output_move_left(Run *run, int *)
 {
     if (run->output_x > 0)
         run->output_x--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -477,6 +479,8 @@ __forceinline__ __device__ int testing_output_move_right(Run *run, int *)
 {
     if (run->output_x < (run->problem.output.x - 1))
         run->output_x++;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -485,8 +489,8 @@ __forceinline__ __device__ int testing_output_move_down(Run *run, int *)
 {
     if (run->output_y < (run->problem.output.y - 1))
         run->output_y++;
-    // else
-    //     status = -1;
+    else
+        run->status = -1;
     return 0;
 }
 
@@ -494,6 +498,8 @@ __forceinline__ __device__ int testing_output_move_up(Run *run, int *)
 {
     if (run->output_y > 0)
         run->output_y--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -512,6 +518,8 @@ __forceinline__ __device__ int testing_input_move_left(Run *run, int *)
 {
     if (run->input_x > 0)
         run->input_x--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -520,6 +528,8 @@ __forceinline__ __device__ int testing_input_move_right(Run *run, int *)
 {
     if (run->input_x < (run->problem.input.x - 1))
         run->input_x++;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -528,6 +538,8 @@ __forceinline__ __device__ int testing_input_move_down(Run *run, int *)
 {
     if (run->input_y < (run->problem.input.y - 1))
         run->input_y++;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -536,6 +548,8 @@ __forceinline__ __device__ int testing_input_move_up(Run *run, int *)
 {
     if (run->input_y > 0)
         run->input_y--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -640,9 +654,11 @@ __forceinline__ __device__ int loop(Run *run, int *p)
 
     if (run->inner_loop < 5 && v > 0 && v <= 30)
     {
+        int pointer = (run->nodes[p[1]].pointer);
+        int * args = run->nodes[p[1]].args;
         for (int i = 0; i < v; i++)
         {
-            run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
+            run->pfuncs[pointer](run, args);
 
             if (run->status != 0)
                 break;
