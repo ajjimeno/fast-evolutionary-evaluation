@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+__forceinline__ __device__ int function_switch(int pointer, Run *run);
+
 __forceinline__ __device__ int get0(Run *run, int *)
 {
     return 0;
@@ -650,15 +652,17 @@ __forceinline__ __device__ int loop(Run *run, int *p)
 {
     run->inner_loop++;
 
-    int v = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
+    int v = function_switch(p[0], run); // run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
     if (run->inner_loop < 5 && v > 0 && v <= 30)
     {
-        int pointer = (run->nodes[p[1]].pointer);
-        int * args = run->nodes[p[1]].args;
+        // int pointer = (run->nodes[p[1]].pointer);
+        // int * args = run->nodes[p[1]].args;
+
         for (int i = 0; i < v; i++)
         {
-            run->pfuncs[pointer](run, args);
+            function_switch(p[1], run);
+            // run->pfuncs[pointer](run, args);
 
             if (run->status != 0)
                 break;
@@ -671,7 +675,7 @@ __forceinline__ __device__ int loop(Run *run, int *p)
 
     run->inner_loop--;
 
-    return 0;
+    return v;
 }
 
 __forceinline__ __device__ int dowhile(Run *run, int *p)
@@ -708,6 +712,325 @@ __forceinline__ __device__ int write_memory(Run *run, int *p)
     int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
     run->memory = value;
+
+    return 0;
+}
+
+struct SNode
+{
+    int node_pointer;
+    int case_operation;
+};
+
+__forceinline__ __device__ int function_switch(int pointer, Run *run)
+{
+    SNode stack[1000];
+    int s_pointer = 1;
+
+    // Root of the program tree
+    stack[0] = {pointer, run->nodes[pointer].pointer};
+
+    int reg = 0;
+
+    // Till no more nodes are available
+    while (s_pointer > 0)
+    {
+        SNode node = stack[--s_pointer];
+
+        switch (node.case_operation)
+        {
+        case 0:
+            reg = get0(NULL, NULL);
+            break;
+        case 1:
+            reg = get1(NULL, NULL);
+            break;
+        case 2:
+            reg = get2(NULL, NULL);
+            break;
+        case 3:
+            reg = get3(NULL, NULL);
+            break;
+        case 4:
+            reg = get4(NULL, NULL);
+            break;
+        case 5:
+            reg = get5(NULL, NULL);
+            break;
+        case 6:
+            reg = get6(NULL, NULL);
+            break;
+        case 7:
+            reg = get7(NULL, NULL);
+            break;
+        case 8:
+            reg = get8(NULL, NULL);
+            break;
+        case 9:
+            reg = get9(NULL, NULL);
+            break;
+        case 10:
+            reg = input_end(run, NULL);
+            break;
+        case 11:
+            reg = input_beginning(run, NULL);
+            break;
+        case 12:
+            reg = input_down_end(run, NULL);
+            break;
+        case 13:
+            reg = output_end(run, NULL);
+            break;
+        case 14:
+            reg = output_beginning(run, NULL);
+            break;
+        case 15:
+            reg = output_down_end(run, NULL);
+            break;
+        case 16:
+            reg = output_move_left(run, NULL);
+            break;
+        case 17:
+            reg = output_move_right(run, NULL);
+            break;
+        case 18:
+            reg = output_move_down(run, NULL);
+            break;
+        case 19:
+            reg = output_move_up(run, NULL);
+            break;
+        case 20:
+            reg = get_input_position_x(run, NULL);
+            break;
+        case 21:
+            reg = get_input_position_y(run, NULL);
+            break;
+        case 22:
+            reg = get_output_position_x(run, NULL);
+            break;
+        case 23:
+            reg = get_output_position_y(run, NULL);
+            break;
+        case 24:
+            reg = get_length_input_x(run, NULL);
+            break;
+        case 25:
+            reg = get_length_input_y(run, NULL);
+            break;
+        case 26:
+            reg = get_length_output_x(run, NULL);
+            break;
+        case 27:
+            reg = get_length_output_y(run, NULL);
+            break;
+        case 28:
+            reg = input_next(run, NULL);
+            break;
+        case 29:
+            reg = input_previous(run, NULL);
+            break;
+        case 30:
+            reg = input_move_left(run, NULL);
+            break;
+        case 31:
+            reg = input_move_right(run, NULL);
+            break;
+        case 32:
+            reg = input_move_down(run, NULL);
+            break;
+        case 33:
+            reg = input_move_up(run, NULL);
+            break;
+        case 34:
+            reg = reset_input_position(run, NULL);
+            break;
+        case 35:
+            reg = reset_input_down_position(run, NULL);
+            break;
+        case 36:
+            reg = input_max(run, NULL);
+            break;
+        case 37:
+            reg = input_min(run, NULL);
+            break;
+        case 38:
+            reg = input_read(run, NULL);
+            break;
+        case 39:
+            reg = output_read(run, NULL);
+            break;
+        case 40:
+            reg = reset_output_position(run, NULL);
+            break;
+        case 41:
+            reg = reset_output_down_position(run, NULL);
+            break;
+        case 42:
+            reg = get_testing_length_input_x(run, NULL);
+            break;
+        case 43:
+            reg = get_testing_length_input_y(run, NULL);
+            break;
+        case 44:
+            reg = get_testing_length_output_x(run, NULL);
+            break;
+        case 45:
+            reg = get_testing_length_output_y(run, NULL);
+            break;
+        case 46:
+            reg = get_testing_input_position_y(run, NULL);
+            break;
+        case 47:
+            reg = get_testing_input_position_x(run, NULL);
+            break;
+        case 48:
+            reg = get_testing_output_position_y(run, NULL);
+            break;
+        case 49:
+            reg = get_testing_output_position_x(run, NULL);
+            break;
+        case 50:
+            reg = testing_input_max(run, NULL);
+            break;
+        case 51:
+            reg = testing_input_min(run, NULL);
+            break;
+        case 52:
+            reg = testing_input_read(run, NULL);
+            break;
+        case 53:
+            reg = testing_output_read_previous(run, NULL);
+            break;
+        case 54:
+            reg = testing_output_read(run, NULL);
+            break;
+        case 55:
+            reg = testing_reset_input_position(run, NULL);
+            break;
+        case 56:
+            reg = testing_reset_input_down_position(run, NULL);
+            break;
+
+        // Write operations missing
+        case 57: // testing_output_write_previous
+            if (run->output_x > 0)
+            {
+
+                Node pnode = run->nodes[node.node_pointer];
+                stack[s_pointer++] = {0, 1001};
+
+                // Add read value node
+
+                Node p0node = run->nodes[node.node_pointer];
+                stack[s_pointer++] = {pnode.args[0], p0node.pointer};
+                // int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
+            }
+
+            break;
+        case 58:
+        {
+            Node pnode = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {0, 1002};
+
+            // Add read value node
+
+            Node p0node = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {pnode.args[0], p0node.pointer};
+        }
+        break;
+        case 59:
+            reg = testing_reset_output_position(run, NULL);
+            break;
+        case 60:
+            reg = testing_reset_output_down_position(run, NULL);
+            break;
+        case 61:
+            reg = testing_output_move_left(run, NULL);
+            break;
+        case 62:
+            reg = testing_output_move_right(run, NULL);
+            break;
+        case 63:
+            reg = testing_output_move_down(run, NULL);
+            break;
+        case 64:
+            reg = testing_output_move_up(run, NULL);
+            break;
+        case 65:
+            reg = testing_is_output_end(run, NULL);
+            break;
+        case 66:
+            reg = testing_is_output_down(run, NULL);
+            break;
+        case 67:
+            reg = testing_input_move_left(run, NULL);
+            break;
+        case 68:
+            reg = testing_input_move_right(run, NULL);
+            break;
+        case 69:
+            reg = testing_input_move_down(run, NULL);
+            break;
+        case 70:
+            reg = testing_input_move_up(run, NULL);
+            break;
+
+        case 71: // comparison
+        {
+            Node pnode = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {node.node_pointer, 1004};
+
+            // Add read value node
+            Node p0node = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {pnode.args[0], p0node.pointer};
+        }
+        break;
+        case 81:
+            reg = read_memory(run, NULL);
+            break;
+        case 82:
+        {
+            Node pnode = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {0, 1003};
+
+            // Add read value node
+            Node p0node = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {pnode.args[0], p0node.pointer};
+        }
+        case 83: // loop
+        {
+            // Add operation node n-times
+            Node pnode = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {pnode.args[1], 1000};
+
+            // Add read value node
+            Node p0node = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {pnode.args[0], p0node.pointer};
+        }
+        break;
+        case 1000:
+            // Read register
+            for (int i = 0; i < reg; i++)
+            {
+                // Loop operation
+                stack[s_pointer++] = {node.node_pointer, run->nodes[node.node_pointer].pointer};
+            }
+        case 1001: // testing_output_write_previous
+            run->output[run->output_y][run->output_x - 1] = reg;
+            break;
+        case 1002: // testing_output_write
+            run->output[run->output_y][run->output_x] = reg;
+            break;
+        case 1003: // write memory
+            run->memory = reg;
+            break;
+        case 1004: // comparison
+            break;
+        default:
+            run->status = -1;
+            break;
+        }
+    }
 
     return 0;
 }
