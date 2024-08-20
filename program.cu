@@ -72,11 +72,11 @@ __forceinline__ __device__ float run(Programs *programs, int program_id, Instanc
 				break;
 		}
 
-		total_accuracy = o; //+= accuracy_calculation(problems->instances[p], output);
+		total_accuracy += accuracy_calculation(problems->instances[p], output);
 
 		// free(r);
 	}
-	return total_accuracy ; // / (float)problems->n_instances;
+	return total_accuracy / (float)problems->n_instances;
 }
 
 // Programs, Problems, split programs
