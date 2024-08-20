@@ -1047,6 +1047,7 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
 
             // Add operation node n-times
             Node *pnode = &run->nodes[node->node_pointer];
+
             stack[s_pointer++] = {pnode->args[1], 100};
 
             // Add read value node
