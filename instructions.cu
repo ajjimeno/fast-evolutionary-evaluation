@@ -736,9 +736,9 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
     // Till no more nodes are available
     while (s_pointer > 0 && run->status == 0)
     {
-        SNode node = stack[--s_pointer];
+        SNode *node = &stack[--s_pointer];
 
-        switch (node.case_operation)
+        switch (node->case_operation)
         {
         case 0:
             reg = get0(NULL, NULL);
@@ -916,21 +916,21 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
             if (run->output_x > 0)
             {
 
-                Node pnode = run->nodes[node.node_pointer];
-                stack[s_pointer++] = {0, 1001};
+                Node *pnode = &run->nodes[node->node_pointer];
+                stack[s_pointer++] = {0, 101};
 
                 // Add read value node
-                stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+                stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
             }
 
             break;
         case 58: // testing_output_write
         {
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {0, 1002};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {0, 102};
 
             // Add read value node
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
         case 59:
@@ -971,11 +971,11 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
             break;
         case 71: // comparison
         {
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {node.node_pointer, 1004};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 104};
 
             // Add read value node
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
         case 72:
@@ -990,42 +990,42 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
             break;
         case 75: // bigger_than
         {
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {node.node_pointer, 1008};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 108};
 
             // Add read value node
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
         case 76: // equal
         {
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {node.node_pointer, 1006};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 106};
 
             // Add read value node
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
         case 77: // no
         {
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {node.node_pointer, 1005};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 105};
 
             // Add read value node
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
         case 78: // prog2
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {pnode.args[1], run->nodes[pnode.args[1]].pointer};
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
             break;
         case 79: // prog3
         {
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {pnode.args[2], run->nodes[pnode.args[2]].pointer};
-            stack[s_pointer++] = {pnode.args[1], run->nodes[pnode.args[1]].pointer};
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {pnode->args[2], run->nodes[pnode->args[2]].pointer};
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
         case 81:
@@ -1033,12 +1033,12 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
             break;
         case 82: // write memory
         {
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {0, 1003};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {0, 103};
 
             // Add read value node
             // Node p0node = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
         case 83: // loop
@@ -1046,22 +1046,22 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
             run->inner_loop++;
 
             // Add operation node n-times
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {pnode.args[1], 1000};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {pnode->args[1], 100};
 
             // Add read value node
-            stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
-        case 1000:
+        case 100:
             if (run->inner_loop < 5 && reg > 0 && reg <= 30)
             {
                 // Read register
-                stack[s_pointer++] = {0, 10001};
+                stack[s_pointer++] = {0, 110};
                 for (int i = 0; i < reg; i++)
                 {
                     // Loop operation
-                    stack[s_pointer++] = {node.node_pointer, run->nodes[node.node_pointer].pointer};
+                    stack[s_pointer++] = {node->node_pointer, run->nodes[node->node_pointer].pointer};
                 }
             }
             else
@@ -1070,60 +1070,60 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
             }
 
             break;
-        case 10001:
+        case 110:
             run->inner_loop--;
             break;
-        case 1001: // testing_output_write_previous
+        case 101: // testing_output_write_previous
             run->output[run->output_y][run->output_x - 1] = reg;
             break;
-        case 1002: // testing_output_write
+        case 102: // testing_output_write
             run->output[run->output_y][run->output_x] = reg;
             break;
         case 1003: // write memory
             run->memory = reg;
             break;
-        case 1004: // comparison
+        case 104: // comparison
         {
-            Node pnode = run->nodes[node.node_pointer];
+            Node *pnode = &run->nodes[node->node_pointer];
             if (reg)
             {
-                stack[s_pointer++] = {pnode.args[0], run->nodes[pnode.args[0]].pointer};
+                stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
             }
             else
             {
-                stack[s_pointer++] = {pnode.args[1], run->nodes[pnode.args[1]].pointer};
+                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
             }
         }
         break;
-        case 1005: // no
+        case 105: // no
             reg = !reg;
             break;
-        case 1006: // equal
+        case 106: // equal
         {
             // copy register
             reg1 = reg;
             // final check
-            stack[s_pointer++] = {node.node_pointer, 1007};
+            stack[s_pointer++] = {node->node_pointer, 107};
             // obtain second value
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {pnode.args[1], run->nodes[pnode.args[1]].pointer};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
         }
         break;
-        case 1007: // equal
+        case 107: // equal
             reg = (reg == reg1);
             break;
-        case 1008: // bigger_than
+        case 108: // bigger_than
         {
             // copy register
             reg1 = reg;
             // final check
-            stack[s_pointer++] = {node.node_pointer, 1009};
+            stack[s_pointer++] = {node->node_pointer, 109};
             // obtain second value
-            Node pnode = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {pnode.args[1], run->nodes[pnode.args[1]].pointer};
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
         }
         break;
-        case 1009:
+        case 109:
             reg = (reg1 > reg);
             break;
         default:
