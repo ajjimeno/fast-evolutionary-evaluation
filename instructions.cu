@@ -96,6 +96,8 @@ __forceinline__ __device__ int output_move_left(Run *run, int *)
 {
     if (run->training_output_x > 0)
         run->training_output_x--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -106,6 +108,8 @@ __forceinline__ __device__ int output_move_right(Run *run, int *)
     {
         if (run->training_output_x < (run->problem.training[run->training_id][1].x - 1))
             run->training_output_x++;
+        else
+            run->status = -1;
     }
     return 0;
 }
@@ -116,6 +120,8 @@ __forceinline__ __device__ int output_move_down(Run *run, int *)
     {
         if (run->training_output_y < (run->problem.training[run->training_id][1].y - 1))
             run->training_output_y++;
+        else
+            run->status = -1;
     }
     return 0;
 }
@@ -124,6 +130,8 @@ __forceinline__ __device__ int output_move_up(Run *run, int *)
 {
     if (run->training_output_y > 0)
         run->training_output_y--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -221,6 +229,8 @@ __forceinline__ __device__ int input_move_left(Run *run, int *)
 {
     if (run->training_input_x > 0)
         run->training_input_x--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -231,6 +241,8 @@ __forceinline__ __device__ int input_move_right(Run *run, int *)
     {
         if (run->training_input_x < (run->problem.training[run->training_id][0].x - 1))
             run->training_input_x++;
+        else
+            run->status = -1;
     }
     return 0;
 }
@@ -241,6 +253,8 @@ __forceinline__ __device__ int input_move_down(Run *run, int *)
     {
         if (run->training_input_y < (run->problem.training[run->training_id][0].y - 1))
             run->training_input_y++;
+        else
+            run->status = -1;
     }
     return 0;
 }
@@ -249,6 +263,8 @@ __forceinline__ __device__ int input_move_up(Run *run, int *)
 {
     if (run->training_input_y > 0)
         run->training_input_y--;
+    else
+        run->status = -1;
 
     return 0;
 }
@@ -412,7 +428,9 @@ __forceinline__ __device__ int testing_output_read_previous(Run *run, int *)
     if (run->output_x > 0)
         return run->output[run->output_y][run->output_x - 1];
 
-    return -1;
+    run->status = -1;
+
+    return 0;
 }
 
 __forceinline__ __device__ int testing_output_read(Run *run, int *)
@@ -441,6 +459,10 @@ __forceinline__ __device__ int testing_output_write_previous(Run *run, int *p)
         int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
         run->output[run->output_y][run->output_x - 1] = value;
+    }
+    else
+    {
+        run->status = -1;
     }
 
     return 0;
@@ -578,7 +600,10 @@ __forceinline__ __device__ int bigger_than_output_next(Run *run, int *p)
             return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x] >
                    run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x + 1];
         }
-
+        else
+        {
+            run->status = -1;
+        }
     return 0;
 }
 
@@ -588,6 +613,10 @@ __forceinline__ __device__ int bigger_than_testing_output_next(Run *run, int *)
     {
         return run->output[run->output_y][run->output_x] >
                run->output[run->output_y][run->output_x + 1];
+    }
+    else
+    {
+        run->status = -1;
     }
 
     return 0;
@@ -600,6 +629,10 @@ __forceinline__ __device__ int swap_testing_output_next(Run *run, int *)
         int tmp = run->output[run->output_y][run->output_x];
         run->output[run->output_y][run->output_x] = run->output[run->output_y][run->output_x + 1];
         run->output[run->output_y][run->output_x + 1] = tmp;
+    }
+    else
+    {
+        run->status = -1;
     }
 
     return 0;
@@ -921,6 +954,10 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
 
                 // Add read value node
                 stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+            }
+            else
+            {
+                run->status = -1;
             }
 
             break;
@@ -1323,7 +1360,7 @@ MAP_INSTRUCTIONS get_map()
     return map;
 }
 
-int getProgram(std::string string, MAP_INSTRUCTIONS map, std::map<int, Node> *nodes, int &position)
+int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *nodes, int &position)
 {
     int program = -1;
 
@@ -1386,7 +1423,7 @@ int getProgram(std::string string, MAP_INSTRUCTIONS map, std::map<int, Node> *no
     return program;
 }
 
-void getProgram(std::string string, MAP_INSTRUCTIONS map, std::map<int, Node> *nodes)
+void getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *nodes)
 {
     int position = 0;
     getProgram(string, map, nodes, position);
