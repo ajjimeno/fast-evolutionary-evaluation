@@ -1364,8 +1364,6 @@ int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *
 {
     int program = -1;
 
-    std::vector<int> subprograms;
-
     int initial_position = position;
 
     while (initial_position < string.length() && string[initial_position] == ' ')
@@ -1392,27 +1390,22 @@ int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *
             else
             {
                 int sub = getProgram(string, map, nodes, position);
-                subprograms.push_back(sub);
+                nodes->at(program).args[nodes->at(program).n_args++] = sub;
             }
         }
+        // Close and return
         else if (string[position] == ')')
         {
-            // Close and return
             position++;
-            nodes->at(program).n_args = subprograms.size();
-
-            for (int i = 0; i < subprograms.size(); i++)
-            {
-                nodes->at(program).args[i] = subprograms[i];
-            }
-
             return program;
         }
         else if (string[position] == ',')
         {
             // After this, there is a new program
             position++;
-            subprograms.push_back(getProgram(string, map, nodes, position));
+
+            int sub = getProgram(string, map, nodes, position);
+            nodes->at(program).args[nodes->at(program).n_args++] = sub;
         }
         else
         {
