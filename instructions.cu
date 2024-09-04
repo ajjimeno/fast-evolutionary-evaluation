@@ -7,51 +7,57 @@
 #include <unordered_map>
 #include <vector>
 
-__forceinline__ __device__ int function_switch(int pointer, Run *run);
+#ifndef SETUP_BUILDING_CPU
+#define FUNCTION_DEFINITION __forceinline__ __device__ int
+#else
+#define FUNCTION_DEFINITION inline int
+#endif
 
-__forceinline__ __device__ int get0(Run *run, int *)
+FUNCTION_DEFINITION function_switch(int pointer, Run *run);
+
+FUNCTION_DEFINITION get0(Run *run, int *)
 {
     return 0;
 }
-__forceinline__ __device__ int get1(Run *run, int *)
+FUNCTION_DEFINITION get1(Run *run, int *)
 {
     return 1;
 }
-__forceinline__ __device__ int get2(Run *run, int *)
+FUNCTION_DEFINITION get2(Run *run, int *)
 {
     return 2;
 }
-__forceinline__ __device__ int get3(Run *run, int *)
+FUNCTION_DEFINITION get3(Run *run, int *)
 {
     return 3;
 }
-__forceinline__ __device__ int get4(Run *run, int *)
+FUNCTION_DEFINITION get4(Run *run, int *)
 {
     return 4;
 }
-__forceinline__ __device__ int get5(Run *run, int *)
+FUNCTION_DEFINITION get5(Run *run, int *)
 {
     return 5;
 }
-__forceinline__ __device__ int get6(Run *run, int *)
+FUNCTION_DEFINITION get6(Run *run, int *)
 {
     return 6;
 }
-__forceinline__ __device__ int get7(Run *run, int *)
+FUNCTION_DEFINITION get7(Run *run, int *)
 {
     return 7;
 }
-__forceinline__ __device__ int get8(Run *run, int *)
+FUNCTION_DEFINITION get8(Run *run, int *)
 {
     return 8;
 }
-__forceinline__ __device__ int get9(Run *run, int *)
+FUNCTION_DEFINITION get9(Run *run, int *)
 {
     return 9;
 }
 
 // Training
-__forceinline__ __device__ int input_end(Run *run, int *)
+FUNCTION_DEFINITION input_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_input_x == (run->problem.training[run->training_id][0].x - 1);
@@ -59,19 +65,19 @@ __forceinline__ __device__ int input_end(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_beginning(Run *run, int *)
+FUNCTION_DEFINITION input_beginning(Run *run, int *)
 {
     return run->training_input_x == 0;
 }
 
-__forceinline__ __device__ int input_down_end(Run *run, int *)
+FUNCTION_DEFINITION input_down_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_input_y == (run->problem.training[run->training_id][0].y - 1);
     return 0;
 }
 
-__forceinline__ __device__ int output_end(Run *run, int *)
+FUNCTION_DEFINITION output_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_output_x == (run->problem.training[run->training_id][1].x - 1);
@@ -79,12 +85,12 @@ __forceinline__ __device__ int output_end(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int output_beginning(Run *run, int *)
+FUNCTION_DEFINITION output_beginning(Run *run, int *)
 {
     return run->training_output_x == 0;
 }
 
-__forceinline__ __device__ int output_down_end(Run *run, int *)
+FUNCTION_DEFINITION output_down_end(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->training_output_y == (run->problem.training[run->training_id][1].y - 1);
@@ -92,7 +98,7 @@ __forceinline__ __device__ int output_down_end(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int output_move_left(Run *run, int *)
+FUNCTION_DEFINITION output_move_left(Run *run, int *)
 {
     if (run->training_output_x > 0)
         run->training_output_x--;
@@ -102,7 +108,7 @@ __forceinline__ __device__ int output_move_left(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int output_move_right(Run *run, int *)
+FUNCTION_DEFINITION output_move_right(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -114,7 +120,7 @@ __forceinline__ __device__ int output_move_right(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int output_move_down(Run *run, int *)
+FUNCTION_DEFINITION output_move_down(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -126,7 +132,7 @@ __forceinline__ __device__ int output_move_down(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int output_move_up(Run *run, int *)
+FUNCTION_DEFINITION output_move_up(Run *run, int *)
 {
     if (run->training_output_y > 0)
         run->training_output_y--;
@@ -136,27 +142,27 @@ __forceinline__ __device__ int output_move_up(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int get_input_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_input_position_x(Run *run, int *)
 {
     return run->training_input_x;
 }
 
-__forceinline__ __device__ int get_input_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_input_position_y(Run *run, int *)
 {
     return run->training_input_y;
 }
 
-__forceinline__ __device__ int get_output_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_output_position_x(Run *run, int *)
 {
     return run->training_output_x;
 }
 
-__forceinline__ __device__ int get_output_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_output_position_y(Run *run, int *)
 {
     return run->training_output_y;
 }
 
-__forceinline__ __device__ int get_length_input_x(Run *run, int *)
+FUNCTION_DEFINITION get_length_input_x(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -166,7 +172,7 @@ __forceinline__ __device__ int get_length_input_x(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int get_length_input_y(Run *run, int *)
+FUNCTION_DEFINITION get_length_input_y(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -176,7 +182,7 @@ __forceinline__ __device__ int get_length_input_y(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int get_length_output_x(Run *run, int *)
+FUNCTION_DEFINITION get_length_output_x(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -186,7 +192,7 @@ __forceinline__ __device__ int get_length_output_x(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int get_length_output_y(Run *run, int *)
+FUNCTION_DEFINITION get_length_output_y(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -197,7 +203,7 @@ __forceinline__ __device__ int get_length_output_y(Run *run, int *)
 }
 
 // Training Input
-__forceinline__ __device__ int input_next(Run *run, int *)
+FUNCTION_DEFINITION input_next(Run *run, int *)
 {
     if (run->training_id < (run->problem.n_training - 1))
     {
@@ -211,7 +217,7 @@ __forceinline__ __device__ int input_next(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_previous(Run *run, int *)
+FUNCTION_DEFINITION input_previous(Run *run, int *)
 {
     if (run->training_id > 0)
     {
@@ -225,7 +231,7 @@ __forceinline__ __device__ int input_previous(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_move_left(Run *run, int *)
+FUNCTION_DEFINITION input_move_left(Run *run, int *)
 {
     if (run->training_input_x > 0)
         run->training_input_x--;
@@ -235,7 +241,7 @@ __forceinline__ __device__ int input_move_left(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_move_right(Run *run, int *)
+FUNCTION_DEFINITION input_move_right(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -247,7 +253,7 @@ __forceinline__ __device__ int input_move_right(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_move_down(Run *run, int *)
+FUNCTION_DEFINITION input_move_down(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -259,7 +265,7 @@ __forceinline__ __device__ int input_move_down(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_move_up(Run *run, int *)
+FUNCTION_DEFINITION input_move_up(Run *run, int *)
 {
     if (run->training_input_y > 0)
         run->training_input_y--;
@@ -269,19 +275,19 @@ __forceinline__ __device__ int input_move_up(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int reset_input_position(Run *run, int *)
+FUNCTION_DEFINITION reset_input_position(Run *run, int *)
 {
     run->training_input_x = 0;
     return 0;
 }
 
-__forceinline__ __device__ int reset_input_down_position(Run *run, int *)
+FUNCTION_DEFINITION reset_input_down_position(Run *run, int *)
 {
     run->training_input_y = 0;
     return 0;
 }
 
-__forceinline__ __device__ int input_max(Run *run, int *)
+FUNCTION_DEFINITION input_max(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -301,7 +307,7 @@ __forceinline__ __device__ int input_max(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_min(Run *run, int *)
+FUNCTION_DEFINITION input_min(Run *run, int *)
 {
     if (run->problem.n_training > 0)
     {
@@ -321,7 +327,7 @@ __forceinline__ __device__ int input_min(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int input_read(Run *run, int *)
+FUNCTION_DEFINITION input_read(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->problem.training[run->training_id][0].array[run->training_input_y][run->training_input_x];
@@ -329,7 +335,7 @@ __forceinline__ __device__ int input_read(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int output_read(Run *run, int *)
+FUNCTION_DEFINITION output_read(Run *run, int *)
 {
     if (run->problem.n_training > 0)
         return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x];
@@ -337,60 +343,60 @@ __forceinline__ __device__ int output_read(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int reset_output_position(Run *run, int *)
+FUNCTION_DEFINITION reset_output_position(Run *run, int *)
 {
     run->training_output_x = 0;
     return 0;
 }
 
-__forceinline__ __device__ int reset_output_down_position(Run *run, int *)
+FUNCTION_DEFINITION reset_output_down_position(Run *run, int *)
 {
     run->training_output_y = 0;
     return 0;
 }
 
 // Testing
-__forceinline__ __device__ int get_testing_length_input_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_input_x(Run *run, int *)
 {
     return run->problem.input.x;
 }
 
-__forceinline__ __device__ int get_testing_length_input_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_input_y(Run *run, int *)
 {
     return run->problem.input.y;
 }
 
-__forceinline__ __device__ int get_testing_length_output_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_output_x(Run *run, int *)
 {
     return run->problem.output.x;
 }
 
-__forceinline__ __device__ int get_testing_length_output_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_output_y(Run *run, int *)
 {
     return run->problem.output.y;
 }
 
-__forceinline__ __device__ int get_testing_input_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_input_position_y(Run *run, int *)
 {
     return run->input_y;
 }
 
-__forceinline__ __device__ int get_testing_input_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_input_position_x(Run *run, int *)
 {
     return run->input_x;
 }
 
-__forceinline__ __device__ int get_testing_output_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_output_position_y(Run *run, int *)
 {
     return run->output_y;
 }
 
-__forceinline__ __device__ int get_testing_output_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_output_position_x(Run *run, int *)
 {
     return run->output_x;
 }
 
-__forceinline__ __device__ int testing_input_max(Run *run, int *)
+FUNCTION_DEFINITION testing_input_max(Run *run, int *)
 {
     int *arr = run->problem.input.array[run->input_y];
     int max = arr[0];
@@ -404,7 +410,7 @@ __forceinline__ __device__ int testing_input_max(Run *run, int *)
     return max;
 }
 
-__forceinline__ __device__ int testing_input_min(Run *run, int *)
+FUNCTION_DEFINITION testing_input_min(Run *run, int *)
 {
     int *arr = run->problem.input.array[run->input_y];
     int min = arr[0];
@@ -418,12 +424,12 @@ __forceinline__ __device__ int testing_input_min(Run *run, int *)
     return min;
 }
 
-__forceinline__ __device__ int testing_input_read(Run *run, int *)
+FUNCTION_DEFINITION testing_input_read(Run *run, int *)
 {
     return run->problem.input.array[run->input_y][run->input_x];
 }
 
-__forceinline__ __device__ int testing_output_read_previous(Run *run, int *)
+FUNCTION_DEFINITION testing_output_read_previous(Run *run, int *)
 {
     if (run->output_x > 0)
         return run->output[run->output_y][run->output_x - 1];
@@ -433,26 +439,26 @@ __forceinline__ __device__ int testing_output_read_previous(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_output_read(Run *run, int *)
+FUNCTION_DEFINITION testing_output_read(Run *run, int *)
 {
     return run->output[run->output_y][run->output_x];
 
     return 0;
 }
 
-__forceinline__ __device__ int testing_reset_input_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_input_position(Run *run, int *)
 {
     run->input_x = 0;
     return 0;
 }
 
-__forceinline__ __device__ int testing_reset_input_down_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_input_down_position(Run *run, int *)
 {
     run->input_y = 0;
     return 0;
 }
 
-__forceinline__ __device__ int testing_output_write_previous(Run *run, int *p)
+FUNCTION_DEFINITION testing_output_write_previous(Run *run, int *p)
 {
     if (run->output_x > 0)
     {
@@ -468,7 +474,7 @@ __forceinline__ __device__ int testing_output_write_previous(Run *run, int *p)
     return 0;
 }
 
-__forceinline__ __device__ int testing_output_write(Run *run, int *p)
+FUNCTION_DEFINITION testing_output_write(Run *run, int *p)
 {
     int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
@@ -477,19 +483,19 @@ __forceinline__ __device__ int testing_output_write(Run *run, int *p)
     return 0;
 }
 
-__forceinline__ __device__ int testing_reset_output_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_output_position(Run *run, int *)
 {
     run->output_x = 0;
     return 0;
 }
 
-__forceinline__ __device__ int testing_reset_output_down_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_output_down_position(Run *run, int *)
 {
     run->output_y = 0;
     return 0;
 }
 
-__forceinline__ __device__ int testing_output_move_left(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_left(Run *run, int *)
 {
     if (run->output_x > 0)
         run->output_x--;
@@ -499,7 +505,7 @@ __forceinline__ __device__ int testing_output_move_left(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_output_move_right(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_right(Run *run, int *)
 {
     if (run->output_x < (run->problem.output.x - 1))
         run->output_x++;
@@ -509,7 +515,7 @@ __forceinline__ __device__ int testing_output_move_right(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_output_move_down(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_down(Run *run, int *)
 {
     if (run->output_y < (run->problem.output.y - 1))
         run->output_y++;
@@ -518,7 +524,7 @@ __forceinline__ __device__ int testing_output_move_down(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_output_move_up(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_up(Run *run, int *)
 {
     if (run->output_y > 0)
         run->output_y--;
@@ -528,17 +534,17 @@ __forceinline__ __device__ int testing_output_move_up(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_is_output_end(Run *run, int *)
+FUNCTION_DEFINITION testing_is_output_end(Run *run, int *)
 {
     return run->output_x == (run->problem.output.x - 1);
 }
 
-__forceinline__ __device__ int testing_is_output_down(Run *run, int *)
+FUNCTION_DEFINITION testing_is_output_down(Run *run, int *)
 {
     return run->output_y == (run->problem.output.y - 1);
 }
 
-__forceinline__ __device__ int testing_input_move_left(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_left(Run *run, int *)
 {
     if (run->input_x > 0)
         run->input_x--;
@@ -548,7 +554,7 @@ __forceinline__ __device__ int testing_input_move_left(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_input_move_right(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_right(Run *run, int *)
 {
     if (run->input_x < (run->problem.input.x - 1))
         run->input_x++;
@@ -558,7 +564,7 @@ __forceinline__ __device__ int testing_input_move_right(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_input_move_down(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_down(Run *run, int *)
 {
     if (run->input_y < (run->problem.input.y - 1))
         run->input_y++;
@@ -568,7 +574,7 @@ __forceinline__ __device__ int testing_input_move_down(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int testing_input_move_up(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_up(Run *run, int *)
 {
     if (run->input_y > 0)
         run->input_y--;
@@ -578,7 +584,7 @@ __forceinline__ __device__ int testing_input_move_up(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int comparison(Run *run, int *p)
+FUNCTION_DEFINITION comparison(Run *run, int *p)
 {
     if (run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args) == 1)
     {
@@ -592,9 +598,10 @@ __forceinline__ __device__ int comparison(Run *run, int *p)
     return 0;
 }
 
-__forceinline__ __device__ int bigger_than_output_next(Run *run, int *p)
+FUNCTION_DEFINITION bigger_than_output_next(Run *run, int *p)
 {
     if (run->problem.n_training > 0)
+    {
         if (run->training_output_x < (run->problem.training[run->training_id][1].x - 1))
         {
             return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x] >
@@ -604,10 +611,11 @@ __forceinline__ __device__ int bigger_than_output_next(Run *run, int *p)
         {
             run->status = -1;
         }
+    }
     return 0;
 }
 
-__forceinline__ __device__ int bigger_than_testing_output_next(Run *run, int *)
+FUNCTION_DEFINITION bigger_than_testing_output_next(Run *run, int *)
 {
     if (run->output_x < (run->problem.output.x - 1))
     {
@@ -622,7 +630,7 @@ __forceinline__ __device__ int bigger_than_testing_output_next(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int swap_testing_output_next(Run *run, int *)
+FUNCTION_DEFINITION swap_testing_output_next(Run *run, int *)
 {
     if (run->output_x < (run->problem.output.x - 1))
     {
@@ -638,7 +646,7 @@ __forceinline__ __device__ int swap_testing_output_next(Run *run, int *)
     return 0;
 }
 
-__forceinline__ __device__ int bigger_than(Run *run, int *p)
+FUNCTION_DEFINITION bigger_than(Run *run, int *p)
 {
     int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
@@ -646,7 +654,7 @@ __forceinline__ __device__ int bigger_than(Run *run, int *p)
     return output1 > output2;
 }
 
-__forceinline__ __device__ int equal(Run *run, int *p)
+FUNCTION_DEFINITION equal(Run *run, int *p)
 {
     int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
@@ -655,14 +663,14 @@ __forceinline__ __device__ int equal(Run *run, int *p)
     return output1 == output2;
 }
 
-__forceinline__ __device__ int no(Run *run, int *p)
+FUNCTION_DEFINITION no(Run *run, int *p)
 {
     int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
     return !output1;
 }
 
-__forceinline__ __device__ int prog2(Run *run, int *p)
+FUNCTION_DEFINITION prog2(Run *run, int *p)
 {
     run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
@@ -670,7 +678,7 @@ __forceinline__ __device__ int prog2(Run *run, int *p)
     return 0;
 }
 
-__forceinline__ __device__ int prog3(Run *run, int *p)
+FUNCTION_DEFINITION prog3(Run *run, int *p)
 {
     run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
@@ -681,7 +689,7 @@ __forceinline__ __device__ int prog3(Run *run, int *p)
     return 0;
 }
 
-__forceinline__ __device__ int loop(Run *run, int *p)
+FUNCTION_DEFINITION loop(Run *run, int *p)
 {
     run->inner_loop++;
 
@@ -711,7 +719,7 @@ __forceinline__ __device__ int loop(Run *run, int *p)
     return v;
 }
 
-__forceinline__ __device__ int dowhile(Run *run, int *p)
+FUNCTION_DEFINITION dowhile(Run *run, int *p)
 {
     int c = 0;
 
@@ -735,12 +743,12 @@ __forceinline__ __device__ int dowhile(Run *run, int *p)
     return 0;
 }
 
-__forceinline__ __device__ int read_memory(Run *run, int *)
+FUNCTION_DEFINITION read_memory(Run *run, int *)
 {
     return run->memory;
 }
 
-__forceinline__ __device__ int write_memory(Run *run, int *p)
+FUNCTION_DEFINITION write_memory(Run *run, int *p)
 {
     int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
 
@@ -755,7 +763,7 @@ struct SNode
     int case_operation;
 };
 
-__forceinline__ __device__ int function_switch(int pointer, Run *run)
+FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 {
     SNode stack[1000];
     int s_pointer = 1;
@@ -1053,9 +1061,11 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
         }
         break;
         case 78: // prog2
+        {
             Node *pnode = &run->nodes[node->node_pointer];
             stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
             break;
         case 79: // prog3
         {
@@ -1174,7 +1184,7 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
 }
 
 #define MAP_INSTRUCTIONS std::unordered_map<std::string, int>
-
+/*
 __global__ void fill_function_pointers(pfunc *pfuncs)
 {
     pfuncs[0] = get0;
@@ -1261,7 +1271,7 @@ __global__ void fill_function_pointers(pfunc *pfuncs)
     pfuncs[81] = read_memory;
     pfuncs[82] = write_memory;
     pfuncs[83] = loop;
-}
+}*/
 
 MAP_INSTRUCTIONS get_map()
 {
@@ -1444,7 +1454,8 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
 
     // Create array of programs in host memory
     Programs *d_sprograms;
-    cudaMallocManaged(&d_sprograms, sizeof(Programs));
+    //cudaMallocManaged(&d_sprograms, sizeof(Programs));
+    allocate_memory((void **)&d_sprograms, sizeof(Programs));
 
     int n_threads = std::min(n_programs, 20);
     int chunk_size = n_programs / n_threads;
@@ -1477,9 +1488,11 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
     d_sprograms->n_nodes = total_nodes;
     d_sprograms->n_programs = total_programs;
 
-    cudaMallocManaged(&d_sprograms->nodes, d_sprograms->n_nodes * sizeof(Node));
+    //cudaMallocManaged(&d_sprograms->nodes, d_sprograms->n_nodes * sizeof(Node));
+    allocate_memory((void **)&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
 
-    cudaMallocManaged(&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
+    //cudaMallocManaged(&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
+    allocate_memory((void **)&d_sprograms->nodes, d_sprograms->n_nodes * sizeof(Node));
 
     size_t offset_nodes = 0;
     size_t offset_programs = 0;
@@ -1501,9 +1514,12 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
 
 int free_programs_from_gpu(Programs *programs)
 {
-    cudaFree(programs->nodes);
-    cudaFree(programs->programs);
-    cudaFree(programs);
+    //cudaFree(programs->nodes);
+    free_memory(programs->programs);
+    //cudaFree(programs->programs);
+    free_memory(programs->nodes);
+    //cudaFree(programs);
+    free_memory(programs);
     return 0;
 }
 

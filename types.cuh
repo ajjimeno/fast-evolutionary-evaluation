@@ -63,4 +63,29 @@ struct Run
     Node *nodes;
 };
 
+#ifndef SETUP_BUILDING_CPU
+#include <cuda.h>
+
+void allocate_memory(void **output, size_t size)
+{
+    cudaMallocManaged(output, size);
+}
+
+void free_memory(void* output) {
+    cudaFree(output);
+}
+
+#else
+
+void allocate_memory(void **output, size_t size)
+{
+    *output = malloc(size);
+}
+
+void free_memory(void* output) {
+    free(output);
+}
+
+#endif
+
 #endif
