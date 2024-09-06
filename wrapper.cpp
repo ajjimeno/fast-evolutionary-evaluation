@@ -22,7 +22,6 @@
 typedef struct RunnerSimulatorWrapper
 {
     PyObject_HEAD Instances *data;
-    pfunc * d_pfuncs;
 
     RunnerSimulatorWrapper() : data(nullptr) {}
 } RunnerSimulatorWrapper;
@@ -88,7 +87,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
     float *accuracy = (float *)malloc(n_programs * sizeof(float));
 
-    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data, self->d_pfuncs);
+    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data);
 
     PyObject *list = PyList_New(n_programs);
     if (!list)

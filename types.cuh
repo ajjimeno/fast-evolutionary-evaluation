@@ -49,7 +49,7 @@ struct Run
 {
     int input_x, input_y;
     int output_x, output_y;
-    pfunc *pfuncs;
+    //pfunc *pfuncs;
     Instance problem;
     int **output;
     int inner_loop;

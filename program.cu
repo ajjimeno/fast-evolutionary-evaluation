@@ -11,7 +11,7 @@
 
 #define MAX_OUTPUT_SIZE 40
 
-__forceinline__ __device__ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
+__forceinline__ __device__ float run(Programs *programs, int program_id, Instances *problems)
 {
 	float total_accuracy = 0.0;
 
@@ -51,7 +51,6 @@ __forceinline__ __device__ float run(Programs *programs, int program_id, Instanc
 			0,						// input_y
 			0,						// output_x
 			0,						// output_y
-			pfuncs,					// funcs
 			problems->instances[p], // problem
 			output,					// output
 			0,						// inner_loop
@@ -79,7 +78,7 @@ __forceinline__ __device__ float run(Programs *programs, int program_id, Instanc
 }
 
 // Programs, Problems, split programs
-__global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, pfunc *pfuncs, float *accuracy, int blocks, int threads)
+__global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, float *accuracy, int blocks, int threads)
 {
 	int programs_per_block = (n_programs / (blocks * threads)) + 1;
 
@@ -88,11 +87,11 @@ __global__ void create_and_run(Programs *programs, int n_programs, Instances *pr
 
 	for (int i = start; i < end && i < n_programs; i++)
 	{
-		accuracy[i] = run(programs, i, problems, pfuncs);
+		accuracy[i] = run(programs, i, problems);
 	}
 }
 
-int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems, pfunc *d_pfuncs)
+int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems)
 {
 	cudaError_t err;
 	float *d_accuracy;
@@ -114,7 +113,7 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
 
 	int blocks = std::min((int)(n_programs / threads), N_BLOCKS);
 
-	create_and_run<<<blocks, threads>>>(d_programs, n_programs, problems, d_pfuncs, d_accuracy, blocks, threads);
+	create_and_run<<<blocks, threads>>>(d_programs, n_programs, problems, d_accuracy, blocks, threads);
 
 	cudaDeviceSynchronize();
 	err = cudaGetLastError();

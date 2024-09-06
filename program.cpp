@@ -8,7 +8,7 @@
 
 #define MAX_OUTPUT_SIZE 40
 
-float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs)
+float run(Programs *programs, int program_id, Instances *problems)
 {
     float total_accuracy = 0.0;
 
@@ -48,7 +48,6 @@ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs
             0,                      // input_y
             0,                      // output_x
             0,                      // output_y
-            pfuncs,                 // funcs
             problems->instances[p], // problem
             output,                 // output
             0,                      // inner_loop
@@ -76,15 +75,15 @@ float run(Programs *programs, int program_id, Instances *problems, pfunc *pfuncs
 }
 
 // Programs, Problems, split programs
-void create_and_run(Programs *programs, int n_programs, Instances *problems, pfunc *pfuncs, float *accuracy, int start, int end)
+void create_and_run(Programs *programs, int n_programs, Instances *problems, float *accuracy, int start, int end)
 {
     for (int i = start; i < end && i < n_programs; i++)
     {
-        accuracy[i] = run(programs, i, problems, pfuncs);
+        accuracy[i] = run(programs, i, problems);
     }
 }
 
-int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems, pfunc *d_pfuncs)
+int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems)
 {
     Programs *d_programs = copy_programs_to_gpu(n_programs, programs);
 
@@ -100,7 +99,7 @@ int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy,
         int start_index = i * chunk_size;
         int end_index = (i == n_threads - 1) ? n_programs : (i + 1) * chunk_size;
 
-        threads.emplace_back(create_and_run, d_programs, n_programs, problems, d_pfuncs, accuracy, start_index, end_index);
+        threads.emplace_back(create_and_run, d_programs, n_programs, problems, accuracy, start_index, end_index);
     }
 
     for (auto &t : threads)

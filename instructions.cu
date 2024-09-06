@@ -7,7 +7,13 @@
 #include <unordered_map>
 #include <vector>
 
-__forceinline__ __device__ int function_switch(int pointer, Run *run);
+#ifndef SETUP_BUILDING_CPU
+#define FUNCTION_DEFINITION __forceinline__ __device__ int
+#else
+#define FUNCTION_DEFINITION inline int
+#endif
+
+FUNCTION_DEFINITION function_switch(int pointer, Run *run);
 
 FUNCTION_DEFINITION get0(Run *run, int *)
 {
@@ -452,31 +458,6 @@ FUNCTION_DEFINITION testing_reset_input_down_position(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_output_write_previous(Run *run, int *p)
-{
-    if (run->output_x > 0)
-    {
-        int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-        run->output[run->output_y][run->output_x - 1] = value;
-    }
-    else
-    {
-        run->status = -1;
-    }
-
-    return 0;
-}
-
-FUNCTION_DEFINITION testing_output_write(Run *run, int *p)
-{
-    int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    run->output[run->output_y][run->output_x] = value;
-
-    return 0;
-}
-
 FUNCTION_DEFINITION testing_reset_output_position(Run *run, int *)
 {
     run->output_x = 0;
@@ -578,20 +559,6 @@ FUNCTION_DEFINITION testing_input_move_up(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION comparison(Run *run, int *p)
-{
-    if (run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args) == 1)
-    {
-        run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
-    }
-    else
-    {
-        run->pfuncs[(run->nodes[p[2]].pointer)](run, run->nodes[p[2]].args);
-    }
-
-    return 0;
-}
-
 FUNCTION_DEFINITION bigger_than_output_next(Run *run, int *p)
 {
     if (run->problem.n_training > 0)
@@ -640,115 +607,9 @@ FUNCTION_DEFINITION swap_testing_output_next(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION bigger_than(Run *run, int *p)
-{
-    int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    int output2 = run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
-    return output1 > output2;
-}
-
-FUNCTION_DEFINITION equal(Run *run, int *p)
-{
-    int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    int output2 = run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
-
-    return output1 == output2;
-}
-
-FUNCTION_DEFINITION no(Run *run, int *p)
-{
-    int output1 = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    return !output1;
-}
-
-FUNCTION_DEFINITION prog2(Run *run, int *p)
-{
-    run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
-    return 0;
-}
-
-FUNCTION_DEFINITION prog3(Run *run, int *p)
-{
-    run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
-
-    run->pfuncs[(run->nodes[p[2]].pointer)](run, run->nodes[p[2]].args);
-
-    return 0;
-}
-
-FUNCTION_DEFINITION loop(Run *run, int *p)
-{
-    run->inner_loop++;
-
-    int v = function_switch(p[0], run); // run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    if (run->inner_loop < 5 && v > 0 && v <= 30)
-    {
-        // int pointer = (run->nodes[p[1]].pointer);
-        // int * args = run->nodes[p[1]].args;
-
-        for (int i = 0; i < v; i++)
-        {
-            function_switch(p[1], run);
-            // run->pfuncs[pointer](run, args);
-
-            if (run->status != 0)
-                break;
-        }
-    }
-    else
-    {
-        run->status = -2;
-    }
-
-    run->inner_loop--;
-
-    return v;
-}
-
-FUNCTION_DEFINITION dowhile(Run *run, int *p)
-{
-    int c = 0;
-
-    run->inner_loop++;
-
-    if (run->inner_loop < 3)
-    {
-        while (!run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args) && c < 10)
-        {
-            c++;
-            run->pfuncs[(run->nodes[p[1]].pointer)](run, run->nodes[p[1]].args);
-        }
-    }
-    else
-    {
-        run->status = -2;
-    }
-
-    run->inner_loop--;
-
-    return 0;
-}
-
 FUNCTION_DEFINITION read_memory(Run *run, int *)
 {
     return run->memory;
-}
-
-FUNCTION_DEFINITION write_memory(Run *run, int *p)
-{
-    int value = run->pfuncs[(run->nodes[p[0]].pointer)](run, run->nodes[p[0]].args);
-
-    run->memory = value;
-
-    return 0;
 }
 
 struct SNode
@@ -1060,7 +921,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
-            break;
+        break;
         case 79: // prog3
         {
             Node *pnode = &run->nodes[node->node_pointer];
@@ -1178,94 +1039,6 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 }
 
 #define MAP_INSTRUCTIONS std::unordered_map<std::string, int>
-
-__global__ void fill_function_pointers(pfunc *pfuncs)
-{
-    pfuncs[0] = get0;
-    pfuncs[1] = get1;
-    pfuncs[2] = get2;
-    pfuncs[3] = get3;
-    pfuncs[4] = get4;
-    pfuncs[5] = get5;
-    pfuncs[6] = get6;
-    pfuncs[7] = get7;
-    pfuncs[8] = get8;
-    pfuncs[9] = get9;
-    pfuncs[10] = input_end;
-    pfuncs[11] = input_beginning;
-    pfuncs[12] = input_down_end;
-    pfuncs[13] = output_end;
-    pfuncs[14] = output_beginning;
-    pfuncs[15] = output_down_end;
-    pfuncs[16] = output_move_left;
-    pfuncs[17] = output_move_right;
-    pfuncs[18] = output_move_down;
-    pfuncs[19] = output_move_up;
-    pfuncs[20] = get_input_position_x;
-    pfuncs[21] = get_input_position_y;
-    pfuncs[22] = get_output_position_x;
-    pfuncs[23] = get_output_position_y;
-    pfuncs[24] = get_length_input_x;
-    pfuncs[25] = get_length_input_y;
-    pfuncs[26] = get_length_output_x;
-    pfuncs[27] = get_length_output_y;
-    pfuncs[28] = input_next;
-    pfuncs[29] = input_previous;
-    pfuncs[30] = input_move_left;
-    pfuncs[31] = input_move_right;
-    pfuncs[32] = input_move_down;
-    pfuncs[33] = input_move_up;
-    pfuncs[34] = reset_input_position;
-    pfuncs[35] = reset_input_down_position;
-    pfuncs[36] = input_max;
-    pfuncs[37] = input_min;
-    pfuncs[38] = input_read;
-    pfuncs[39] = output_read;
-    pfuncs[40] = reset_output_position;
-    pfuncs[41] = reset_output_down_position;
-    pfuncs[42] = get_testing_length_input_x;
-    pfuncs[43] = get_testing_length_input_y;
-    pfuncs[44] = get_testing_length_output_x;
-    pfuncs[45] = get_testing_length_output_y;
-    pfuncs[46] = get_testing_input_position_y;
-    pfuncs[47] = get_testing_input_position_x;
-    pfuncs[48] = get_testing_output_position_y;
-    pfuncs[49] = get_testing_output_position_x;
-    pfuncs[50] = testing_input_max;
-    pfuncs[51] = testing_input_min;
-    pfuncs[52] = testing_input_read;
-    pfuncs[53] = testing_output_read_previous;
-    pfuncs[54] = testing_output_read;
-    pfuncs[55] = testing_reset_input_position;
-    pfuncs[56] = testing_reset_input_down_position;
-    pfuncs[57] = testing_output_write_previous;
-    pfuncs[58] = testing_output_write;
-    pfuncs[59] = testing_reset_output_position;
-    pfuncs[60] = testing_reset_output_down_position;
-    pfuncs[61] = testing_output_move_left;
-    pfuncs[62] = testing_output_move_right;
-    pfuncs[63] = testing_output_move_down;
-    pfuncs[64] = testing_output_move_up;
-    pfuncs[65] = testing_is_output_end;
-    pfuncs[66] = testing_is_output_down;
-    pfuncs[67] = testing_input_move_left;
-    pfuncs[68] = testing_input_move_right;
-    pfuncs[69] = testing_input_move_down;
-    pfuncs[70] = testing_input_move_up;
-    pfuncs[71] = comparison;
-    pfuncs[72] = bigger_than_output_next;
-    pfuncs[73] = bigger_than_testing_output_next;
-    pfuncs[74] = swap_testing_output_next;
-    pfuncs[75] = bigger_than;
-    pfuncs[76] = equal;
-    pfuncs[77] = no;
-    pfuncs[78] = prog2;
-    pfuncs[79] = prog3;
-    pfuncs[80] = dowhile;
-    pfuncs[81] = read_memory;
-    pfuncs[82] = write_memory;
-    pfuncs[83] = loop;
-}*/
 
 MAP_INSTRUCTIONS get_map()
 {
@@ -1448,7 +1221,7 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
 
     // Create array of programs in host memory
     Programs *d_sprograms;
-    //cudaMallocManaged(&d_sprograms, sizeof(Programs));
+    // cudaMallocManaged(&d_sprograms, sizeof(Programs));
     allocate_memory((void **)&d_sprograms, sizeof(Programs));
 
     int n_threads = std::min(n_programs, 20);
@@ -1482,10 +1255,10 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
     d_sprograms->n_nodes = total_nodes;
     d_sprograms->n_programs = total_programs;
 
-    //cudaMallocManaged(&d_sprograms->nodes, d_sprograms->n_nodes * sizeof(Node));
+    // cudaMallocManaged(&d_sprograms->nodes, d_sprograms->n_nodes * sizeof(Node));
     allocate_memory((void **)&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
 
-    //cudaMallocManaged(&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
+    // cudaMallocManaged(&d_sprograms->programs, d_sprograms->n_programs * sizeof(int));
     allocate_memory((void **)&d_sprograms->nodes, d_sprograms->n_nodes * sizeof(Node));
 
     size_t offset_nodes = 0;
@@ -1508,11 +1281,11 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
 
 int free_programs_from_gpu(Programs *programs)
 {
-    //cudaFree(programs->nodes);
+    // cudaFree(programs->nodes);
     free_memory(programs->programs);
-    //cudaFree(programs->programs);
+    // cudaFree(programs->programs);
     free_memory(programs->nodes);
-    //cudaFree(programs);
+    // cudaFree(programs);
     free_memory(programs);
     return 0;
 }
