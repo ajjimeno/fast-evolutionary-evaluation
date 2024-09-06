@@ -196,11 +196,13 @@ int **push_array(int **array, int y, int x)
 {
     int **output;
 
-    cudaMallocManaged(&output, y * sizeof(int *));
+    //cudaMallocManaged(&output, y * sizeof(int *));
+    allocate_memory((void **)&output, y * sizeof(int *));
 
     for (int i = 0; i < y; i++)
     {
-        cudaMallocManaged(&output[i], x * sizeof(int));
+        //cudaMallocManaged(&output[i], x * sizeof(int));
+        allocate_memory((void **)&output[i], x * sizeof(int));
 
         for (int j = 0; j < x; j++)
         {
@@ -217,11 +219,13 @@ Instances *load_data(const char *dir)
 
     Instances *output;
 
-    cudaMallocManaged(&output, sizeof(Instances));
+    //cudaMallocManaged(&output, sizeof(Instances));
+    allocate_memory((void **)&output, sizeof(Instances));
 
     output->n_instances = instances->n_instances;
 
-    cudaMallocManaged(&output->instances, instances->n_instances * sizeof(Instance));
+    //cudaMallocManaged(&output->instances, instances->n_instances * sizeof(Instance));
+    allocate_memory((void **)&output->instances, instances->n_instances * sizeof(Instance));
 
     for (int i = 0; i < instances->n_instances; i++)
     {
@@ -259,11 +263,13 @@ Instances *load_data(const char *dir)
                        instances->instances[i].initial.y,
                        instances->instances[i].initial.x);
 
-        cudaMallocManaged(&output->instances[i].training, output->instances[i].n_training * sizeof(Array *));
+        //cudaMallocManaged(&output->instances[i].training, output->instances[i].n_training * sizeof(Array *));
+        allocate_memory((void **)&output->instances[i].training, output->instances[i].n_training * sizeof(Array *));
 
         for (int j = 0; j < output->instances[i].n_training; j++)
         {
-            cudaMallocManaged(&output->instances[i].training[j], 2*sizeof(Array));
+            //cudaMallocManaged(&output->instances[i].training[j], 2*sizeof(Array));
+            allocate_memory((void **)&output->instances[i].training[j], 2*sizeof(Array));
 
             for (int k = 0; k < 2; k++)
             {

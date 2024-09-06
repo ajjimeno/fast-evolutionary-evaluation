@@ -3,6 +3,9 @@
 #include "problems.cu"
 #include "types.cuh"
 
+#ifndef PROGRAM_RUNNING
+#define PROGRAM_RUNNING
+
 #define N_BLOCKS 500
 #define N_THREADS 1024
 
@@ -64,8 +67,6 @@ __forceinline__ __device__ float run(Programs *programs, int program_id, Instanc
 		int o;
 		for (int i = 0; i < 200; i++)
 		{
-			//pfuncs[program[0].pointer](&r, program[0].args);
-
 			o = function_switch(0, &r);
 
 			if (r.status != 0)
@@ -73,8 +74,6 @@ __forceinline__ __device__ float run(Programs *programs, int program_id, Instanc
 		}
 
 		total_accuracy += accuracy_calculation(problems->instances[p], output);
-
-		// free(r);
 	}
 	return total_accuracy / (float)problems->n_instances;
 }
@@ -176,3 +175,5 @@ int main()
 
 	execute_and_evaluate(n_programs, programs.data(), accuracy);
 }*/
+
+#endif
