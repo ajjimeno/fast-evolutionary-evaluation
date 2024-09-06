@@ -19,7 +19,7 @@ int main()
 
     for (int i=0; i<30000;i++)
 {
-    std::map<int, Node> nodes;
+    std::vector<Node> nodes;
     getProgram(c, map, &nodes);
 }
     /*

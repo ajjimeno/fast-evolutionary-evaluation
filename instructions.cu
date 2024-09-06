@@ -7,6 +7,22 @@
 #include <unordered_map>
 #include <vector>
 
+struct MMH3
+{
+    size_t operator()(const std::string &str) const
+    {
+        // Use a fast hash function like MurmurHash3 for better performance
+        uint32_t hash = 5381;
+        for (int i = 0; i < str.length(); i++)
+        {
+            hash = ((hash << 5) + hash) + str[i];
+        }
+        return hash;
+    }
+};
+
+#define MAP_INSTRUCTIONS std::unordered_map<std::string, int> //, MMH3>
+
 __forceinline__ __device__ int function_switch(int pointer, Run *run);
 
 __forceinline__ __device__ int get0(Run *run, int *)
@@ -1173,8 +1189,6 @@ __forceinline__ __device__ int function_switch(int pointer, Run *run)
     return 0;
 }
 
-#define MAP_INSTRUCTIONS std::unordered_map<std::string, int>
-
 __global__ void fill_function_pointers(pfunc *pfuncs)
 {
     pfuncs[0] = get0;
@@ -1360,7 +1374,7 @@ MAP_INSTRUCTIONS get_map()
     return map;
 }
 
-int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *nodes, int &position)
+int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes, int &position)
 {
     int program = -1;
 
@@ -1378,7 +1392,7 @@ int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *
             program = nodes->size();
             int pointer = map[string.substr(initial_position, position - initial_position)];
 
-            nodes->insert({program, {pointer, 0, {0, 0, 0}}});
+            nodes->push_back({pointer, 0, {0, 0, 0}});
 
             position++;
 
@@ -1416,7 +1430,7 @@ int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *
     return program;
 }
 
-void getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::map<int, Node> *nodes)
+void getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes)
 {
     int position = 0;
     getProgram(string, map, nodes, position);
@@ -1426,7 +1440,7 @@ void copy_program(int start_index, int end_index, std::vector<int> *programs, st
 {
     for (int i = start_index; i < end_index; ++i)
     {
-        std::map<int, Node> subnodes;
+        std::vector<Node> subnodes;
         getProgram(code[i], map, &subnodes);
 
         programs->push_back(nodes->size());
