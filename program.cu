@@ -91,7 +91,7 @@ __global__ void create_and_run(Programs *programs, int n_programs, Instances *pr
 	}
 }
 
-int execute_and_evaluate(int n_programs, std::string *programs, float *accuracy, Instances *problems)
+int execute_and_evaluate(int n_programs, std::string_view *programs, float *accuracy, Instances *problems)
 {
 	cudaError_t err;
 	float *d_accuracy;

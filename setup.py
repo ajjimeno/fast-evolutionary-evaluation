@@ -20,6 +20,8 @@ def install_gpu():
                 "-fPIC",
                 "--compiler-options",
                 "-march=native",
+                "--compiler-options",
+                "-finline-functions"
             ],
         )
 
@@ -57,7 +59,7 @@ def install_cpu():
     moduleCPU = Extension(
             "SimulatorCPU",
             sources=["wrapper.cpp"],
-            extra_compile_args=["-g", "-O3", "-march=native", "-std=c++11", "-DSETUP_BUILDING_CPU", "-Wsign-compare"],
+            extra_compile_args=["-g", "-O3", "-march=native", "-std=c++11", "-DSETUP_BUILDING_CPU", "-Wsign-compare", "-finline-functions"],
     )
     setup(
             name="SimulatorCPU",
@@ -69,10 +71,3 @@ def install_cpu():
 if __name__ == "__main__":
     install_gpu()
     install_cpu()
-    """
-    try:
-        subprocess.check_output("nvidia-smi")
-        install_gpu()
-    except:
-        install_cpu()
-    """

@@ -15,49 +15,49 @@
 
 FUNCTION_DEFINITION function_switch(int pointer, Run *run);
 
-FUNCTION_DEFINITION get0(Run *run, int *)
+FUNCTION_DEFINITION get0(Run *run)
 {
     return 0;
 }
-FUNCTION_DEFINITION get1(Run *run, int *)
+FUNCTION_DEFINITION get1(Run *run)
 {
     return 1;
 }
-FUNCTION_DEFINITION get2(Run *run, int *)
+FUNCTION_DEFINITION get2(Run *run)
 {
     return 2;
 }
-FUNCTION_DEFINITION get3(Run *run, int *)
+FUNCTION_DEFINITION get3(Run *run)
 {
     return 3;
 }
-FUNCTION_DEFINITION get4(Run *run, int *)
+FUNCTION_DEFINITION get4(Run *run)
 {
     return 4;
 }
-FUNCTION_DEFINITION get5(Run *run, int *)
+FUNCTION_DEFINITION get5(Run *run)
 {
     return 5;
 }
-FUNCTION_DEFINITION get6(Run *run, int *)
+FUNCTION_DEFINITION get6(Run *run)
 {
     return 6;
 }
-FUNCTION_DEFINITION get7(Run *run, int *)
+FUNCTION_DEFINITION get7(Run *run)
 {
     return 7;
 }
-FUNCTION_DEFINITION get8(Run *run, int *)
+FUNCTION_DEFINITION get8(Run *run)
 {
     return 8;
 }
-FUNCTION_DEFINITION get9(Run *run, int *)
+FUNCTION_DEFINITION get9(Run *run)
 {
     return 9;
 }
 
 // Training
-FUNCTION_DEFINITION input_end(Run *run, int *)
+FUNCTION_DEFINITION input_end(Run *run)
 {
     if (run->problem.n_training > 0)
         return run->training_input_x == (run->problem.training[run->training_id][0].x - 1);
@@ -65,19 +65,19 @@ FUNCTION_DEFINITION input_end(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_beginning(Run *run, int *)
+FUNCTION_DEFINITION input_beginning(Run *run)
 {
     return run->training_input_x == 0;
 }
 
-FUNCTION_DEFINITION input_down_end(Run *run, int *)
+FUNCTION_DEFINITION input_down_end(Run *run)
 {
     if (run->problem.n_training > 0)
         return run->training_input_y == (run->problem.training[run->training_id][0].y - 1);
     return 0;
 }
 
-FUNCTION_DEFINITION output_end(Run *run, int *)
+FUNCTION_DEFINITION output_end(Run *run)
 {
     if (run->problem.n_training > 0)
         return run->training_output_x == (run->problem.training[run->training_id][1].x - 1);
@@ -85,12 +85,12 @@ FUNCTION_DEFINITION output_end(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION output_beginning(Run *run, int *)
+FUNCTION_DEFINITION output_beginning(Run *run)
 {
     return run->training_output_x == 0;
 }
 
-FUNCTION_DEFINITION output_down_end(Run *run, int *)
+FUNCTION_DEFINITION output_down_end(Run *run)
 {
     if (run->problem.n_training > 0)
         return run->training_output_y == (run->problem.training[run->training_id][1].y - 1);
@@ -98,7 +98,7 @@ FUNCTION_DEFINITION output_down_end(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION output_move_left(Run *run, int *)
+FUNCTION_DEFINITION output_move_left(Run *run)
 {
     if (run->training_output_x > 0)
         run->training_output_x--;
@@ -108,7 +108,7 @@ FUNCTION_DEFINITION output_move_left(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION output_move_right(Run *run, int *)
+FUNCTION_DEFINITION output_move_right(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -120,7 +120,7 @@ FUNCTION_DEFINITION output_move_right(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION output_move_down(Run *run, int *)
+FUNCTION_DEFINITION output_move_down(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -132,7 +132,7 @@ FUNCTION_DEFINITION output_move_down(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION output_move_up(Run *run, int *)
+FUNCTION_DEFINITION output_move_up(Run *run)
 {
     if (run->training_output_y > 0)
         run->training_output_y--;
@@ -142,27 +142,27 @@ FUNCTION_DEFINITION output_move_up(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION get_input_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_input_position_x(Run *run)
 {
     return run->training_input_x;
 }
 
-FUNCTION_DEFINITION get_input_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_input_position_y(Run *run)
 {
     return run->training_input_y;
 }
 
-FUNCTION_DEFINITION get_output_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_output_position_x(Run *run)
 {
     return run->training_output_x;
 }
 
-FUNCTION_DEFINITION get_output_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_output_position_y(Run *run)
 {
     return run->training_output_y;
 }
 
-FUNCTION_DEFINITION get_length_input_x(Run *run, int *)
+FUNCTION_DEFINITION get_length_input_x(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -172,7 +172,7 @@ FUNCTION_DEFINITION get_length_input_x(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION get_length_input_y(Run *run, int *)
+FUNCTION_DEFINITION get_length_input_y(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -182,7 +182,7 @@ FUNCTION_DEFINITION get_length_input_y(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION get_length_output_x(Run *run, int *)
+FUNCTION_DEFINITION get_length_output_x(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -192,7 +192,7 @@ FUNCTION_DEFINITION get_length_output_x(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION get_length_output_y(Run *run, int *)
+FUNCTION_DEFINITION get_length_output_y(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -203,7 +203,7 @@ FUNCTION_DEFINITION get_length_output_y(Run *run, int *)
 }
 
 // Training Input
-FUNCTION_DEFINITION input_next(Run *run, int *)
+FUNCTION_DEFINITION input_next(Run *run)
 {
     if (run->training_id < (run->problem.n_training - 1))
     {
@@ -217,7 +217,7 @@ FUNCTION_DEFINITION input_next(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_previous(Run *run, int *)
+FUNCTION_DEFINITION input_previous(Run *run)
 {
     if (run->training_id > 0)
     {
@@ -231,7 +231,7 @@ FUNCTION_DEFINITION input_previous(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_move_left(Run *run, int *)
+FUNCTION_DEFINITION input_move_left(Run *run)
 {
     if (run->training_input_x > 0)
         run->training_input_x--;
@@ -241,7 +241,7 @@ FUNCTION_DEFINITION input_move_left(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_move_right(Run *run, int *)
+FUNCTION_DEFINITION input_move_right(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -253,7 +253,7 @@ FUNCTION_DEFINITION input_move_right(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_move_down(Run *run, int *)
+FUNCTION_DEFINITION input_move_down(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -265,7 +265,7 @@ FUNCTION_DEFINITION input_move_down(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_move_up(Run *run, int *)
+FUNCTION_DEFINITION input_move_up(Run *run)
 {
     if (run->training_input_y > 0)
         run->training_input_y--;
@@ -275,19 +275,19 @@ FUNCTION_DEFINITION input_move_up(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION reset_input_position(Run *run, int *)
+FUNCTION_DEFINITION reset_input_position(Run *run)
 {
     run->training_input_x = 0;
     return 0;
 }
 
-FUNCTION_DEFINITION reset_input_down_position(Run *run, int *)
+FUNCTION_DEFINITION reset_input_down_position(Run *run)
 {
     run->training_input_y = 0;
     return 0;
 }
 
-FUNCTION_DEFINITION input_max(Run *run, int *)
+FUNCTION_DEFINITION input_max(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -307,7 +307,7 @@ FUNCTION_DEFINITION input_max(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_min(Run *run, int *)
+FUNCTION_DEFINITION input_min(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -327,7 +327,7 @@ FUNCTION_DEFINITION input_min(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION input_read(Run *run, int *)
+FUNCTION_DEFINITION input_read(Run *run)
 {
     if (run->problem.n_training > 0)
         return run->problem.training[run->training_id][0].array[run->training_input_y][run->training_input_x];
@@ -335,7 +335,7 @@ FUNCTION_DEFINITION input_read(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION output_read(Run *run, int *)
+FUNCTION_DEFINITION output_read(Run *run)
 {
     if (run->problem.n_training > 0)
         return run->problem.training[run->training_id][1].array[run->training_output_y][run->training_output_x];
@@ -343,60 +343,60 @@ FUNCTION_DEFINITION output_read(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION reset_output_position(Run *run, int *)
+FUNCTION_DEFINITION reset_output_position(Run *run)
 {
     run->training_output_x = 0;
     return 0;
 }
 
-FUNCTION_DEFINITION reset_output_down_position(Run *run, int *)
+FUNCTION_DEFINITION reset_output_down_position(Run *run)
 {
     run->training_output_y = 0;
     return 0;
 }
 
 // Testing
-FUNCTION_DEFINITION get_testing_length_input_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_input_x(Run *run)
 {
     return run->problem.input.x;
 }
 
-FUNCTION_DEFINITION get_testing_length_input_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_input_y(Run *run)
 {
     return run->problem.input.y;
 }
 
-FUNCTION_DEFINITION get_testing_length_output_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_output_x(Run *run)
 {
     return run->problem.output.x;
 }
 
-FUNCTION_DEFINITION get_testing_length_output_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_length_output_y(Run *run)
 {
     return run->problem.output.y;
 }
 
-FUNCTION_DEFINITION get_testing_input_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_input_position_y(Run *run)
 {
     return run->input_y;
 }
 
-FUNCTION_DEFINITION get_testing_input_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_input_position_x(Run *run)
 {
     return run->input_x;
 }
 
-FUNCTION_DEFINITION get_testing_output_position_y(Run *run, int *)
+FUNCTION_DEFINITION get_testing_output_position_y(Run *run)
 {
     return run->output_y;
 }
 
-FUNCTION_DEFINITION get_testing_output_position_x(Run *run, int *)
+FUNCTION_DEFINITION get_testing_output_position_x(Run *run)
 {
     return run->output_x;
 }
 
-FUNCTION_DEFINITION testing_input_max(Run *run, int *)
+FUNCTION_DEFINITION testing_input_max(Run *run)
 {
     int *arr = run->problem.input.array[run->input_y];
     int max = arr[0];
@@ -410,7 +410,7 @@ FUNCTION_DEFINITION testing_input_max(Run *run, int *)
     return max;
 }
 
-FUNCTION_DEFINITION testing_input_min(Run *run, int *)
+FUNCTION_DEFINITION testing_input_min(Run *run)
 {
     int *arr = run->problem.input.array[run->input_y];
     int min = arr[0];
@@ -424,12 +424,12 @@ FUNCTION_DEFINITION testing_input_min(Run *run, int *)
     return min;
 }
 
-FUNCTION_DEFINITION testing_input_read(Run *run, int *)
+FUNCTION_DEFINITION testing_input_read(Run *run)
 {
     return run->problem.input.array[run->input_y][run->input_x];
 }
 
-FUNCTION_DEFINITION testing_output_read_previous(Run *run, int *)
+FUNCTION_DEFINITION testing_output_read_previous(Run *run)
 {
     if (run->output_x > 0)
         return run->output[run->output_y][run->output_x - 1];
@@ -439,38 +439,38 @@ FUNCTION_DEFINITION testing_output_read_previous(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_output_read(Run *run, int *)
+FUNCTION_DEFINITION testing_output_read(Run *run)
 {
     return run->output[run->output_y][run->output_x];
 
     return 0;
 }
 
-FUNCTION_DEFINITION testing_reset_input_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_input_position(Run *run)
 {
     run->input_x = 0;
     return 0;
 }
 
-FUNCTION_DEFINITION testing_reset_input_down_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_input_down_position(Run *run)
 {
     run->input_y = 0;
     return 0;
 }
 
-FUNCTION_DEFINITION testing_reset_output_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_output_position(Run *run)
 {
     run->output_x = 0;
     return 0;
 }
 
-FUNCTION_DEFINITION testing_reset_output_down_position(Run *run, int *)
+FUNCTION_DEFINITION testing_reset_output_down_position(Run *run)
 {
     run->output_y = 0;
     return 0;
 }
 
-FUNCTION_DEFINITION testing_output_move_left(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_left(Run *run)
 {
     if (run->output_x > 0)
         run->output_x--;
@@ -480,7 +480,7 @@ FUNCTION_DEFINITION testing_output_move_left(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_output_move_right(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_right(Run *run)
 {
     if (run->output_x < (run->problem.output.x - 1))
         run->output_x++;
@@ -490,7 +490,7 @@ FUNCTION_DEFINITION testing_output_move_right(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_output_move_down(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_down(Run *run)
 {
     if (run->output_y < (run->problem.output.y - 1))
         run->output_y++;
@@ -499,7 +499,7 @@ FUNCTION_DEFINITION testing_output_move_down(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_output_move_up(Run *run, int *)
+FUNCTION_DEFINITION testing_output_move_up(Run *run)
 {
     if (run->output_y > 0)
         run->output_y--;
@@ -509,17 +509,17 @@ FUNCTION_DEFINITION testing_output_move_up(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_is_output_end(Run *run, int *)
+FUNCTION_DEFINITION testing_is_output_end(Run *run)
 {
     return run->output_x == (run->problem.output.x - 1);
 }
 
-FUNCTION_DEFINITION testing_is_output_down(Run *run, int *)
+FUNCTION_DEFINITION testing_is_output_down(Run *run)
 {
     return run->output_y == (run->problem.output.y - 1);
 }
 
-FUNCTION_DEFINITION testing_input_move_left(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_left(Run *run)
 {
     if (run->input_x > 0)
         run->input_x--;
@@ -529,7 +529,7 @@ FUNCTION_DEFINITION testing_input_move_left(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_input_move_right(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_right(Run *run)
 {
     if (run->input_x < (run->problem.input.x - 1))
         run->input_x++;
@@ -539,7 +539,7 @@ FUNCTION_DEFINITION testing_input_move_right(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_input_move_down(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_down(Run *run)
 {
     if (run->input_y < (run->problem.input.y - 1))
         run->input_y++;
@@ -549,7 +549,7 @@ FUNCTION_DEFINITION testing_input_move_down(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION testing_input_move_up(Run *run, int *)
+FUNCTION_DEFINITION testing_input_move_up(Run *run)
 {
     if (run->input_y > 0)
         run->input_y--;
@@ -559,7 +559,7 @@ FUNCTION_DEFINITION testing_input_move_up(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION bigger_than_output_next(Run *run, int *p)
+FUNCTION_DEFINITION bigger_than_output_next(Run *run)
 {
     if (run->problem.n_training > 0)
     {
@@ -576,7 +576,7 @@ FUNCTION_DEFINITION bigger_than_output_next(Run *run, int *p)
     return 0;
 }
 
-FUNCTION_DEFINITION bigger_than_testing_output_next(Run *run, int *)
+FUNCTION_DEFINITION bigger_than_testing_output_next(Run *run)
 {
     if (run->output_x < (run->problem.output.x - 1))
     {
@@ -591,7 +591,7 @@ FUNCTION_DEFINITION bigger_than_testing_output_next(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION swap_testing_output_next(Run *run, int *)
+FUNCTION_DEFINITION swap_testing_output_next(Run *run)
 {
     if (run->output_x < (run->problem.output.x - 1))
     {
@@ -607,7 +607,7 @@ FUNCTION_DEFINITION swap_testing_output_next(Run *run, int *)
     return 0;
 }
 
-FUNCTION_DEFINITION read_memory(Run *run, int *)
+FUNCTION_DEFINITION read_memory(Run *run)
 {
     return run->memory;
 }
@@ -637,175 +637,175 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         switch (node->case_operation)
         {
         case 0:
-            reg = get0(NULL, NULL);
+            reg = get0(NULL);
             break;
         case 1:
-            reg = get1(NULL, NULL);
+            reg = get1(NULL);
             break;
         case 2:
-            reg = get2(NULL, NULL);
+            reg = get2(NULL);
             break;
         case 3:
-            reg = get3(NULL, NULL);
+            reg = get3(NULL);
             break;
         case 4:
-            reg = get4(NULL, NULL);
+            reg = get4(NULL);
             break;
         case 5:
-            reg = get5(NULL, NULL);
+            reg = get5(NULL);
             break;
         case 6:
-            reg = get6(NULL, NULL);
+            reg = get6(NULL);
             break;
         case 7:
-            reg = get7(NULL, NULL);
+            reg = get7(NULL);
             break;
         case 8:
-            reg = get8(NULL, NULL);
+            reg = get8(NULL);
             break;
         case 9:
-            reg = get9(NULL, NULL);
+            reg = get9(NULL);
             break;
         case 10:
-            reg = input_end(run, NULL);
+            reg = input_end(run);
             break;
         case 11:
-            reg = input_beginning(run, NULL);
+            reg = input_beginning(run);
             break;
         case 12:
-            reg = input_down_end(run, NULL);
+            reg = input_down_end(run);
             break;
         case 13:
-            reg = output_end(run, NULL);
+            reg = output_end(run);
             break;
         case 14:
-            reg = output_beginning(run, NULL);
+            reg = output_beginning(run);
             break;
         case 15:
-            reg = output_down_end(run, NULL);
+            reg = output_down_end(run);
             break;
         case 16:
-            reg = output_move_left(run, NULL);
+            reg = output_move_left(run);
             break;
         case 17:
-            reg = output_move_right(run, NULL);
+            reg = output_move_right(run);
             break;
         case 18:
-            reg = output_move_down(run, NULL);
+            reg = output_move_down(run);
             break;
         case 19:
-            reg = output_move_up(run, NULL);
+            reg = output_move_up(run);
             break;
         case 20:
-            reg = get_input_position_x(run, NULL);
+            reg = get_input_position_x(run);
             break;
         case 21:
-            reg = get_input_position_y(run, NULL);
+            reg = get_input_position_y(run);
             break;
         case 22:
-            reg = get_output_position_x(run, NULL);
+            reg = get_output_position_x(run);
             break;
         case 23:
-            reg = get_output_position_y(run, NULL);
+            reg = get_output_position_y(run);
             break;
         case 24:
-            reg = get_length_input_x(run, NULL);
+            reg = get_length_input_x(run);
             break;
         case 25:
-            reg = get_length_input_y(run, NULL);
+            reg = get_length_input_y(run);
             break;
         case 26:
-            reg = get_length_output_x(run, NULL);
+            reg = get_length_output_x(run);
             break;
         case 27:
-            reg = get_length_output_y(run, NULL);
+            reg = get_length_output_y(run);
             break;
         case 28:
-            reg = input_next(run, NULL);
+            reg = input_next(run);
             break;
         case 29:
-            reg = input_previous(run, NULL);
+            reg = input_previous(run);
             break;
         case 30:
-            reg = input_move_left(run, NULL);
+            reg = input_move_left(run);
             break;
         case 31:
-            reg = input_move_right(run, NULL);
+            reg = input_move_right(run);
             break;
         case 32:
-            reg = input_move_down(run, NULL);
+            reg = input_move_down(run);
             break;
         case 33:
-            reg = input_move_up(run, NULL);
+            reg = input_move_up(run);
             break;
         case 34:
-            reg = reset_input_position(run, NULL);
+            reg = reset_input_position(run);
             break;
         case 35:
-            reg = reset_input_down_position(run, NULL);
+            reg = reset_input_down_position(run);
             break;
         case 36:
-            reg = input_max(run, NULL);
+            reg = input_max(run);
             break;
         case 37:
-            reg = input_min(run, NULL);
+            reg = input_min(run);
             break;
         case 38:
-            reg = input_read(run, NULL);
+            reg = input_read(run);
             break;
         case 39:
-            reg = output_read(run, NULL);
+            reg = output_read(run);
             break;
         case 40:
-            reg = reset_output_position(run, NULL);
+            reg = reset_output_position(run);
             break;
         case 41:
-            reg = reset_output_down_position(run, NULL);
+            reg = reset_output_down_position(run);
             break;
         case 42:
-            reg = get_testing_length_input_x(run, NULL);
+            reg = get_testing_length_input_x(run);
             break;
         case 43:
-            reg = get_testing_length_input_y(run, NULL);
+            reg = get_testing_length_input_y(run);
             break;
         case 44:
-            reg = get_testing_length_output_x(run, NULL);
+            reg = get_testing_length_output_x(run);
             break;
         case 45:
-            reg = get_testing_length_output_y(run, NULL);
+            reg = get_testing_length_output_y(run);
             break;
         case 46:
-            reg = get_testing_input_position_y(run, NULL);
+            reg = get_testing_input_position_y(run);
             break;
         case 47:
-            reg = get_testing_input_position_x(run, NULL);
+            reg = get_testing_input_position_x(run);
             break;
         case 48:
-            reg = get_testing_output_position_y(run, NULL);
+            reg = get_testing_output_position_y(run);
             break;
         case 49:
-            reg = get_testing_output_position_x(run, NULL);
+            reg = get_testing_output_position_x(run);
             break;
         case 50:
-            reg = testing_input_max(run, NULL);
+            reg = testing_input_max(run);
             break;
         case 51:
-            reg = testing_input_min(run, NULL);
+            reg = testing_input_min(run);
             break;
         case 52:
-            reg = testing_input_read(run, NULL);
+            reg = testing_input_read(run);
             break;
         case 53:
-            reg = testing_output_read_previous(run, NULL);
+            reg = testing_output_read_previous(run);
             break;
         case 54:
-            reg = testing_output_read(run, NULL);
+            reg = testing_output_read(run);
             break;
         case 55:
-            reg = testing_reset_input_position(run, NULL);
+            reg = testing_reset_input_position(run);
             break;
         case 56:
-            reg = testing_reset_input_down_position(run, NULL);
+            reg = testing_reset_input_down_position(run);
             break;
         // Write operations missing
         case 57: // testing_output_write_previous
@@ -834,40 +834,40 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 59:
-            reg = testing_reset_output_position(run, NULL);
+            reg = testing_reset_output_position(run);
             break;
         case 60:
-            reg = testing_reset_output_down_position(run, NULL);
+            reg = testing_reset_output_down_position(run);
             break;
         case 61:
-            reg = testing_output_move_left(run, NULL);
+            reg = testing_output_move_left(run);
             break;
         case 62:
-            reg = testing_output_move_right(run, NULL);
+            reg = testing_output_move_right(run);
             break;
         case 63:
-            reg = testing_output_move_down(run, NULL);
+            reg = testing_output_move_down(run);
             break;
         case 64:
-            reg = testing_output_move_up(run, NULL);
+            reg = testing_output_move_up(run);
             break;
         case 65:
-            reg = testing_is_output_end(run, NULL);
+            reg = testing_is_output_end(run);
             break;
         case 66:
-            reg = testing_is_output_down(run, NULL);
+            reg = testing_is_output_down(run);
             break;
         case 67:
-            reg = testing_input_move_left(run, NULL);
+            reg = testing_input_move_left(run);
             break;
         case 68:
-            reg = testing_input_move_right(run, NULL);
+            reg = testing_input_move_right(run);
             break;
         case 69:
-            reg = testing_input_move_down(run, NULL);
+            reg = testing_input_move_down(run);
             break;
         case 70:
-            reg = testing_input_move_up(run, NULL);
+            reg = testing_input_move_up(run);
             break;
         case 71: // comparison
         {
@@ -879,14 +879,14 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 72:
-            reg = bigger_than_output_next(run, NULL);
+            reg = bigger_than_output_next(run);
             break;
 
         case 73:
-            reg = bigger_than_testing_output_next(run, NULL);
+            reg = bigger_than_testing_output_next(run);
             break;
         case 74:
-            reg = swap_testing_output_next(run, NULL);
+            reg = swap_testing_output_next(run);
             break;
         case 75: // bigger_than
         {
@@ -931,7 +931,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 81:
-            reg = read_memory(run, NULL);
+            reg = read_memory(run);
             break;
         case 82: // write memory
         {
@@ -1038,7 +1038,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
     return 0;
 }
 
-#define MAP_INSTRUCTIONS std::unordered_map<std::string, int>
+#define MAP_INSTRUCTIONS std::unordered_map<std::string_view, int>
 
 MAP_INSTRUCTIONS get_map()
 {
@@ -1137,19 +1137,23 @@ MAP_INSTRUCTIONS get_map()
     return map;
 }
 
-int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes, int &position)
+inline int getProgram(const std::string_view &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes, int &position)
 {
     int program = -1;
 
     int initial_position = position;
+    const int length = string.length();
+    const char * cstr = string.data();
 
-    while (initial_position < string.length() && string[initial_position] == ' ')
+    while (initial_position < length && cstr[initial_position] == ' ')
         initial_position++;
 
     // Traverse string into tree
-    while (position < string.length())
+    while (position < length)
     {
-        if (string[position] == '(')
+        switch (cstr[position])
+        {
+        case '(':
         {
             // Create new program entry
             program = nodes->size();
@@ -1159,7 +1163,7 @@ int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::vector<Node> *no
 
             position++;
 
-            if (string[position] == ')')
+            if (cstr[position] == ')')
             {
                 position++;
                 return program;
@@ -1170,36 +1174,35 @@ int getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::vector<Node> *no
                 nodes->at(program).args[nodes->at(program).n_args++] = sub;
             }
         }
-        // Close and return
-        else if (string[position] == ')')
-        {
+        break;
+        case ')':
             position++;
             return program;
-        }
-        else if (string[position] == ',')
+            break;
+        case ',':
         {
-            // After this, there is a new program
             position++;
 
             int sub = getProgram(string, map, nodes, position);
             nodes->at(program).args[nodes->at(program).n_args++] = sub;
         }
-        else
-        {
+        break;
+        default:
             position++;
+            break;
         }
     }
 
     return program;
 }
 
-void getProgram(std::string &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes)
+inline void getProgram(const std::string_view &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes)
 {
     int position = 0;
     getProgram(string, map, nodes, position);
 }
 
-void copy_program(int start_index, int end_index, std::vector<int> *programs, std::vector<Node> *nodes, std::string *code, MAP_INSTRUCTIONS map)
+inline void copy_program(int start_index, int end_index, std::vector<int> *programs, std::vector<Node> *nodes, std::string_view *code, MAP_INSTRUCTIONS map)
 {
     for (int i = start_index; i < end_index; ++i)
     {
@@ -1215,7 +1218,7 @@ void copy_program(int start_index, int end_index, std::vector<int> *programs, st
     }
 }
 
-Programs *copy_programs_to_gpu(int n_programs, std::string *code)
+Programs *copy_programs_to_gpu(int n_programs, std::string_view *code)
 {
     MAP_INSTRUCTIONS map = get_map();
 
@@ -1224,7 +1227,7 @@ Programs *copy_programs_to_gpu(int n_programs, std::string *code)
     // cudaMallocManaged(&d_sprograms, sizeof(Programs));
     allocate_memory((void **)&d_sprograms, sizeof(Programs));
 
-    int n_threads = std::min(n_programs, 20);
+    int n_threads = std::min(n_programs, 80);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;
