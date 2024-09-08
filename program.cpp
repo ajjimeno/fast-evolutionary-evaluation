@@ -83,7 +83,7 @@ void create_and_run(Programs *programs, int n_programs, Instances *problems, flo
     }
 }
 
-int execute_and_evaluate(int n_programs, std::string_view *programs, float *accuracy, Instances *problems)
+int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Instances *problems)
 {
     Programs *d_programs = copy_programs_to_gpu(n_programs, programs);
 
@@ -91,7 +91,7 @@ int execute_and_evaluate(int n_programs, std::string_view *programs, float *accu
 
     std::vector<std::thread> threads;
 
-    int n_threads = std::min(n_programs, 80);
+    int n_threads = std::min(n_programs, 20);
     int chunk_size = n_programs / n_threads;
 
     for (int i = 0; i < n_threads; ++i)

@@ -1038,7 +1038,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
     return 0;
 }
 
-#define MAP_INSTRUCTIONS std::unordered_map<std::string_view, int>
+#define MAP_INSTRUCTIONS std::unordered_map<STRING, int>
 
 MAP_INSTRUCTIONS get_map()
 {
@@ -1137,13 +1137,13 @@ MAP_INSTRUCTIONS get_map()
     return map;
 }
 
-inline int getProgram(const std::string_view &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes, int &position)
+inline int getProgram(const STRING *string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes, int &position)
 {
     int program = -1;
 
     int initial_position = position;
-    const int length = string.length();
-    const char * cstr = string.data();
+    const int length = string->length();
+    const char * cstr = string->data();
 
     while (initial_position < length && cstr[initial_position] == ' ')
         initial_position++;
@@ -1157,7 +1157,7 @@ inline int getProgram(const std::string_view &string, MAP_INSTRUCTIONS &map, std
         {
             // Create new program entry
             program = nodes->size();
-            int pointer = map[string.substr(initial_position, position - initial_position)];
+            int pointer = map[string->substr(initial_position, position - initial_position)];
 
             nodes->push_back({pointer, 0, {0, 0, 0}});
 
@@ -1196,13 +1196,13 @@ inline int getProgram(const std::string_view &string, MAP_INSTRUCTIONS &map, std
     return program;
 }
 
-inline void getProgram(const std::string_view &string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes)
+inline void getProgram(const STRING *string, MAP_INSTRUCTIONS &map, std::vector<Node> *nodes)
 {
     int position = 0;
     getProgram(string, map, nodes, position);
 }
 
-inline void copy_program(int start_index, int end_index, std::vector<int> *programs, std::vector<Node> *nodes, std::string_view *code, MAP_INSTRUCTIONS map)
+inline void copy_program(int start_index, int end_index, std::vector<int> *programs, std::vector<Node> *nodes, STRING **code, MAP_INSTRUCTIONS map)
 {
     for (int i = start_index; i < end_index; ++i)
     {
@@ -1218,7 +1218,7 @@ inline void copy_program(int start_index, int end_index, std::vector<int> *progr
     }
 }
 
-Programs *copy_programs_to_gpu(int n_programs, std::string_view *code)
+Programs *copy_programs_to_gpu(int n_programs, STRING **code)
 {
     MAP_INSTRUCTIONS map = get_map();
 
@@ -1227,7 +1227,7 @@ Programs *copy_programs_to_gpu(int n_programs, std::string_view *code)
     // cudaMallocManaged(&d_sprograms, sizeof(Programs));
     allocate_memory((void **)&d_sprograms, sizeof(Programs));
 
-    int n_threads = std::min(n_programs, 80);
+    int n_threads = std::min(n_programs, 20);
     int chunk_size = n_programs / n_threads;
 
     std::vector<std::thread> threads;

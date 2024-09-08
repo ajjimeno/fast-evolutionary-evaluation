@@ -74,7 +74,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     }
 
     // Convert Python list to C++ vector of strings
-    std::vector<std::string_view> cpp_strings;
+    std::vector<STRING> cpp_strings;
     if (!PyList_Check(py_list))
     {
         std::cout << "Argument is not a list" << std::endl;
@@ -91,14 +91,14 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             PyObject *str_method = PyObject_GetAttrString(py_item, "__str__");
             PyObject *str_obj = PyObject_CallObject(str_method, NULL);
             const char *str = PyUnicode_AsUTF8(str_obj);
-            cpp_strings.push_back(std::string_view(str));
+            cpp_strings.push_back(STRING(str));
             Py_DECREF(str_obj);
             Py_DECREF(str_method);
         }
         else if (!PyUnicode_Check(py_item))
         {
             const char *str = PyUnicode_AsUTF8(py_item);
-            cpp_strings.push_back(std::string_view(str));
+            cpp_strings.push_back(STRING(str));
             // PyMem_Free(str);
         }
         else
