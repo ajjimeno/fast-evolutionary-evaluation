@@ -74,7 +74,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     }
 
     // Convert Python list to C++ vector of strings
-    std::vector<STRING> cpp_strings;
+    std::vector<STRING *> cpp_strings;
     if (!PyList_Check(py_list))
     {
         std::cout << "Argument is not a list" << std::endl;
@@ -91,14 +91,20 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             PyObject *str_method = PyObject_GetAttrString(py_item, "__str__");
             PyObject *str_obj = PyObject_CallObject(str_method, NULL);
             const char *str = PyUnicode_AsUTF8(str_obj);
-            cpp_strings.push_back(STRING(str));
+            char* copy = new char[strlen(str) + 1]; // Allocate memory
+            strcpy(copy, str);
+            STRING * string = new STRING(copy);
+            cpp_strings.push_back(string);
             Py_DECREF(str_obj);
             Py_DECREF(str_method);
         }
         else if (!PyUnicode_Check(py_item))
         {
             const char *str = PyUnicode_AsUTF8(py_item);
-            cpp_strings.push_back(STRING(str));
+            char* copy = new char[strlen(str) + 1]; // Allocate memory
+            strcpy(copy, str);
+            STRING * string = new STRING(copy);
+            cpp_strings.push_back(string);
             // PyMem_Free(str);
         }
         else
@@ -115,6 +121,12 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
     execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data);
 
+    for (auto &s : cpp_strings)
+    {
+        delete s->data();
+        delete s;
+    }
+    
     PyObject *list = PyList_New(n_programs);
     if (!list)
     {

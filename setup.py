@@ -13,6 +13,8 @@ def install_gpu():
             sources=["wrapper.cu"],
             extra_compile_args=[
                 "-O3",
+                "--std",
+                "c++17",
                 "-arch=compute_86",
                 "-code=sm_86",
                 "-Xptxas=-O3",
@@ -21,7 +23,9 @@ def install_gpu():
                 "--compiler-options",
                 "-march=native",
                 "--compiler-options",
-                "-finline-functions"
+                "-finline-functions",
+                "--compiler-options",
+                "-std=c++17"
             ],
         )
 
@@ -70,4 +74,4 @@ def install_cpu():
 
 if __name__ == "__main__":
     install_gpu()
-    install_cpu()
+    #install_cpu()
