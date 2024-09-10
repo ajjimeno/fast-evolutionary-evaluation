@@ -74,4 +74,4 @@ def install_cpu():
 
 if __name__ == "__main__":
     install_gpu()
-    #install_cpu()
+    install_cpu()
