@@ -1029,6 +1029,64 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 109:
             reg = (reg1 > reg);
             break;
+        case 84:
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 120};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+            break;
+        case 120:
+        {
+            reg1 = reg;
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 121};
+
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+            break;
+        case 121:
+            if (reg >= 0 && reg < get_testing_length_output_x(run) && reg1 >= 0 && reg1 < get_testing_length_output_y(run))
+            {
+                run->output_x = reg;
+                run->output_y = reg1;
+            }
+            else
+            {
+                run->status = -1;
+            }
+
+            break;
+        case 85:
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 122};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+            break;
+        case 122:
+        {
+            reg1 = reg;
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 123};
+
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+            break;
+        case 123:
+            if (reg >= 0 && reg < get_testing_length_input_x(run) && reg1 >= 0 && reg1 < get_testing_length_input_y(run))
+            {
+                run->input_x = reg;
+                run->input_y = reg1;
+            }
+            else
+            {
+                run->status = -1;
+            }
+
+            break;
         default:
             run->status = -1;
             break;
@@ -1133,6 +1191,9 @@ MAP_INSTRUCTIONS get_map()
     map["read_memory"] = 81;
     map["write_memory"] = 82;
     map["loop"] = 83;
+
+    map["testing_set_input_position"]=84;
+    map["testing_set_input_down_position"]=85;
 
     return map;
 }
