@@ -628,6 +628,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
     int reg = 0;
     int reg1 = 0;
+    int reg2 = 0;
 
     // Till no more nodes are available
     while (s_pointer > 0 && run->status == 0)
@@ -1029,14 +1030,14 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 109:
             reg = (reg1 > reg);
             break;
-        case 84:
+        case 84: // testing_set_input_position
         {
             Node *pnode = &run->nodes[node->node_pointer];
             stack[s_pointer++] = {node->node_pointer, 120};
 
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
-            break;
+        break;
         case 120:
         {
             reg1 = reg;
@@ -1045,7 +1046,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
             stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
         }
-            break;
+        break;
         case 121:
             if (reg >= 0 && reg < get_testing_length_output_x(run) && reg1 >= 0 && reg1 < get_testing_length_output_y(run))
             {
@@ -1058,14 +1059,14 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             }
 
             break;
-        case 85:
+        case 85: // testing_set_input_position
         {
             Node *pnode = &run->nodes[node->node_pointer];
             stack[s_pointer++] = {node->node_pointer, 122};
 
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
-            break;
+        break;
         case 122:
         {
             reg1 = reg;
@@ -1074,7 +1075,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
             stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
         }
-            break;
+        break;
         case 123:
             if (reg >= 0 && reg < get_testing_length_input_x(run) && reg1 >= 0 && reg1 < get_testing_length_input_y(run))
             {
@@ -1087,6 +1088,97 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             }
 
             break;
+        case 86: // testing_set_output_value
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 124};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+        break;
+        case 124:
+        {
+            reg1 = reg;
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 125};
+
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+        break;
+        case 125:
+        {
+            reg2 = reg;
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 126};
+
+            stack[s_pointer++] = {pnode->args[2], run->nodes[pnode->args[2]].pointer};
+        }
+        break;
+        case 126:
+            if (reg1 >= 0 && reg1 < get_testing_length_output_x(run) && reg2 >= 0 && reg2 < get_testing_length_output_y(run))
+            {
+                run->output[reg2][reg1] = reg;
+            }
+            else
+            {
+                run->status = -1;
+            }
+
+            break;
+        case 87: // testing_get_input_value
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 127};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+        break;
+        case 127:
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 128};
+
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+        break;
+        case 128:
+            if (reg >= 0 && reg < get_testing_length_input_x(run) && reg1 >= 0 && reg1 < get_testing_length_input_y(run))
+            {
+                reg = run->problem.input.array[reg1][reg];
+            }
+            else
+            {
+                run->status = -1;
+            }
+
+            break;
+        case 88: // testing_get_output_value
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 129};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+        break;
+        case 129:
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 130};
+
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+        break;
+        case 130:
+            if (reg >= 0 && reg < get_testing_length_output_x(run) && reg1 >= 0 && reg1 < get_testing_length_output_y(run))
+            {
+                reg = run->problem.output.array[reg1][reg];
+            }
+            else
+            {
+                run->status = -1;
+            }
+
+            break; 
         default:
             run->status = -1;
             break;
@@ -1192,8 +1284,11 @@ MAP_INSTRUCTIONS get_map()
     map["write_memory"] = 82;
     map["loop"] = 83;
 
-    map["testing_set_input_position"]=84;
-    map["testing_set_input_down_position"]=85;
+    map["testing_set_input_position"] = 84;
+    map["testing_set_output_position"] = 85;
+    map["testing_set_output_value"] = 86;
+    map["testing_get_input_value"] = 87;
+    map["testing_get_output_value"] = 88;
 
     return map;
 }
@@ -1204,7 +1299,7 @@ inline int getProgram(const STRING *string, MAP_INSTRUCTIONS &map, std::vector<N
 
     int initial_position = position;
     const int length = string->length();
-    const char * cstr = string->data();
+    const char *cstr = string->data();
 
     while (initial_position < length && cstr[initial_position] == ' ')
         initial_position++;
