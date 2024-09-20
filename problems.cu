@@ -9,7 +9,7 @@ float accuracy_calculation(Instance problem, int **output)
 #endif
 {
     float tp = 0.0;
-    float total = 0;
+    float total = 0.0;
 
     int count[10];
     for (int i = 0; i < problem.gt.y; i++)
