@@ -64,10 +64,9 @@ float run(Programs *programs, int program_id, Instances *problems)
             0,                      // training_output_y
             program};
 
-        int o;
         for (int i = 0; i < 200; i++)
         {
-            o = function_switch(0, &r);
+            function_switch(0, &r);
 
             if (r.status != 0)
                 break;
