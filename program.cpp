@@ -39,11 +39,10 @@ float run(Programs *programs, int program_id, Instances *problems)
         {
             for (int j = 0; j < problems->instances[p].initial.x; j++)
             {
-                if (i < problems->instances[p].input.x && j < problems->instances[p].input.y)
+                if (j < problems->instances[p].input.x && i < problems->instances[p].input.y)
                 { output[i][j] = problems->instances[p].input.array[i][j]; }
                 else
                 { output[i][j] = 0; }
-                //output[i][j] = problems->instances[p].initial.array[i][j];
             }
         }
 

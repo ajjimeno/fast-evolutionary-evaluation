@@ -16,14 +16,18 @@ float accuracy_calculation(Instance problem, int **output)
     {
         for (int j = 0; j < problem.gt.x; j++)
         {
-            count[problem.gt.array[i][j]]++;
+            if (problem.gt.array[i][j] > 0 && problem.gt.array[i][j] < 10)
+                count[problem.gt.array[i][j]]++;
         }
     }
 
     float inv[10];
     for (int i = 0; i < 10; i++)
     {
-        inv[i] = 1.0 / count[i];
+        if (count[i] == 0)
+            inv[i] = 0.0;
+        else
+            inv[i] = 1.0 / count[i];
     }
 
 
