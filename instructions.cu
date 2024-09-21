@@ -1369,7 +1369,7 @@ inline void copy_program(int start_index, int end_index, std::vector<int> *progr
 
         programs->push_back(nodes->size());
 
-        for (int i = 0; i < subnodes.size(); i++)
+        for (long unsigned int i = 0; i < subnodes.size(); i++)
         {
             nodes->push_back({subnodes[i].pointer, subnodes[i].n_args, {subnodes[i].args[0], subnodes[i].args[1], subnodes[i].args[2]}});
         }
@@ -1428,7 +1428,7 @@ Programs *copy_programs_to_gpu(int n_programs, STRING **code)
     {
         std::copy(nodes[i].begin(), nodes[i].end(), d_sprograms->nodes + offset_nodes);
 
-        for (int j = 0; j < programs[i].size(); j++)
+        for (long unsigned int j = 0; j < programs[i].size(); j++)
         {
             programs[i][j] += offset_nodes;
         }

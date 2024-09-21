@@ -63,7 +63,7 @@ Instance read_file(string file_name)
 
                     vector<string> l = split(line, " ");
 
-                    for (int x = 0; x < l.size(); x++)
+                    for (long unsigned int x = 0; x < l.size(); x++)
                     {
                         a.array[k][x] = stoi(l.at(x));
                     }
@@ -97,7 +97,7 @@ Instance read_file(string file_name)
                 getline(myfile, line);
                 vector<string> l = split(line, " ");
 
-                for (int x = 0; x < l.size(); x++)
+                for (long unsigned int x = 0; x < l.size(); x++)
                 {
                     ins.input.array[k][x] = stoi(l.at(x));
                 }
@@ -125,7 +125,7 @@ Instance read_file(string file_name)
                 getline(myfile, line);
                 vector<string> l = split(line, " ");
 
-                for (int x = 0; x < l.size(); x++)
+                for (long unsigned int x = 0; x < l.size(); x++)
                 {
                     ins.output.array[k][x] = stoi(l.at(x));
                     ins.gt.array[k][x] = stoi(l.at(x));
@@ -148,7 +148,7 @@ Instance read_file(string file_name)
                 getline(myfile, line);
                 vector<string> l = split(line, " ");
 
-                for (int x = 0; x < l.size(); x++)
+                for (long unsigned int x = 0; x < l.size(); x++)
                 {
                     ins.initial.array[k][x] = stoi(l.at(x));
                 }
