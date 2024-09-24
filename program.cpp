@@ -67,8 +67,8 @@ float run(Programs *programs, int program_id, Instances *problems)
         {
             function_switch(0, &r);
 
-            if (r.status != 0)
-                break;
+            //if (r.status != 0)
+            //    break;
         }
 
         total_accuracy += accuracy_calculation(problems->instances[p], output);
