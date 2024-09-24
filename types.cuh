@@ -42,8 +42,12 @@ struct Programs
     Node *nodes;
 };
 
-struct Run;
-typedef int (*pfunc)(Run *run, int *p);
+struct InputInstance
+{
+    int min;
+    int max;
+};
+
 
 struct Run
 {
@@ -61,6 +65,7 @@ struct Run
     int training_input_x, training_input_y;
     int training_output_x, training_output_y;
     Node *nodes;
+    InputInstance inputInstance;
 };
 
 #ifndef SETUP_BUILDING_CPU

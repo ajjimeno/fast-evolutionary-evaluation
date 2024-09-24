@@ -63,6 +63,9 @@ float run(Programs *programs, int program_id, Instances *problems)
             0,                      // training_output_y
             program};
 
+        r.inputInstance.max = input_max(&r);
+        r.inputInstance.min = input_min(&r);
+
         for (int i = 0; i < 200; i++)
         {
             function_switch(0, &r);

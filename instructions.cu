@@ -746,10 +746,10 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             reg = reset_input_down_position(run);
             break;
         case 36:
-            reg = input_max(run);
+            reg = run->inputInstance.max;
             break;
         case 37:
-            reg = input_min(run);
+            reg = run->inputInstance.min;
             break;
         case 38:
             reg = input_read(run);

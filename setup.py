@@ -25,7 +25,7 @@ def install_gpu():
                 "--compiler-options",
                 "-finline-functions",
                 "--compiler-options",
-                "-std=c++17"
+                "-std=c++17",
             ],
         )
 
