@@ -2,6 +2,7 @@
 #define PROGRAM_INSTRUCTIONS_C
 
 #include "types.cuh"
+#include "problems.cu"
 #include <map>
 #include <thread>
 #include <unordered_map>
@@ -1450,6 +1451,77 @@ int free_programs_from_gpu(Programs *programs)
     // cudaFree(programs);
     free_memory(programs);
     return 0;
+}
+
+#define MAX_OUTPUT_SIZE 40
+
+#ifndef SETUP_BUILDING_CPU
+__forceinline__ __device__ float run(Programs *programs, int program_id, Instances *problems)
+#else
+float run(Programs *programs, int program_id, Instances *problems)
+#endif
+{
+	float total_accuracy = 0.0;
+
+	// Limit program size to 1000 nodes
+	Node program[1000];
+
+	int pointer_end;
+	if ((program_id + 1) == programs->n_programs)
+		pointer_end = programs->n_nodes;
+	else
+		pointer_end = programs->programs[program_id + 1];
+
+	for (int i = 0; i < pointer_end - programs->programs[program_id]; i++)
+	{
+		program[i] = programs->nodes[programs->programs[program_id] + i];
+	}
+
+	int myArray[MAX_OUTPUT_SIZE][MAX_OUTPUT_SIZE];
+	int *output[MAX_OUTPUT_SIZE];
+	for (int i = 0; i < MAX_OUTPUT_SIZE; i++)
+	{
+		output[i] = myArray[i];
+	}
+
+	for (int p = 0; p < problems->n_instances; p++)
+	{
+		for (int i = 0; i < problems->instances[p].initial.y; i++)
+		{
+			for (int j = 0; j < problems->instances[p].initial.x; j++)
+			{
+				output[i][j] = problems->instances[p].initial.array[i][j];
+			}
+		}
+
+		Run r = {
+			0,						// input_x
+			0,						// input_y
+			0,						// output_x
+			0,						// output_y
+			problems->instances[p], // problem
+			output,					// output
+			0,						// inner_loop
+			0,						// status
+			0,						// memory
+			0,						// training_id
+			0,						// training_input_x
+			0,						// training_input_y
+			0,						// training_output_x
+			0,						// training_output_y
+			program};
+
+		for (int i = 0; i < 200; i++)
+		{
+			function_switch(0, &r);
+
+			if (r.status != 0)
+				break;
+		}
+
+		total_accuracy += accuracy_calculation(problems->instances[p], output);
+	}
+	return total_accuracy / (float)problems->n_instances;
 }
 
 #endif
