@@ -13,6 +13,8 @@ struct Array
     int **array;
 };
 
+struct Shape;
+
 struct Instance
 {
     Array **training;
@@ -21,6 +23,9 @@ struct Instance
     Array output;
     Array gt;
     Array initial;
+
+    int n_shapes;
+    Shape * shapes;
 };
 
 struct Instances
@@ -53,22 +58,25 @@ struct BoundingBox
     int height;
 };
 
+/*
 struct Color
 {
     int value;
     int frequency;
 };
+*/
 
 struct Shape
 {
-    int y;
+    char type;
     int x;
+    int y;
 
     int area;
 
     BoundingBox box;
 
-    Color *Color;
+    //Color *color;
 };
 
 struct InputInstance

@@ -1134,6 +1134,21 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
+        case 89: // in_input_shape
+            reg = 0;
+            for (int i = 0; i < run->problem.n_shapes; i++)
+            {
+                BoundingBox box = run->problem.shapes[i].box;
+
+                if (run->input_x >= box.left && run->input_x <= box.left + box.width &&
+                    run->input_y >= box.top && run->input_y <= box.top + box.height)
+                {
+                    reg = 1;
+                    break;
+                }
+            }
+
+            break;
         case 127:
         {
             reg1 = reg;
@@ -1181,7 +1196,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
 
-            break; 
+            break;
         default:
             run->status = -1;
             break;
@@ -1293,6 +1308,7 @@ MAP_INSTRUCTIONS get_map()
     map["testing_get_input_value"] = 87;
     map["testing_get_output_value"] = 88;
 
+    map["in_input_shape"] = 89;
 
     return map;
 }
@@ -1461,67 +1477,67 @@ __forceinline__ __device__ float run(Programs *programs, int program_id, Instanc
 float run(Programs *programs, int program_id, Instances *problems)
 #endif
 {
-	float total_accuracy = 0.0;
+    float total_accuracy = 0.0;
 
-	// Limit program size to 1000 nodes
-	Node program[1000];
+    // Limit program size to 1000 nodes
+    Node program[1000];
 
-	int pointer_end;
-	if ((program_id + 1) == programs->n_programs)
-		pointer_end = programs->n_nodes;
-	else
-		pointer_end = programs->programs[program_id + 1];
+    int pointer_end;
+    if ((program_id + 1) == programs->n_programs)
+        pointer_end = programs->n_nodes;
+    else
+        pointer_end = programs->programs[program_id + 1];
 
-	for (int i = 0; i < pointer_end - programs->programs[program_id]; i++)
-	{
-		program[i] = programs->nodes[programs->programs[program_id] + i];
-	}
+    for (int i = 0; i < pointer_end - programs->programs[program_id]; i++)
+    {
+        program[i] = programs->nodes[programs->programs[program_id] + i];
+    }
 
-	int myArray[MAX_OUTPUT_SIZE][MAX_OUTPUT_SIZE];
-	int *output[MAX_OUTPUT_SIZE];
-	for (int i = 0; i < MAX_OUTPUT_SIZE; i++)
-	{
-		output[i] = myArray[i];
-	}
+    int myArray[MAX_OUTPUT_SIZE][MAX_OUTPUT_SIZE];
+    int *output[MAX_OUTPUT_SIZE];
+    for (int i = 0; i < MAX_OUTPUT_SIZE; i++)
+    {
+        output[i] = myArray[i];
+    }
 
-	for (int p = 0; p < problems->n_instances; p++)
-	{
-		for (int i = 0; i < problems->instances[p].initial.y; i++)
-		{
-			for (int j = 0; j < problems->instances[p].initial.x; j++)
-			{
-				output[i][j] = problems->instances[p].initial.array[i][j];
-			}
-		}
+    for (int p = 0; p < problems->n_instances; p++)
+    {
+        for (int i = 0; i < problems->instances[p].initial.y; i++)
+        {
+            for (int j = 0; j < problems->instances[p].initial.x; j++)
+            {
+                output[i][j] = problems->instances[p].initial.array[i][j];
+            }
+        }
 
-		Run r = {
-			0,						// input_x
-			0,						// input_y
-			0,						// output_x
-			0,						// output_y
-			problems->instances[p], // problem
-			output,					// output
-			0,						// inner_loop
-			0,						// status
-			0,						// memory
-			0,						// training_id
-			0,						// training_input_x
-			0,						// training_input_y
-			0,						// training_output_x
-			0,						// training_output_y
-			program};
+        Run r = {
+            0,                      // input_x
+            0,                      // input_y
+            0,                      // output_x
+            0,                      // output_y
+            problems->instances[p], // problem
+            output,                 // output
+            0,                      // inner_loop
+            0,                      // status
+            0,                      // memory
+            0,                      // training_id
+            0,                      // training_input_x
+            0,                      // training_input_y
+            0,                      // training_output_x
+            0,                      // training_output_y
+            program};
 
-		for (int i = 0; i < 200; i++)
-		{
-			function_switch(0, &r);
+        for (int i = 0; i < 200; i++)
+        {
+            function_switch(0, &r);
 
-			if (r.status != 0)
-				break;
-		}
+            if (r.status != 0)
+                break;
+        }
 
-		total_accuracy += accuracy_calculation(problems->instances[p], output);
-	}
-	return total_accuracy / (float)problems->n_instances;
+        total_accuracy += accuracy_calculation(problems->instances[p], output);
+    }
+    return total_accuracy / (float)problems->n_instances;
 }
 
 #endif

@@ -72,8 +72,8 @@ Instance read_file(string file_name)
                 training_example.push_back(a);
             }
 
-            training[i] = (Array*)malloc(training_example.size()*sizeof(Array));
-            
+            training[i] = (Array *)malloc(training_example.size() * sizeof(Array));
+
             std::copy(training_example.begin(), training_example.end(), training[i]);
         }
 
@@ -163,6 +163,56 @@ Instance read_file(string file_name)
     return ins;
 }
 
+Shape *read_shapes(string file_name, Instance &instance)
+{
+    std::cout << "File:" << file_name << std::endl;
+    string line;
+    ifstream myfile(file_name);
+
+    if (myfile.is_open())
+    {
+        // Training size
+        getline(myfile, line);
+
+        int t_shapes = stoi(line);
+
+        instance.n_shapes = t_shapes;
+
+        Shape *shapes = (Shape *)malloc(t_shapes * sizeof(Shape));
+
+        for (int i = 0; i < t_shapes; i++)
+        {
+            getline(myfile, line);
+
+            shapes[i].type = line[0];
+
+            getline(myfile, line);
+
+            vector<string> l = split(line, " ");
+
+            shapes[i].x = stoi(l[0]);
+            shapes[i].y = stoi(l[1]);
+
+            getline(myfile, line);
+
+            shapes[i].area = stof(line);
+
+            getline(myfile, line);
+
+            l = split(line, " ");
+
+            shapes[i].box.left = stoi(l[0]);
+            shapes[i].box.top = stoi(l[1]);
+            shapes[i].box.width = stoi(l[2]);
+            shapes[i].box.height = stoi(l[3]);
+        }
+    }
+    else
+        cout << "Unable to open file";
+
+    return NULL;
+}
+
 Instances *read_dir(const char *path)
 {
     Instances *output;
@@ -178,8 +228,17 @@ Instances *read_dir(const char *path)
     s += "/";
 
     while ((entry = readdir(dir)) != NULL)
-        if (entry->d_name[0] != '.')
-            ins.push_back(read_file(s + entry->d_name));
+    {
+        string st(entry->d_name);
+        if (entry->d_name[0] != '.' && st.find(".txt") == st.length() - 4)
+        {
+            Instance instance = read_file(s + entry->d_name);
+
+            instance.shapes = read_shapes(s + st + ".s", instance);
+
+            ins.push_back(instance);
+        }
+    }
 
     closedir(dir);
 
@@ -196,12 +255,12 @@ int **push_array(int **array, int y, int x)
 {
     int **output;
 
-    //cudaMallocManaged(&output, y * sizeof(int *));
+    // cudaMallocManaged(&output, y * sizeof(int *));
     allocate_memory((void **)&output, y * sizeof(int *));
 
     for (int i = 0; i < y; i++)
     {
-        //cudaMallocManaged(&output[i], x * sizeof(int));
+        // cudaMallocManaged(&output[i], x * sizeof(int));
         allocate_memory((void **)&output[i], x * sizeof(int));
 
         for (int j = 0; j < x; j++)
@@ -219,12 +278,12 @@ Instances *load_data(const char *dir)
 
     Instances *output;
 
-    //cudaMallocManaged(&output, sizeof(Instances));
+    // cudaMallocManaged(&output, sizeof(Instances));
     allocate_memory((void **)&output, sizeof(Instances));
 
     output->n_instances = instances->n_instances;
 
-    //cudaMallocManaged(&output->instances, instances->n_instances * sizeof(Instance));
+    // cudaMallocManaged(&output->instances, instances->n_instances * sizeof(Instance));
     allocate_memory((void **)&output->instances, instances->n_instances * sizeof(Instance));
 
     for (int i = 0; i < instances->n_instances; i++)
@@ -263,13 +322,13 @@ Instances *load_data(const char *dir)
                        instances->instances[i].initial.y,
                        instances->instances[i].initial.x);
 
-        //cudaMallocManaged(&output->instances[i].training, output->instances[i].n_training * sizeof(Array *));
+        // cudaMallocManaged(&output->instances[i].training, output->instances[i].n_training * sizeof(Array *));
         allocate_memory((void **)&output->instances[i].training, output->instances[i].n_training * sizeof(Array *));
 
         for (int j = 0; j < output->instances[i].n_training; j++)
         {
-            //cudaMallocManaged(&output->instances[i].training[j], 2*sizeof(Array));
-            allocate_memory((void **)&output->instances[i].training[j], 2*sizeof(Array));
+            // cudaMallocManaged(&output->instances[i].training[j], 2*sizeof(Array));
+            allocate_memory((void **)&output->instances[i].training[j], 2 * sizeof(Array));
 
             for (int k = 0; k < 2; k++)
             {
