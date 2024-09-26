@@ -1,6 +1,9 @@
 #ifndef PROGRAM_TYPES_H
 #define PROGRAM_TYPES_H
 
+#include <opencv2/opencv.hpp>
+
+
 #define STRING std::string_view
 
 struct Array
@@ -40,6 +43,32 @@ struct Programs
 
     int n_nodes;
     Node *nodes;
+};
+
+struct BoundingBox
+{
+    int top;
+    int left;
+    int width;
+    int height;
+};
+
+struct Color
+{
+    int value;
+    int frequency;
+};
+
+struct Shape
+{
+    int y;
+    int x;
+
+    int area;
+
+    BoundingBox box;
+
+    Color *Color;
 };
 
 struct InputInstance
