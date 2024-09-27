@@ -163,7 +163,7 @@ Instance read_file(string file_name)
     return ins;
 }
 
-Shape *read_shapes(string file_name, Instance &instance)
+Shape *read_shapes(string file_name, Instance *instance)
 {
     std::cout << "File:" << file_name << std::endl;
     string line;
@@ -176,7 +176,7 @@ Shape *read_shapes(string file_name, Instance &instance)
 
         int t_shapes = stoi(line);
 
-        instance.n_shapes = t_shapes;
+        instance->n_shapes = t_shapes;
 
         Shape *shapes = (Shape *)malloc(t_shapes * sizeof(Shape));
 
@@ -206,9 +206,14 @@ Shape *read_shapes(string file_name, Instance &instance)
             shapes[i].box.width = stoi(l[2]);
             shapes[i].box.height = stoi(l[3]);
         }
+
+        return shapes;
     }
     else
+    {
+        instance->n_shapes = 0;
         cout << "Unable to open file";
+    }
 
     return NULL;
 }
@@ -234,7 +239,7 @@ Instances *read_dir(const char *path)
         {
             Instance instance = read_file(s + entry->d_name);
 
-            instance.shapes = read_shapes(s + st + ".s", instance);
+            instance.shapes = read_shapes(s + st + ".s", &instance);
 
             ins.push_back(instance);
         }
@@ -288,6 +293,9 @@ Instances *load_data(const char *dir)
 
     for (int i = 0; i < instances->n_instances; i++)
     {
+        output->instances[i].n_shapes = instances->instances[i].n_shapes;
+        output->instances[i].shapes = instances->instances[i].shapes;
+
         output->instances[i].n_training = instances->instances[i].n_training;
 
         output->instances[i].input.x = instances->instances[i].input.x;

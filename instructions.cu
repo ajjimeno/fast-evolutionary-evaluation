@@ -1136,8 +1136,10 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         break;
         case 89: // in_input_shape
             reg = 0;
+
             for (int i = 0; i < run->problem.n_shapes; i++)
-            {
+            {   //std::cout << "nshapes: " << run->problem.n_shapes <<std::endl;
+                //std::cout << run->problem.shapes <<std::endl;
                 BoundingBox box = run->problem.shapes[i].box;
 
                 if (run->input_x >= box.left && run->input_x <= box.left + box.width &&
@@ -1469,7 +1471,7 @@ int free_programs_from_gpu(Programs *programs)
     return 0;
 }
 
-#define MAX_OUTPUT_SIZE 40
+#define MAX_OUTPUT_SIZE 100
 
 #ifndef SETUP_BUILDING_CPU
 __forceinline__ __device__ float run(Programs *programs, int program_id, Instances *problems)
@@ -1480,7 +1482,7 @@ float run(Programs *programs, int program_id, Instances *problems)
     float total_accuracy = 0.0;
 
     // Limit program size to 1000 nodes
-    Node program[1000];
+    Node program[10000];
 
     int pointer_end;
     if ((program_id + 1) == programs->n_programs)
@@ -1506,7 +1508,11 @@ float run(Programs *programs, int program_id, Instances *problems)
         {
             for (int j = 0; j < problems->instances[p].initial.x; j++)
             {
-                output[i][j] = problems->instances[p].initial.array[i][j];
+                
+                if (i < problems->instances[p].input.y && j <  problems->instances[p].input.x)
+                    output[i][j] = problems->instances[p].input.array[i][j];
+                else
+                    output[i][j] = 0; 
             }
         }
 
@@ -1531,8 +1537,8 @@ float run(Programs *programs, int program_id, Instances *problems)
         {
             function_switch(0, &r);
 
-            if (r.status != 0)
-                break;
+            //if (r.status != 0)
+            //    break;
         }
 
         total_accuracy += accuracy_calculation(problems->instances[p], output);

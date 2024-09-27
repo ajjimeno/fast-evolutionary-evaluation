@@ -22,7 +22,7 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
 
     std::vector<std::thread> threads;
 
-    int n_threads = std::min(n_programs, 20);
+    int n_threads = std::min(n_programs, 40);
     int chunk_size = n_programs / n_threads;
 
     for (int i = 0; i < n_threads; ++i)
