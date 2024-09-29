@@ -1,9 +1,6 @@
 #ifndef PROGRAM_TYPES_H
 #define PROGRAM_TYPES_H
 
-#include <opencv2/opencv.hpp>
-
-
 #define STRING std::string_view
 
 struct Array
