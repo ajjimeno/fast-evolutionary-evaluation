@@ -613,6 +613,38 @@ FUNCTION_DEFINITION read_memory(Run *run)
     return run->memory;
 }
 
+enum Direction
+{
+    d_up = 0,
+    d_down = 1,
+    d_left = 2,
+    d_right = 3,
+};
+
+int aligned(Run *run, Direction d)
+{
+    switch (d)
+    {
+    case d_up:
+        return run->output[0][run->output_x];
+        break;
+    case d_down:
+        return run->output[run->problem.initial.y - 1][run->output_x];
+        break;
+    case d_left:
+        return run->output[run->output_y][0];
+        break;
+    case d_right:
+        return run->output[run->output_y][run->problem.initial.x - 1];
+        break;
+    default:
+        run->status = -1;
+        break;
+    }
+
+    return 0;
+}
+
 struct SNode
 {
     int node_pointer;
@@ -1138,8 +1170,8 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             reg = 0;
 
             for (int i = 0; i < run->problem.n_shapes; i++)
-            {   //std::cout << "nshapes: " << run->problem.n_shapes <<std::endl;
-                //std::cout << run->problem.shapes <<std::endl;
+            { // std::cout << "nshapes: " << run->problem.n_shapes <<std::endl;
+                // std::cout << run->problem.shapes <<std::endl;
                 BoundingBox box = run->problem.shapes[i].box;
 
                 if (run->input_x >= box.left && run->input_x <= box.left + box.width &&
@@ -1179,6 +1211,29 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
+        case 90: // aligned_above
+            reg = aligned(run, d_up);
+            break;
+        case 91: //aligned_below
+            reg = aligned(run, d_down);
+            break;
+        case 92: // aligned_left
+            reg = aligned(run, d_left);
+            break;
+        case 93: // aligned right
+            reg = aligned(run, d_right);
+            break;
+        case 94: // distance_from_output_position_x         
+            reg = distance_from_output();
+            break;
+        case 95: // distance_from_output_position_y
+            reg = distance_from_output();
+            break;
+        case 96: // add
+            break;
+        case 97: // substract
+            break;
+        
         case 129:
         {
             reg1 = reg;
@@ -1311,6 +1366,11 @@ MAP_INSTRUCTIONS get_map()
     map["testing_get_output_value"] = 88;
 
     map["in_input_shape"] = 89;
+
+    map["aligned_above"] = 90;
+    map["aligned_below"] = 91;
+    map["aligned_left"] = 92;
+    map["aligned_right"] = 93;
 
     return map;
 }
@@ -1508,11 +1568,11 @@ float run(Programs *programs, int program_id, Instances *problems)
         {
             for (int j = 0; j < problems->instances[p].initial.x; j++)
             {
-                
-                if (i < problems->instances[p].input.y && j <  problems->instances[p].input.x)
+
+                if (i < problems->instances[p].input.y && j < problems->instances[p].input.x)
                     output[i][j] = problems->instances[p].input.array[i][j];
                 else
-                    output[i][j] = 0; 
+                    output[i][j] = 0;
             }
         }
 
@@ -1537,8 +1597,8 @@ float run(Programs *programs, int program_id, Instances *problems)
         {
             function_switch(0, &r);
 
-            //if (r.status != 0)
-            //    break;
+            // if (r.status != 0)
+            //     break;
         }
 
         total_accuracy += accuracy_calculation(problems->instances[p], output);
