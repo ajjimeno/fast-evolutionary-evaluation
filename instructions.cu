@@ -1151,6 +1151,54 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             }
 
             break;
+
+        case 95: // add
+            {
+                Node *pnode = &run->nodes[node->node_pointer];
+                stack[s_pointer++] = {node->node_pointer, 140};
+
+                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+            }
+            break;
+        case 140:
+        {
+            reg1 = reg;
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 141};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+        break;
+        case 141:
+            reg += reg1;
+            break;
+        case 96: // sub
+            {
+                Node *pnode = &run->nodes[node->node_pointer];
+                stack[s_pointer++] = {node->node_pointer, 142};
+
+                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+            }
+            break;
+        case 142:
+        {
+            reg1 = reg;
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 143};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+        break;
+        case 143:
+            reg = reg - reg1;
+            break;
+
+        case 97: // testing_output_distance_to_input_x
+            reg = abs(run->output_x - run->input_x);
+            break;
+        case 98: // testing_output_distance_to_input_y
+            reg = abs(run->output_y - run->input_y);
+            break;
         case 127:
         {
             reg1 = reg;
@@ -1311,6 +1359,12 @@ MAP_INSTRUCTIONS get_map()
     map["testing_get_output_value"] = 88;
 
     map["in_input_shape"] = 89;
+
+    map["add"] = 95;
+    map["sub"] = 96;
+
+    map["testing_output_distance_to_input_x"] = 97;
+    map["testing_output_distance_to_input_y"] = 98;
 
     return map;
 }
