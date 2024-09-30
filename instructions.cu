@@ -1271,16 +1271,6 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 93: // aligned right
             reg = aligned(run, d_right);
             break;
-        case 94: // distance_from_output_position_x         
-            reg = distance_from_output();
-            break;
-        case 95: // distance_from_output_position_y
-            reg = distance_from_output();
-            break;
-        case 96: // add
-            break;
-        case 97: // substract
-            break;
         
         case 129:
         {
@@ -1415,16 +1405,16 @@ MAP_INSTRUCTIONS get_map()
 
     map["in_input_shape"] = 89;
 
+    map["aligned_above"] = 90;
+    map["aligned_below"] = 91;
+    map["aligned_left"] = 92;
+    map["aligned_right"] = 93;
+
     map["add"] = 95;
     map["sub"] = 96;
 
     map["testing_output_distance_to_input_x"] = 97;
     map["testing_output_distance_to_input_y"] = 98;
-
-    map["aligned_above"] = 90;
-    map["aligned_below"] = 91;
-    map["aligned_left"] = 92;
-    map["aligned_right"] = 93;
 
     return map;
 }
