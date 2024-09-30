@@ -11,7 +11,12 @@ float accuracy_calculation(Instance problem, int **output)
     float tp = 0.0;
     float total = 0.0;
 
+    
     int count[10];
+    for (int i = 0; i < 10; i++)
+    {
+        count[i] = 0;
+    }
     for (int i = 0; i < problem.gt.y; i++)
     {
         for (int j = 0; j < problem.gt.x; j++)
@@ -25,12 +30,11 @@ float accuracy_calculation(Instance problem, int **output)
     float inv[10];
     for (int i = 0; i < 10; i++)
     {
-        // std::cout << i << ":" << count[i] << std::endl;
-        // inv[i] = 1;
         if (count[i] == 0)
             inv[i] = 0.0;
         else
             inv[i] = 1.0 / count[i];
+
     }
 
     // Count number of equal entries
@@ -41,6 +45,7 @@ float accuracy_calculation(Instance problem, int **output)
             if (problem.gt.array[i][j] == output[i][j])
             {
                 tp+=inv[problem.gt.array[i][j]];
+
             }
 
             total+=inv[problem.gt.array[i][j]];
