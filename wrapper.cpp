@@ -65,9 +65,9 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             PyObject *str_method = PyObject_GetAttrString(py_item, "__str__");
             PyObject *str_obj = PyObject_CallObject(str_method, NULL);
             const char *str = PyUnicode_AsUTF8(str_obj);
-            char* copy = new char[strlen(str) + 1]; // Allocate memory
+            char *copy = new char[strlen(str) + 1]; // Allocate memory
             strcpy(copy, str);
-            STRING * string = new STRING(copy);
+            STRING *string = new STRING(copy);
 
             cpp_strings.push_back(string);
 
@@ -77,9 +77,9 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         else if (!PyUnicode_Check(py_item))
         {
             const char *str = PyUnicode_AsUTF8(py_item);
-            char* copy = new char[strlen(str) + 1]; // Allocate memory
+            char *copy = new char[strlen(str) + 1]; // Allocate memory
             strcpy(copy, str);
-            STRING * string = new STRING(copy);
+            STRING *string = new STRING(copy);
             cpp_strings.push_back(string);
             // PyMem_Free(str);
         }
@@ -125,6 +125,78 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     return list;
 }
 
+static PyObject *wrapRunProgram(RunnerSimulatorWrapper *self, PyObject *args)
+{
+
+    PyObject *obj = PyTuple_GetItem(args, 0);
+    PyObject *repr = PyObject_Str(obj); // Alternatively use PyObject_Repr, but it adds single quotes
+    PyObject *str = PyUnicode_AsEncodedString(repr, "utf-8", "~E~");
+    const STRING code(PyBytes_AS_STRING(str));
+
+    int myArray[MAX_OUTPUT_SIZE][MAX_OUTPUT_SIZE];
+    int *output[MAX_OUTPUT_SIZE];
+    for (int i = 0; i < MAX_OUTPUT_SIZE; i++)
+    {
+        output[i] = myArray[i];
+    }
+    
+    MAP_INSTRUCTIONS map = get_map();
+
+    std::vector<Node> subnodes;
+    getProgram(&code, map, &subnodes);
+
+    Node program[10000];
+
+    for (unsigned long i = 0; i < subnodes.size(); i++)
+    {
+        program[i] = subnodes[i];
+    }
+
+    run_problem(program, self->data, 0, output);
+
+    // Return the output as a Python list
+
+    Py_XDECREF(repr);
+    Py_XDECREF(str);
+
+    Py_INCREF(Py_None);
+
+    // Create a Python list object
+    PyObject *py_list = PyList_New(0);
+    if (!py_list)
+    {
+        return nullptr; // Handle potential errors
+    }
+
+    for (int i = 0; i < self->data->instances[0].initial.y; i++)
+    {
+        PyObject *py_inner_list = PyList_New(self->data->instances[0].initial.x);
+        if (!py_inner_list)
+        {
+            Py_DECREF(py_list);
+            return nullptr;
+        }
+
+        for (int j = 0; j < self->data->instances[0].initial.x; j++)
+        {
+            PyObject *py_int = PyLong_FromLong(output[i][j]);
+            if (!py_int)
+            {
+                Py_DECREF(py_list);
+                Py_DECREF(py_inner_list);
+                return nullptr;
+            }
+            PyList_SET_ITEM(py_inner_list, j, py_int);
+        }
+
+        PyList_Append(py_list, py_inner_list);
+    }
+    
+    return py_list;
+
+    //return Py_None;
+}
+
 // Getters and setters (here only for the 'eaten' attribute)
 static PyGetSetDef RunnerSimulatorWrapper_getsets[] = {
     /*{
@@ -139,6 +211,7 @@ static PyGetSetDef RunnerSimulatorWrapper_getsets[] = {
 // Class method declarations
 static PyMethodDef RunnerSimulatorWrapper_methods[] = {
     {(char *)"run", (PyCFunction)wrapRun, METH_VARARGS, NULL},
+    {(char *)"runProgram", (PyCFunction)wrapRunProgram, METH_VARARGS, NULL},
     //{(char *)"compile", (PyCFunction)wrapCompile, METH_VARARGS, NULL},
     {NULL, NULL, 0, NULL}};
 

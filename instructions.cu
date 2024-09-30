@@ -1185,13 +1185,13 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             break;
 
         case 95: // add
-            {
-                Node *pnode = &run->nodes[node->node_pointer];
-                stack[s_pointer++] = {node->node_pointer, 140};
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 140};
 
-                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
-            }
-            break;
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+        break;
         case 140:
         {
             reg1 = reg;
@@ -1205,13 +1205,13 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             reg += reg1;
             break;
         case 96: // sub
-            {
-                Node *pnode = &run->nodes[node->node_pointer];
-                stack[s_pointer++] = {node->node_pointer, 142};
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 142};
 
-                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
-            }
-            break;
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+        break;
         case 142:
         {
             reg1 = reg;
@@ -1262,7 +1262,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 90: // aligned_above
             reg = aligned(run, d_up);
             break;
-        case 91: //aligned_below
+        case 91: // aligned_below
             reg = aligned(run, d_down);
             break;
         case 92: // aligned_left
@@ -1271,7 +1271,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 93: // aligned right
             reg = aligned(run, d_right);
             break;
-        
+
         case 129:
         {
             reg1 = reg;
@@ -1578,6 +1578,52 @@ int free_programs_from_gpu(Programs *programs)
 #define MAX_OUTPUT_SIZE 100
 
 #ifndef SETUP_BUILDING_CPU
+__forceinline__ __device__ float run_problem(Node &program[], Instances *problems, int p, int **output)
+#else
+float run_problem(Node program[], Instances *problems, int p, int **output)
+#endif
+{
+    for (int i = 0; i < problems->instances[p].initial.y; i++)
+    {
+        for (int j = 0; j < problems->instances[p].initial.x; j++)
+        {
+
+            if (i < problems->instances[p].input.y && j < problems->instances[p].input.x)
+                output[i][j] = problems->instances[p].input.array[i][j];
+            else
+                output[i][j] = 0;
+        }
+    }
+
+    Run r = {
+        0,                      // input_x
+        0,                      // input_y
+        0,                      // output_x
+        0,                      // output_y
+        problems->instances[p], // problem
+        output,                 // output
+        0,                      // inner_loop
+        0,                      // status
+        0,                      // memory
+        0,                      // training_id
+        0,                      // training_input_x
+        0,                      // training_input_y
+        0,                      // training_output_x
+        0,                      // training_output_y
+        program};
+
+    for (int i = 0; i < 200; i++)
+    {
+        function_switch(0, &r);
+
+        // if (r.status != 0)
+        //     break;
+    }
+
+    return accuracy_calculation(problems->instances[p], output);
+}
+
+#ifndef SETUP_BUILDING_CPU
 __forceinline__ __device__ float run(Programs *programs, int program_id, Instances *problems)
 #else
 float run(Programs *programs, int program_id, Instances *problems)
@@ -1608,44 +1654,7 @@ float run(Programs *programs, int program_id, Instances *problems)
 
     for (int p = 0; p < problems->n_instances; p++)
     {
-        for (int i = 0; i < problems->instances[p].initial.y; i++)
-        {
-            for (int j = 0; j < problems->instances[p].initial.x; j++)
-            {
-
-                if (i < problems->instances[p].input.y && j < problems->instances[p].input.x)
-                    output[i][j] = problems->instances[p].input.array[i][j];
-                else
-                    output[i][j] = 0;
-            }
-        }
-
-        Run r = {
-            0,                      // input_x
-            0,                      // input_y
-            0,                      // output_x
-            0,                      // output_y
-            problems->instances[p], // problem
-            output,                 // output
-            0,                      // inner_loop
-            0,                      // status
-            0,                      // memory
-            0,                      // training_id
-            0,                      // training_input_x
-            0,                      // training_input_y
-            0,                      // training_output_x
-            0,                      // training_output_y
-            program};
-
-        for (int i = 0; i < 200; i++)
-        {
-            function_switch(0, &r);
-
-            // if (r.status != 0)
-            //     break;
-        }
-
-        total_accuracy += accuracy_calculation(problems->instances[p], output);
+        total_accuracy += run_problem(program, problems, p, output);
     }
     return total_accuracy / (float)problems->n_instances;
 }

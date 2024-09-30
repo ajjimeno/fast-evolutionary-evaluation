@@ -24,10 +24,13 @@ float accuracy_calculation(Instance problem, int **output)
     float inv[10];
     for (int i = 0; i < 10; i++)
     {
+        inv[i] = 1;
+        /*
         if (count[i] == 0)
             inv[i] = 0.0;
         else
             inv[i] = 1.0 / count[i];
+        */
     }
 
 
