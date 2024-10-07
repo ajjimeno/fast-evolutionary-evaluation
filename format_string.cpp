@@ -5,7 +5,7 @@
 #include <stack>
 #include <vector>
 
-#define STRING std::string
+//#define STRING std::string
 
 const std::vector<int> ids = {0, 1, 2};
 
@@ -16,11 +16,11 @@ struct TreeNode
     TreeNode(int arity, STRING name) : arity(arity), name(name) {}
 };
 
-#define MAP std::unordered_map<int, TreeNode>
+#define MAP_TREENODE std::unordered_map<int, TreeNode>
 
-MAP getTreeNodeMap()
+MAP_TREENODE getTreeNodeMap()
 {
-    MAP nodes;
+    MAP_TREENODE nodes;
 
     nodes.emplace(0, TreeNode{2, "prog2"});
     nodes.emplace(1, TreeNode{0, "get9"});
@@ -55,7 +55,7 @@ std::string toString(const std::vector<int> &nodes)
     std::string string;
     std::stack<std::pair<int, std::vector<std::string*>*>> stack;
 
-    MAP nmap = getTreeNodeMap();
+    MAP_TREENODE nmap = getTreeNodeMap();
 
     for (const int &node : nodes)
     {
@@ -85,9 +85,10 @@ std::string toString(const std::vector<int> &nodes)
     return string;
 }
 
+/*
 int main()
 {
     for (int i = 0; i < 1000000;i++)
         toString(ids);
     return 0;
-}
+}*/

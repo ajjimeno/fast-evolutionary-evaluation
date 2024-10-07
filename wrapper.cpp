@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "data.cu"
+#include "format_string.cpp"
 #include "program.cpp"
 
 #if PY_MAJOR_VERSION >= 3
@@ -38,6 +39,11 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
     return 0;
 }
 
+std::vector<uint8_t> bytes_to_vector(const char *bytes, size_t length)
+{
+    return std::vector<uint8_t>(bytes, bytes + length);
+}
+
 static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 {
     PyObject *py_list;
@@ -55,6 +61,8 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         return NULL;
     }
 
+    MAP_TREENODE nmap;
+
     Py_ssize_t len = PyList_Size(py_list);
     for (Py_ssize_t i = 0; i < len; ++i)
     {
@@ -62,12 +70,62 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
         if (PyObject_HasAttrString(py_item, "__str__"))
         {
+            if (nmap.size() == 0)
+            {
+                std::unordered_map<int, STRING> node_name;
+            
+                PyObject *pDict = PyObject_GetAttrString(py_item, "object_ids");
+
+                PyObject *key, *value;
+                Py_ssize_t pos = 0;
+                while (PyDict_Next(pDict, &pos, &key, &value)) {
+                    const char *key_str = PyUnicode_AsUTF8(key);
+                    int value_int = PyLong_AsLong(value);
+
+                    node_name[value_int] = STRING(key_str);
+
+                    printf("Key: %s, id: %d\n", key_str, value_int);
+                }
+
+                Py_DECREF(pDict);
+
+                pDict = PyObject_GetAttrString(py_item, "ids_objects");
+                pos = 0;
+                while (PyDict_Next(pDict, &pos, &key, &value)) {
+                    int key_int = PyLong_AsLong(key);
+                    PyObject *attribute_name = PyUnicode_FromString("arity");
+                    PyObject *attribute_value = PyObject_GetAttr(value, attribute_name);
+                    Py_DECREF(attribute_name);
+
+                    nmap.emplace(key_int, TreeNode{(int)PyLong_AsLong(attribute_value), node_name[key_int]});
+                    
+                    printf("Key: %d, arity: %d\n", key_int, PyLong_AsLong(attribute_value));
+                }
+
+                Py_DECREF(pDict);
+            }
+
+            Py_buffer view;
+            PyObject_GetBuffer(py_item, &view, PyBUF_SIMPLE);
+
+            signed char * buffer_address = (signed char *)view.buf;
+            Py_ssize_t buffer_length = view.len;
+
+            std::vector<signed char> * bytes = new std::vector<signed char>(buffer_address, buffer_address + buffer_length);
+
+            free(bytes);
+
+            PyBuffer_Release(&view);
+
+
             PyObject *str_method = PyObject_GetAttrString(py_item, "__str__");
             PyObject *str_obj = PyObject_CallObject(str_method, NULL);
             const char *str = PyUnicode_AsUTF8(str_obj);
             char *copy = new char[strlen(str) + 1]; // Allocate memory
             strcpy(copy, str);
             STRING *string = new STRING(copy);
+
+            std::cout << "String: " << *string << std::endl;
 
             cpp_strings.push_back(string);
 
@@ -89,6 +147,8 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             std::cout << "List element is not a string" << std::endl;
             return NULL;
         }
+
+        //Py_DECREF(py_item);
     }
 
     int n_programs = cpp_strings.size();
@@ -139,7 +199,7 @@ static PyObject *wrapRunProgram(RunnerSimulatorWrapper *self, PyObject *args)
     {
         output[i] = myArray[i];
     }
-    
+
     MAP_INSTRUCTIONS map = get_map();
 
     std::vector<Node> subnodes;
@@ -152,7 +212,7 @@ static PyObject *wrapRunProgram(RunnerSimulatorWrapper *self, PyObject *args)
         program[i] = subnodes[i];
     }
 
-    run_problem(program, self->data, 0, output);
+    std::cout << "acc: " << run_problem(program, self->data, 0, output) << std::endl;
 
     // Return the output as a Python list
 
@@ -191,10 +251,10 @@ static PyObject *wrapRunProgram(RunnerSimulatorWrapper *self, PyObject *args)
 
         PyList_Append(py_list, py_inner_list);
     }
-    
+
     return py_list;
 
-    //return Py_None;
+    // return Py_None;
 }
 
 // Getters and setters (here only for the 'eaten' attribute)
