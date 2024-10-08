@@ -48,8 +48,11 @@ inline void string2program(int start_index, int end_index, STRING ** programs, s
 {
     for (int i = start_index; i < end_index; i++)
     {
-        const char *str = toString(byte_buffers->at(i), nmap).c_str();
+        std::string s = toString(byte_buffers->at(i), nmap);
+
+        char *str = s.data();
         char *copy = new char[strlen(str) + 1];
+        strcpy(copy, str);
         programs[i] = new STRING(copy);
     }
 }
@@ -79,7 +82,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     {
         PyObject *py_item = PyList_GetItem(py_list, i);
 
-        if (PyObject_HasAttrString(py_item, "__str__"))
+        if (PyObject_HasAttrString(py_item, "object_ids")) // "__str__"
         {
             if (nmap.size() == 0)
             {
@@ -124,7 +127,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
             PyBuffer_Release(&view);
         }
-        else if (!PyUnicode_Check(py_item))
+        else if (PyUnicode_Check(py_item))
         {
             const char *str = PyUnicode_AsUTF8(py_item);
             char *copy = new char[strlen(str) + 1]; // Allocate memory
@@ -149,9 +152,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     if (cpp_strings.size() > 0)
     {
         n_programs = cpp_strings.size();
-
         accuracy = (float *)malloc(n_programs * sizeof(float));
-
         execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data);
     }
     else if (byte_buffers.size() > 0)
@@ -179,6 +180,9 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         {
             t.join();
         }
+
+        std::cout << n_programs << " programs written" << std::endl;
+        //std::cout << programs[0][0] << std::endl;
 
         std::cout << "Ending program writing" << std::endl;
         accuracy = (float *)malloc(n_programs * sizeof(float));
