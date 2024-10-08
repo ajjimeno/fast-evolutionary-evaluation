@@ -50,24 +50,22 @@ std::string format(const STRING &name, const std::vector<std::string*>* args)
     return std::string(name) + concatenate_arguments(args);
 }
 
-std::string toString(const std::vector<int> &nodes)
+std::string toString(const std::vector<signed char> &nodes, MAP_TREENODE *nmap)
 {
     std::string string;
     std::stack<std::pair<int, std::vector<std::string*>*>> stack;
-
-    MAP_TREENODE nmap = getTreeNodeMap();
 
     for (const int &node : nodes)
     {
         std::vector<std::string*> * v = new std::vector<std::string*>();
         stack.push({node, v});
 
-        while (!stack.empty() && stack.top().second->size() == nmap.at(stack.top().first).arity)
+        while (!stack.empty() && stack.top().second->size() == nmap->at(stack.top().first).arity)
         {
             auto &[prim, args] = stack.top();
             stack.pop();
 
-            string = format(nmap.at(prim).name, args);
+            string = format(nmap->at(prim).name, args);
 
             for (int i = 0; i < args->size(); i++)
             { delete args->at(i); }

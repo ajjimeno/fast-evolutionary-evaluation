@@ -44,6 +44,16 @@ std::vector<uint8_t> bytes_to_vector(const char *bytes, size_t length)
     return std::vector<uint8_t>(bytes, bytes + length);
 }
 
+inline void string2program(int start_index, int end_index, STRING ** programs, std::vector<std::vector<signed char>> *byte_buffers, MAP_TREENODE *nmap)
+{
+    for (int i = start_index; i < end_index; i++)
+    {
+        const char *str = toString(byte_buffers->at(i), nmap).c_str();
+        char *copy = new char[strlen(str) + 1];
+        programs[i] = new STRING(copy);
+    }
+}
+
 static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 {
     PyObject *py_list;
@@ -55,6 +65,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
     // Convert Python list to C++ vector of strings
     std::vector<STRING *> cpp_strings;
+    std::vector<std::vector<signed char>> byte_buffers;
     if (!PyList_Check(py_list))
     {
         std::cout << "Argument is not a list" << std::endl;
@@ -62,7 +73,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     }
 
     MAP_TREENODE nmap;
-
+    std::cout << "Collecting programs" << std::endl;
     Py_ssize_t len = PyList_Size(py_list);
     for (Py_ssize_t i = 0; i < len; ++i)
     {
@@ -73,33 +84,31 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             if (nmap.size() == 0)
             {
                 std::unordered_map<int, STRING> node_name;
-            
+
                 PyObject *pDict = PyObject_GetAttrString(py_item, "object_ids");
 
                 PyObject *key, *value;
                 Py_ssize_t pos = 0;
-                while (PyDict_Next(pDict, &pos, &key, &value)) {
+                while (PyDict_Next(pDict, &pos, &key, &value))
+                {
                     const char *key_str = PyUnicode_AsUTF8(key);
                     int value_int = PyLong_AsLong(value);
 
                     node_name[value_int] = STRING(key_str);
-
-                    printf("Key: %s, id: %d\n", key_str, value_int);
                 }
 
                 Py_DECREF(pDict);
 
                 pDict = PyObject_GetAttrString(py_item, "ids_objects");
                 pos = 0;
-                while (PyDict_Next(pDict, &pos, &key, &value)) {
+                while (PyDict_Next(pDict, &pos, &key, &value))
+                {
                     int key_int = PyLong_AsLong(key);
                     PyObject *attribute_name = PyUnicode_FromString("arity");
                     PyObject *attribute_value = PyObject_GetAttr(value, attribute_name);
                     Py_DECREF(attribute_name);
 
                     nmap.emplace(key_int, TreeNode{(int)PyLong_AsLong(attribute_value), node_name[key_int]});
-                    
-                    printf("Key: %d, arity: %d\n", key_int, PyLong_AsLong(attribute_value));
                 }
 
                 Py_DECREF(pDict);
@@ -108,29 +117,12 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             Py_buffer view;
             PyObject_GetBuffer(py_item, &view, PyBUF_SIMPLE);
 
-            signed char * buffer_address = (signed char *)view.buf;
+            signed char *buffer_address = (signed char *)view.buf;
             Py_ssize_t buffer_length = view.len;
 
-            std::vector<signed char> * bytes = new std::vector<signed char>(buffer_address, buffer_address + buffer_length);
-
-            free(bytes);
+            byte_buffers.push_back(std::vector<signed char>(buffer_address, buffer_address + buffer_length));
 
             PyBuffer_Release(&view);
-
-
-            PyObject *str_method = PyObject_GetAttrString(py_item, "__str__");
-            PyObject *str_obj = PyObject_CallObject(str_method, NULL);
-            const char *str = PyUnicode_AsUTF8(str_obj);
-            char *copy = new char[strlen(str) + 1]; // Allocate memory
-            strcpy(copy, str);
-            STRING *string = new STRING(copy);
-
-            std::cout << "String: " << *string << std::endl;
-
-            cpp_strings.push_back(string);
-
-            Py_DECREF(str_obj);
-            Py_DECREF(str_method);
         }
         else if (!PyUnicode_Check(py_item))
         {
@@ -147,21 +139,69 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             std::cout << "List element is not a string" << std::endl;
             return NULL;
         }
-
-        //Py_DECREF(py_item);
     }
 
-    int n_programs = cpp_strings.size();
+    std::cout << "Programs collected" << std::endl;
 
-    float *accuracy = (float *)malloc(n_programs * sizeof(float));
+    float *accuracy = NULL;
+    int n_programs = 0;
 
-    execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data);
+    if (cpp_strings.size() > 0)
+    {
+        n_programs = cpp_strings.size();
+
+        accuracy = (float *)malloc(n_programs * sizeof(float));
+
+        execute_and_evaluate(n_programs, &cpp_strings[0], accuracy, self->data);
+    }
+    else if (byte_buffers.size() > 0)
+    {
+        n_programs = byte_buffers.size();
+
+        STRING **programs = new STRING *[n_programs];
+
+        int n_threads = std::min(n_programs, 20);
+        int chunk_size = n_programs / n_threads;
+
+        std::vector<std::thread> threads;
+
+        std::cout << "Starting program writing" << std::endl;
+
+        for (int i = 0; i < n_threads; ++i)
+        {
+            int start_index = i * chunk_size;
+            int end_index = (i == n_threads - 1) ? n_programs : (i + 1) * chunk_size;
+
+            threads.emplace_back(string2program, start_index, end_index, programs, &byte_buffers, &nmap);
+        }
+
+        for (auto &t : threads)
+        {
+            t.join();
+        }
+
+        std::cout << "Ending program writing" << std::endl;
+        accuracy = (float *)malloc(n_programs * sizeof(float));
+
+        execute_and_evaluate(n_programs, &programs[0], accuracy, self->data);
+
+        for (int i = 0; i < n_programs; i++)
+        {
+            delete programs[i]->data();
+            delete programs[i];
+        }
+    }
 
     for (auto &s : cpp_strings)
     {
         delete s->data();
         delete s;
     }
+
+    // for (auto &b : byte_buffers)
+    //{
+    //     delete b;
+    // }
 
     PyObject *list = PyList_New(n_programs);
     if (!list)
