@@ -613,6 +613,34 @@ FUNCTION_DEFINITION read_memory(Run *run)
     return run->memory;
 }
 
+FUNCTION_DEFINITION get_max_color(Run *run)
+{
+    // Color frequency
+    int frequency[10];
+
+    for (int i = 0; i < 10; i++)
+    { frequency[i] = 0; }
+
+    for (int i = 0; i < run->problem.input.y; i++)
+    {
+        for (int j=0; j < run->problem.input.x; j++)
+        {
+            frequency[run->problem.input.array[i][j]]++;
+        }
+    }
+
+    // Get color with maximum frequency
+    int max_freq = 0;
+
+    for (int i = 1; i < 10; i++)
+    {
+      if (frequency[i] > frequency[max_freq])
+      { max_freq = i; }
+    }
+
+    return max_freq;
+}
+
 enum Direction
 {
     d_up = 0,
@@ -1292,6 +1320,9 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             }
 
             break;
+        case 99:
+            reg = get_max_color(run);
+            break;
         default:
             run->status = -1;
             break;
@@ -1415,6 +1446,8 @@ MAP_INSTRUCTIONS get_map()
 
     map["testing_output_distance_to_input_x"] = 97;
     map["testing_output_distance_to_input_y"] = 98;
+
+    map["get_max_color"] = 99;
 
     return map;
 }
