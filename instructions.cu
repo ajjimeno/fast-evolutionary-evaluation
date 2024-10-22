@@ -1044,7 +1044,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 102: // testing_output_write
             run->output[run->output_y][run->output_x] = reg;
             break;
-        case 1003: // write memory
+        case 103: // write memory
             run->memory = reg;
             break;
         case 104: // comparison
@@ -1052,11 +1052,11 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             Node *pnode = &run->nodes[node->node_pointer];
             if (reg)
             {
-                stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
             }
             else
             {
-                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+                stack[s_pointer++] = {pnode->args[2], run->nodes[pnode->args[2]].pointer};
             }
         }
         break;
@@ -1323,6 +1323,46 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 99:
             reg = get_max_color(run);
             break;
+        case 1000:
+        {
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 1003};
+
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+        break;
+        case 1001:
+            if (run->stack_pointer >= 0)
+            {
+                reg = run->stack[run->stack_pointer];
+                run->stack_pointer--;
+            }
+            else
+            {
+                run->status = -1;
+            }
+            break;
+        case 1002:
+            if (run->stack_pointer >= 0)
+            {
+                reg = run->stack[run->stack_pointer];
+            }
+            else
+            {
+                run->status = -1;
+            }
+            break;
+        case 1003:
+            if (run->stack_pointer < 1000)
+            {
+                run->stack_pointer++;
+                run->stack[run->stack_pointer] = reg;
+            }
+            else
+            {
+                run->status = -1;
+            }
+            break;
         default:
             run->status = -1;
             break;
@@ -1448,6 +1488,10 @@ MAP_INSTRUCTIONS get_map()
     map["testing_output_distance_to_input_y"] = 98;
 
     map["get_max_color"] = 99;
+
+    map["stack_push"] = 1000;
+    map["stack_pop"] = 1001;
+    map["stack_top"] = 1002;
 
     return map;
 }
@@ -1644,6 +1688,8 @@ float run_problem(Node program[], Instances *problems, int p, int **output)
         0,                      // training_output_x
         0,                      // training_output_y
         program};
+
+    r.stack_pointer = -1;
 
     for (int i = 0; i < 200; i++)
     {

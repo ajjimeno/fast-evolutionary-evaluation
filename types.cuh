@@ -100,6 +100,8 @@ struct Run
     int training_output_x, training_output_y;
     Node *nodes;
     InputInstance inputInstance;
+    int stack_pointer;
+    int stack[1000];
 };
 
 #ifndef SETUP_BUILDING_CPU
