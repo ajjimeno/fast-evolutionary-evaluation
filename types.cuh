@@ -92,7 +92,7 @@ struct Run
     int **output;
     int inner_loop;
     int status;
-    int memory;
+    int memory[10];
     // Programs *programs;
     // long program_offset;
     int training_id;

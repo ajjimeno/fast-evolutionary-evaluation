@@ -608,10 +608,10 @@ FUNCTION_DEFINITION swap_testing_output_next(Run *run)
     return 0;
 }
 
-FUNCTION_DEFINITION read_memory(Run *run)
+/*FUNCTION_DEFINITION read_memory(Run *run)
 {
     return run->memory;
-}
+}*/
 
 FUNCTION_DEFINITION get_max_color(Run *run)
 {
@@ -692,7 +692,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
     int reg2 = 0;
 
     // Till no more nodes are available
-    while (s_pointer > 0 && run->status == 0)
+    while (s_pointer > 0) // && run->status == 0)
     {
         SNode *node = &stack[--s_pointer];
 
@@ -993,12 +993,27 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 81:
-            reg = read_memory(run);
+            //reg = read_memory(run);
+        {       
+            Node *pnode = &run->nodes[node->node_pointer];
+            stack[s_pointer++] = {node->node_pointer, 183};
+
+            // Add read value node
+            // Node p0node = run->nodes[node.node_pointer];
+            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+        }
+            break;
+        case 183:
+            if (reg >= 0 && reg < 10)
+            {
+                //std::cout << "Memory read: " << reg << " " << run->memory[reg] << std::endl;
+                reg = run->memory[reg];
+            }
             break;
         case 82: // write memory
         {
             Node *pnode = &run->nodes[node->node_pointer];
-            stack[s_pointer++] = {0, 103};
+            stack[s_pointer++] = {node->node_pointer, 103};
 
             // Add read value node
             // Node p0node = run->nodes[node.node_pointer];
@@ -1045,7 +1060,25 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             run->output[run->output_y][run->output_x] = reg;
             break;
         case 103: // write memory
-            run->memory = reg;
+            {
+                // copy register
+                reg1 = reg;
+                //std::cout << "Memory write step1: " << reg1 << std::endl;
+                // final check
+                stack[s_pointer++] = {node->node_pointer, 187};
+                Node *pnode = &run->nodes[node->node_pointer];
+
+                //std::cout << "Memory second pointer: " << pnode->args[1] << " " << run->nodes[pnode->args[1]].pointer << std::endl;
+                // obtain second value
+                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+            }
+            break;
+        case 187: // write memory
+            //std::cout << "Memory write: " << reg1 << " " << reg << std::endl;
+            if (reg1 >= 0 && reg1 < 10)
+            {
+                run->memory[reg1] = reg;
+            }
             break;
         case 104: // comparison
         {
@@ -1323,7 +1356,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 99:
             reg = get_max_color(run);
             break;
-        case 1000:
+        case 1000: // stack_push
         {
             Node *pnode = &run->nodes[node->node_pointer];
             stack[s_pointer++] = {node->node_pointer, 1003};
@@ -1331,7 +1364,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
-        case 1001:
+        case 1001: // stack_pop
             if (run->stack_pointer >= 0)
             {
                 reg = run->stack[run->stack_pointer];
@@ -1342,7 +1375,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
             break;
-        case 1002:
+        case 1002: // stack_top
             if (run->stack_pointer >= 0)
             {
                 reg = run->stack[run->stack_pointer];
@@ -1681,7 +1714,7 @@ float run_problem(Node program[], Instances *problems, int p, int **output)
         output,                 // output
         0,                      // inner_loop
         0,                      // status
-        0,                      // memory
+        {0,0,0,0,0,0,0,0,0,0},  // memory
         0,                      // training_id
         0,                      // training_input_x
         0,                      // training_input_y
