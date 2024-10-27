@@ -16,6 +16,11 @@
 
 FUNCTION_DEFINITION function_switch(int pointer, Run *run);
 
+FUNCTION_DEFINITION status_end(Run *run)
+{
+    return run->status = -2;
+}
+
 FUNCTION_DEFINITION get0(Run *run)
 {
     return 0;
@@ -1078,6 +1083,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             if (reg1 >= 0 && reg1 < 10)
             {
                 run->memory[reg1] = reg;
+                //std::cout << run->memory[reg1] << std::endl;
             }
             break;
         case 104: // comparison
@@ -1396,6 +1402,9 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
             break;
+        case 1004:
+            status_end(run);
+            break;
         default:
             run->status = -1;
             break;
@@ -1525,6 +1534,7 @@ MAP_INSTRUCTIONS get_map()
     map["stack_push"] = 1000;
     map["stack_pop"] = 1001;
     map["stack_top"] = 1002;
+    map["status_end"] = 1004;
 
     return map;
 }
@@ -1728,8 +1738,9 @@ float run_problem(Node program[], Instances *problems, int p, int **output)
     {
         function_switch(0, &r);
 
-        // if (r.status != 0)
-        //     break;
+        // status_end
+        if (r.status == -2)
+             break;
     }
 
     return accuracy_calculation(problems->instances[p], output);
