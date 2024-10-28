@@ -894,7 +894,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 58: // testing_output_write
         {
             Node *pnode = &run->nodes[node->node_pointer];
-            stack[s_pointer++] = {0, 102};
+            stack[s_pointer++] = {node->node_pointer, 102};
 
             // Add read value node
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
@@ -1034,6 +1034,8 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
             stack[s_pointer++] = {pnode->args[1], 100};
 
+            //std::cout << "pointer: " <<  pnode->args[1] << "/" << run->nodes[pnode->args[1]].pointer << std::endl;
+
             // Add read value node
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
@@ -1041,17 +1043,19 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 100:
             if (run->inner_loop < 5 && reg > 0 && reg <= 30)
             {
+                //std::cout << "loop reg: " << reg << std::endl;
                 // Read register
-                stack[s_pointer++] = {0, 110};
+                stack[s_pointer++] = {node->node_pointer, 110};
                 for (int i = 0; i < reg; i++)
                 {
+                    //std::cout << node->node_pointer << "/" << run->nodes[node->node_pointer].pointer << std::endl;
                     // Loop operation
                     stack[s_pointer++] = {node->node_pointer, run->nodes[node->node_pointer].pointer};
                 }
             }
             else
             {
-                run->status = -2;
+                run->status = -1;
             }
 
             break;
