@@ -1152,10 +1152,10 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 121:
-            if (reg >= 0 && reg < get_testing_length_input_x(run) && reg1 >= 0 && reg1 < get_testing_length_input_y(run))
+            if (reg1 >= 0 && reg1 < get_testing_length_input_x(run) && reg >= 0 && reg < get_testing_length_input_y(run))
             {
-                run->input_x = reg;
-                run->input_y = reg1;
+                run->input_x = reg1;
+                run->input_y = reg;
             }
             else
             {
@@ -1181,10 +1181,10 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 123:
-            if (reg >= 0 && reg < get_testing_length_output_x(run) && reg1 >= 0 && reg1 < get_testing_length_output_y(run))
+            if (reg1 >= 0 && reg1 < get_testing_length_output_x(run) && reg >= 0 && reg < get_testing_length_output_y(run))
             {
-                run->output_x = reg;
-                run->output_y = reg1;
+                run->output_x = reg1;
+                run->output_y = reg;
             }
             else
             {
