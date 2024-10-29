@@ -1041,7 +1041,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 100:
-            if (run->inner_loop < 5 && reg > 0 && reg <= 30)
+            if (run->inner_loop < 3 && reg > 0 && reg <= 30)
             {
                 //std::cout << "loop reg: " << reg << std::endl;
                 // Read register
