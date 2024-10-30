@@ -687,29 +687,31 @@ struct SNode
 };
 
 void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
-    if (*top >= STACK_REGISTRY_SIZE - 1) {
+    if (top[0] >= STACK_REGISTRY_SIZE - 1) {
         printf("Stack Overflow\n");
         return;
     }
-    *top++;
-    stack[*top] = reg;
-    *top++;
+    top[0]++;
+    stack[top[0]] = reg;
+    top[0]++;
     stack[*top] = reg1;
-    *top++;
-    stack[*top] = reg2;
+    top[0]++;
+    stack[top[0]] = reg2;
+    //std::cout<< "push:"<<top[0] << std::endl;
 }
 
 void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2) {
-    if (*top < 0) {
+    if (top[0] < 0) {
         printf("Stack Underflow\n");
         return;
     }
-    *reg2 = stack[*top];
-    *top--;
-    *reg1 = stack[*top];
-    *top--;
-    *reg = stack[*top];
-    *top--;
+    reg2[0] = stack[top[0]];
+    top[0]--;
+    reg1[0] = stack[top[0]];
+    top[0]--;
+    reg[0] = stack[top[0]];
+    top[0]--;
+    //std::cout<< "pop:"<<top[0] << std::endl;
 }
 
 #define PUSH push_registers(&top, stack_registry, reg, reg1, reg2)
