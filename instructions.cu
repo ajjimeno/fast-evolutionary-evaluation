@@ -686,36 +686,34 @@ struct SNode
     int case_operation;
 };
 
-int top = -1; // Initialize the top of the stack to -1 (empty)
-
-void push_registers(int &top, int *stack, int reg, int reg1, int reg2) {
-    if (top >= STACK_REGISTRY_SIZE - 1) {
+void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
+    if (*top >= STACK_REGISTRY_SIZE - 1) {
         printf("Stack Overflow\n");
         return;
     }
-    top++;
-    stack[top] = reg;
-    top++;
-    stack[top] = reg1;
-    top++;
-    stack[top] = reg2;
+    *top++;
+    stack[*top] = reg;
+    *top++;
+    stack[*top] = reg1;
+    *top++;
+    stack[*top] = reg2;
 }
 
-void pop_registers(int &top, int *stack, int *reg, int *reg1, int *reg2) {
-    if (top < 0) {
+void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2) {
+    if (*top < 0) {
         printf("Stack Underflow\n");
         return;
     }
-    *reg2 = stack[top];
-    top--;
-    *reg1 = stack[top];
-    top--;
-    *reg = stack[top];
-    top--;
+    *reg2 = stack[*top];
+    *top--;
+    *reg1 = stack[*top];
+    *top--;
+    *reg = stack[*top];
+    *top--;
 }
 
-#define PUSH push_registers(top, stack_registry, reg, reg1, reg2)
-#define POP pop_registers(top, stack_registry, &reg, &reg1, &reg2)
+#define PUSH push_registers(&top, stack_registry, reg, reg1, reg2)
+#define POP pop_registers(&top, stack_registry, &reg, &reg1, &reg2)
 
 FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 {
