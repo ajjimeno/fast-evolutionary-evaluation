@@ -14,7 +14,7 @@
 #define FUNCTION_DEFINITION inline int
 #endif
 
-#define STACK_REGISTRY_SIZE 10*3
+#define STACK_REGISTRY_SIZE 100*3
 
 FUNCTION_DEFINITION function_switch(int pointer, Run *run);
 
@@ -694,7 +694,7 @@ void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
     top[0]++;
     stack[top[0]] = reg;
     top[0]++;
-    stack[*top] = reg1;
+    stack[top[0]] = reg1;
     top[0]++;
     stack[top[0]] = reg2;
     //std::cout<< "push:"<<top[0] << std::endl;
@@ -1495,6 +1495,9 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             break;
         }
     }
+
+    if (top != -1)
+    { std::cout << "top:" << top << std::endl; }
 
     return 0;
 }
