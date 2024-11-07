@@ -31,6 +31,7 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
 
     self->data = load_data(bytes);
 
+    
     size_t stackSize = 50 * 1024;
 
     cudaError_t err = cudaThreadSetLimit(cudaLimitStackSize, stackSize);
@@ -48,16 +49,6 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
         fprintf(stderr, "Error setting malloc heap size: %s\n", cudaGetErrorString(err));
         return 1;
     }
-
-    /*
-    size_t newMallocHeapSize = 1024 * 1024 * 1024; // 1 GB
-    cudaDeviceSetLimit(cudaLimitMallocHeapSize, newMallocHeapSize);
-    if (err != cudaSuccess)
-    {
-        // Handle error
-        fprintf(stderr, "Error setting malloc size: %s\n", cudaGetErrorString(err));
-        return 1;
-    }*/
 
     cudaDeviceSynchronize();
 
@@ -148,6 +139,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
     return list;
 }
+
 
 // Getters and setters (here only for the 'eaten' attribute)
 static PyGetSetDef RunnerSimulatorWrapper_getsets[] = {

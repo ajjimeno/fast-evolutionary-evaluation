@@ -656,7 +656,11 @@ enum Direction
     d_right = 3,
 };
 
+#ifndef SETUP_BUILDING_CPU
+__device__ int aligned(Run *run, Direction d)
+#else
 int aligned(Run *run, Direction d)
+#endif
 {
     switch (d)
     {
@@ -686,7 +690,11 @@ struct SNode
     int case_operation;
 };
 
+#ifndef SETUP_BUILDING_CPU
+__device__ void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
+#else
 void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
+#endif
     if (top[0] >= STACK_REGISTRY_SIZE - 1) {
         printf("Stack Overflow\n");
         return;
@@ -700,7 +708,11 @@ void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
     //std::cout<< "push:"<<top[0] << std::endl;
 }
 
+#ifndef SETUP_BUILDING_CPU
+__device__ void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2) {
+#else
 void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2) {
+#endif
     if (top[0] < 0) {
         printf("Stack Underflow\n");
         return;
@@ -716,6 +728,7 @@ void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2) {
 
 #define PUSH push_registers(&top, stack_registry, reg, reg1, reg2)
 #define POP pop_registers(&top, stack_registry, &reg, &reg1, &reg2)
+
 
 FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 {
@@ -1496,8 +1509,8 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
     }
 
-    if (top != -1)
-    { std::cout << "top:" << top << std::endl; }
+    //if (top != -1)
+    //{ std::cout << "top:" << top << std::endl; }
 
     return 0;
 }
@@ -1786,7 +1799,7 @@ int free_programs_from_gpu(Programs *programs)
 #define MAX_OUTPUT_SIZE 100
 
 #ifndef SETUP_BUILDING_CPU
-__forceinline__ __device__ float run_problem(Node &program[], Instances *problems, int p, int **output)
+__forceinline__ __device__ float run_problem(Node program[], Instances *problems, int p, int **output)
 #else
 float run_problem(Node program[], Instances *problems, int p, int **output)
 #endif
