@@ -161,7 +161,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
         STRING **programs = new STRING *[n_programs];
 
-        int n_threads = std::min(n_programs, 20);
+        int n_threads = std::min(n_programs, cores());
         int chunk_size = n_programs / n_threads;
 
         std::vector<std::thread> threads;
