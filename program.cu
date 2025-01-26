@@ -20,7 +20,7 @@ __global__ void create_and_run(Programs *programs, int n_programs, Instances *pr
 
 	for (int i = start; i < end && i < n_programs; i++)
 	{
-		accuracy[i] = run(programs, i, problems);
+	    accuracy[i] = run(programs, i, problems);
 	}
 }
 
@@ -42,9 +42,11 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
 
 	std::cout << "Starting kernel " << n_programs << std::endl;
 
-	int threads = std::min(N_THREADS, n_programs);
+	//int threads = std::min(N_THREADS, n_programs);
+	int threads = 128;
 
-	int blocks = std::min((int)(n_programs / threads), N_BLOCKS);
+	//int blocks = std::min((int)(n_programs / threads), N_BLOCKS)+1;
+	int blocks = 500;
 
 	create_and_run<<<blocks, threads>>>(d_programs, n_programs, problems, d_accuracy, blocks, threads);
 

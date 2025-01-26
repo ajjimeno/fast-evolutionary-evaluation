@@ -252,7 +252,7 @@ static PyObject *wrapRunProgram(RunnerSimulatorWrapper *self, PyObject *args)
     Node program[10000];
 
     for (unsigned long i = 0; i < subnodes.size(); i++)
-    {
+    {   std::cout << subnodes[i].pointer << "|" << subnodes.size() <<"\n";
         program[i] = subnodes[i];
     }
 

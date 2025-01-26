@@ -6,8 +6,8 @@ import os
 def install_gpu():
     try:
         subprocess.check_output("nvidia-smi")
-        os.environ["CFLAGS"] = "-O3 -gstabs -march=native"
-        os.environ["LDFLAGS"] = "-O3 -gstabs -march=native"
+        #os.environ["CFLAGS"] = "-O3 -gstabs -march=native"
+        #os.environ["LDFLAGS"] = "-O3 -gstabs -march=native"
         module1 = Extension(
             "SimulatorGPU",
             sources=["wrapper.cu"],
@@ -26,6 +26,7 @@ def install_gpu():
                 "-finline-functions",
                 "--compiler-options",
                 "-std=c++17",
+                "-g",
             ],
         )
 

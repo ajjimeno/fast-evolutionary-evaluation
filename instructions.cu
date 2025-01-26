@@ -9,7 +9,8 @@
 #include <vector>
 
 #ifndef SETUP_BUILDING_CPU
-#define FUNCTION_DEFINITION __forceinline__ __device__ int
+//#define FUNCTION_DEFINITION __forceinline__ __device__ int
+#define FUNCTION_DEFINITION __device__ int
 #else
 #define FUNCTION_DEFINITION inline int
 #endif
@@ -752,36 +753,36 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
         switch (node->case_operation)
         {
-        case 0:
-            reg = get0(NULL);
-            break;
-        case 1:
-            reg = get1(NULL);
-            break;
-        case 2:
-            reg = get2(NULL);
-            break;
-        case 3:
-            reg = get3(NULL);
-            break;
-        case 4:
-            reg = get4(NULL);
-            break;
-        case 5:
-            reg = get5(NULL);
-            break;
-        case 6:
-            reg = get6(NULL);
-            break;
-        case 7:
-            reg = get7(NULL);
-            break;
-        case 8:
-            reg = get8(NULL);
-            break;
-        case 9:
-            reg = get9(NULL);
-            break;
+            case 0:
+                reg = get0(NULL);
+                break;
+            case 1:
+                reg = get1(NULL);
+                break;
+            case 2:
+                reg = get2(NULL);
+                break;
+            case 3:
+                reg = get3(NULL);
+                break;
+            case 4:
+                reg = get4(NULL);
+                break;
+            case 5:
+                reg = get5(NULL);
+                break;
+            case 6:
+                reg = get6(NULL);
+                break;
+            case 7:
+                reg = get7(NULL);
+                break;
+            case 8:
+                reg = get8(NULL);
+                break;
+            case 9:
+                reg = get9(NULL);
+                break;
         case 10:
             reg = input_end(run);
             break;
@@ -861,10 +862,10 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             reg = reset_input_down_position(run);
             break;
         case 36:
-            reg = run->inputInstance.max;
+            reg = input_max(run);
             break;
         case 37:
-            reg = run->inputInstance.min;
+            reg = input_min(run);
             break;
         case 38:
             reg = input_read(run);
@@ -929,7 +930,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             {
 
                 Node *pnode = &run->nodes[node->node_pointer];
-                stack[s_pointer++] = {0, 101};
+                stack[s_pointer++] = {node->node_pointer, 101};
 
                 // Add read value node
                 stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
@@ -941,14 +942,14 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
             break;
         case 58: // testing_output_write
-        {
-            Node *pnode = &run->nodes[node->node_pointer];
-            stack[s_pointer++] = {node->node_pointer, 102};
+            {
+                Node *pnode = &run->nodes[node->node_pointer]; 
+                stack[s_pointer++] = {node->node_pointer, 102};
 
-            // Add read value node
-            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
-        }
-        break;
+                // Add read value node
+                stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+            }
+            break;
         case 59:
             reg = testing_reset_output_position(run);
             break;
@@ -1321,8 +1322,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             reg = 0;
 
             for (int i = 0; i < run->problem.n_shapes; i++)
-            { // std::cout << "nshapes: " << run->problem.n_shapes <<std::endl;
-                // std::cout << run->problem.shapes <<std::endl;
+            { 
                 BoundingBox box = run->problem.shapes[i].box;
 
                 if (run->input_x >= box.left && run->input_x <= box.left + box.width &&
@@ -1468,6 +1468,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
+        
         case 1001: // stack_pop
             if (run->stack_pointer >= 0)
             {
@@ -1500,6 +1501,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
             break;
+        
         case 1004:
             status_end(run);
             break;
@@ -1508,6 +1510,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             break;
         }
     }
+
 
     //if (top != -1)
     //{ std::cout << "top:" << top << std::endl; }
