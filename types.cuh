@@ -1,6 +1,9 @@
 #ifndef PROGRAM_TYPES_H
 #define PROGRAM_TYPES_H
 
+#include <iostream>
+#include <thread>
+
 #define STRING std::string_view
 
 struct Array
@@ -129,5 +132,18 @@ void free_memory(void *output)
 }
 
 #endif
+
+int cores() {
+    int num_cores = std::thread::hardware_concurrency();
+
+    if (num_cores != 0) {
+        std::cout << "Number of cores: " << num_cores << std::endl;
+        return num_cores;
+    } else {
+        std::cout << "Could not determine number of cores.\n";
+    }
+
+    return 1;
+}
 
 #endif

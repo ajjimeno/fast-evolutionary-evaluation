@@ -41,24 +41,6 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
         return 1;
     }
 
-    err = cudaThreadSetLimit(cudaLimitMallocHeapSize, stackSize / 2);
-    if (err != cudaSuccess)
-    {
-        // Handle error
-        fprintf(stderr, "Error setting malloc heap size: %s\n", cudaGetErrorString(err));
-        return 1;
-    }
-
-    /*
-    size_t newMallocHeapSize = 1024 * 1024 * 1024; // 1 GB
-    cudaDeviceSetLimit(cudaLimitMallocHeapSize, newMallocHeapSize);
-    if (err != cudaSuccess)
-    {
-        // Handle error
-        fprintf(stderr, "Error setting malloc size: %s\n", cudaGetErrorString(err));
-        return 1;
-    }*/
-
     cudaDeviceSynchronize();
 
     return 0;

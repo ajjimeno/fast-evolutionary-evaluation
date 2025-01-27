@@ -9,7 +9,8 @@
 #include <vector>
 
 #ifndef SETUP_BUILDING_CPU
-#define FUNCTION_DEFINITION __forceinline__ __device__ int
+// #define FUNCTION_DEFINITION __forceinline__ __device__ int
+#define FUNCTION_DEFINITION __device__ int
 #else
 #define FUNCTION_DEFINITION inline int
 #endif
@@ -660,7 +661,11 @@ enum Direction
     d_right = 3,
 };
 
+#ifndef SETUP_BUILDING_CPU
+__device__ int aligned(Run *run, Direction d)
+#else
 int aligned(Run *run, Direction d)
+#endif
 {
     switch (d)
     {
@@ -690,10 +695,22 @@ struct SNode
     int case_operation;
 };
 
+<<<<<<< HEAD
 void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
 {
     if (top[0] >= STACK_REGISTRY_SIZE - 1)
     {
+=======
+#ifndef SETUP_BUILDING_CPU
+__device__ void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
+{
+#else
+void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
+{
+#endif
+    if (top[0] >= STACK_REGISTRY_SIZE - 1)
+    {
+>>>>>>> d0cef12458d5e8aee9ba76b8da550f6ee565931d
         printf("Stack Overflow\n");
         return;
     }
@@ -706,8 +723,13 @@ void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
     // std::cout<< "push:"<<top[0] << std::endl;
 }
 
+#ifndef SETUP_BUILDING_CPU
+__device__ void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2)
+{
+#else
 void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2)
 {
+#endif
     if (top[0] < 0)
     {
         printf("Stack Underflow\n");
@@ -856,10 +878,10 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             reg = reset_input_down_position(run);
             break;
         case 36:
-            reg = run->inputInstance.max;
+            reg = input_max(run);
             break;
         case 37:
-            reg = run->inputInstance.min;
+            reg = input_min(run);
             break;
         case 38:
             reg = input_read(run);
@@ -924,7 +946,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             {
 
                 Node *pnode = &run->nodes[node->node_pointer];
-                stack[s_pointer++] = {0, 101};
+                stack[s_pointer++] = {node->node_pointer, 101};
 
                 // Add read value node
                 stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
@@ -1316,8 +1338,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             reg = 0;
 
             for (int i = 0; i < run->problem.n_shapes; i++)
-            { // std::cout << "nshapes: " << run->problem.n_shapes <<std::endl;
-                // std::cout << run->problem.shapes <<std::endl;
+            {
                 BoundingBox box = run->problem.shapes[i].box;
 
                 if (run->input_x >= box.left && run->input_x <= box.left + box.width &&
@@ -1463,6 +1484,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
         }
         break;
+
         case 1001: // stack_pop
             if (run->stack_pointer >= 0)
             {
@@ -1495,6 +1517,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
             break;
+
         case 1004:
             status_end(run);
             break;
@@ -1504,10 +1527,8 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
     }
 
-    if (top != -1)
-    {
-        std::cout << "top:" << top << std::endl;
-    }
+    // if (top != -1)
+    //{ std::cout << "top:" << top << std::endl; }
 
     return 0;
 }
@@ -1796,7 +1817,7 @@ int free_programs_from_gpu(Programs *programs)
 #define MAX_OUTPUT_SIZE 100
 
 #ifndef SETUP_BUILDING_CPU
-__forceinline__ __device__ float run_problem(Node &program[], Instances *problems, int p, int **output)
+__forceinline__ __device__ float run_problem(Node program[], Instances *problems, int p, int **output)
 #else
 float run_problem(Node program[], Instances *problems, int p, int **output)
 #endif

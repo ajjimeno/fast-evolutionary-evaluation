@@ -294,7 +294,21 @@ Instances *load_data(const char *dir)
     for (int i = 0; i < instances->n_instances; i++)
     {
         output->instances[i].n_shapes = instances->instances[i].n_shapes;
-        output->instances[i].shapes = instances->instances[i].shapes;
+
+
+        allocate_memory((void **)&output->instances[i].shapes, instances->instances[i].n_shapes*sizeof(Shape));
+
+        for (int j = 0; j < instances->instances[i].n_shapes; j++)
+        { 
+            output->instances[i].shapes[j].area = instances->instances[i].shapes[j].area;
+            output->instances[i].shapes[j].x = instances->instances[i].shapes[j].x;
+            output->instances[i].shapes[j].y = instances->instances[i].shapes[j].y;
+            output->instances[i].shapes[j].type = instances->instances[i].shapes[j].type;
+            output->instances[i].shapes[j].box.height = instances->instances[i].shapes[j].box.height;
+            output->instances[i].shapes[j].box.width = instances->instances[i].shapes[j].box.width;
+            output->instances[i].shapes[j].box.left = instances->instances[i].shapes[j].box.left;
+            output->instances[i].shapes[j].box.top = instances->instances[i].shapes[j].box.top;
+        }
 
         output->instances[i].n_training = instances->instances[i].n_training;
 
