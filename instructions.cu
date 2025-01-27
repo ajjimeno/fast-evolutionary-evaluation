@@ -695,12 +695,6 @@ struct SNode
     int case_operation;
 };
 
-<<<<<<< HEAD
-void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
-{
-    if (top[0] >= STACK_REGISTRY_SIZE - 1)
-    {
-=======
 #ifndef SETUP_BUILDING_CPU
 __device__ void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
 {
@@ -710,7 +704,6 @@ void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
 #endif
     if (top[0] >= STACK_REGISTRY_SIZE - 1)
     {
->>>>>>> d0cef12458d5e8aee9ba76b8da550f6ee565931d
         printf("Stack Overflow\n");
         return;
     }
