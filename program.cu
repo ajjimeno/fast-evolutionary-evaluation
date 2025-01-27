@@ -8,8 +8,6 @@
 #define N_BLOCKS 500
 #define N_THREADS 1024
 
-
-
 // Programs, Problems, split programs
 __global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, float *accuracy, int blocks, int threads)
 {

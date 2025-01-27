@@ -22,7 +22,7 @@ struct Instance
     Array initial;
 
     int n_shapes;
-    Shape * shapes;
+    Shape *shapes;
 };
 
 struct Instances
@@ -73,7 +73,7 @@ struct Shape
 
     BoundingBox box;
 
-    //Color *color;
+    // Color *color;
 };
 
 struct InputInstance
@@ -81,7 +81,6 @@ struct InputInstance
     int min;
     int max;
 };
-
 
 struct Run
 {

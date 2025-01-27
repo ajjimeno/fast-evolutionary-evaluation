@@ -14,7 +14,7 @@
 #define FUNCTION_DEFINITION inline int
 #endif
 
-#define STACK_REGISTRY_SIZE 100*3
+#define STACK_REGISTRY_SIZE 100 * 3
 
 FUNCTION_DEFINITION function_switch(int pointer, Run *run);
 
@@ -626,11 +626,13 @@ FUNCTION_DEFINITION get_max_color(Run *run)
     int frequency[10];
 
     for (int i = 0; i < 10; i++)
-    { frequency[i] = 0; }
+    {
+        frequency[i] = 0;
+    }
 
     for (int i = 0; i < run->problem.input.y; i++)
     {
-        for (int j=0; j < run->problem.input.x; j++)
+        for (int j = 0; j < run->problem.input.x; j++)
         {
             frequency[run->problem.input.array[i][j]]++;
         }
@@ -641,8 +643,10 @@ FUNCTION_DEFINITION get_max_color(Run *run)
 
     for (int i = 1; i < 10; i++)
     {
-      if (frequency[i] > frequency[max_freq])
-      { max_freq = i; }
+        if (frequency[i] > frequency[max_freq])
+        {
+            max_freq = i;
+        }
     }
 
     return max_freq;
@@ -686,8 +690,10 @@ struct SNode
     int case_operation;
 };
 
-void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
-    if (top[0] >= STACK_REGISTRY_SIZE - 1) {
+void push_registers(int *top, int *stack, int reg, int reg1, int reg2)
+{
+    if (top[0] >= STACK_REGISTRY_SIZE - 1)
+    {
         printf("Stack Overflow\n");
         return;
     }
@@ -697,11 +703,13 @@ void push_registers(int *top, int *stack, int reg, int reg1, int reg2) {
     stack[top[0]] = reg1;
     top[0]++;
     stack[top[0]] = reg2;
-    //std::cout<< "push:"<<top[0] << std::endl;
+    // std::cout<< "push:"<<top[0] << std::endl;
 }
 
-void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2) {
-    if (top[0] < 0) {
+void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2)
+{
+    if (top[0] < 0)
+    {
         printf("Stack Underflow\n");
         return;
     }
@@ -711,7 +719,7 @@ void pop_registers(int *top, int *stack, int *reg, int *reg1, int *reg2) {
     top[0]--;
     reg[0] = stack[top[0]];
     top[0]--;
-    //std::cout<< "pop:"<<top[0] << std::endl;
+    // std::cout<< "pop:"<<top[0] << std::endl;
 }
 
 #define PUSH push_registers(&top, stack_registry, reg, reg1, reg2)
@@ -1034,20 +1042,20 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         }
         break;
         case 81:
-            //reg = read_memory(run);
-        {       
-            Node *pnode = &run->nodes[node->node_pointer];
-            stack[s_pointer++] = {node->node_pointer, 183};
+            // reg = read_memory(run);
+            {
+                Node *pnode = &run->nodes[node->node_pointer];
+                stack[s_pointer++] = {node->node_pointer, 183};
 
-            // Add read value node
-            // Node p0node = run->nodes[node.node_pointer];
-            stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
-        }
+                // Add read value node
+                // Node p0node = run->nodes[node.node_pointer];
+                stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
+            }
             break;
         case 183:
             if (reg >= 0 && reg < 10)
             {
-                //std::cout << "Memory read: " << reg << " " << run->memory[reg] << std::endl;
+                // std::cout << "Memory read: " << reg << " " << run->memory[reg] << std::endl;
                 reg = run->memory[reg];
             }
             break;
@@ -1070,7 +1078,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
             stack[s_pointer++] = {pnode->args[1], 100};
 
-            //std::cout << "pointer: " <<  pnode->args[1] << "/" << run->nodes[pnode->args[1]].pointer << std::endl;
+            // std::cout << "pointer: " <<  pnode->args[1] << "/" << run->nodes[pnode->args[1]].pointer << std::endl;
 
             // Add read value node
             stack[s_pointer++] = {pnode->args[0], run->nodes[pnode->args[0]].pointer};
@@ -1079,13 +1087,13 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         case 100:
             if (run->inner_loop < 3 && reg > 0 && reg <= 30)
             {
-                //std::cout << "loop reg: " << reg << std::endl;
-                // Read register
+                // std::cout << "loop reg: " << reg << std::endl;
+                //  Read register
                 stack[s_pointer++] = {node->node_pointer, 110};
                 for (int i = 0; i < reg; i++)
                 {
-                    //std::cout << node->node_pointer << "/" << run->nodes[node->node_pointer].pointer << std::endl;
-                    // Loop operation
+                    // std::cout << node->node_pointer << "/" << run->nodes[node->node_pointer].pointer << std::endl;
+                    //  Loop operation
                     stack[s_pointer++] = {node->node_pointer, run->nodes[node->node_pointer].pointer};
                 }
             }
@@ -1105,31 +1113,31 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             run->output[run->output_y][run->output_x] = reg;
             break;
         case 103: // write memory
-            {
-                // copy register
-                reg1 = reg;
-                //std::cout << "Memory write step1: " << reg1 << std::endl;
-                // final check
-                stack[s_pointer++] = {node->node_pointer, 187};
-                Node *pnode = &run->nodes[node->node_pointer];
-                PUSH;
-                //std::cout << "Memory second pointer: " << pnode->args[1] << " " << run->nodes[pnode->args[1]].pointer << std::endl;
-                // obtain second value
-                stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
-            }
-            break;
+        {
+            // copy register
+            reg1 = reg;
+            // std::cout << "Memory write step1: " << reg1 << std::endl;
+            //  final check
+            stack[s_pointer++] = {node->node_pointer, 187};
+            Node *pnode = &run->nodes[node->node_pointer];
+            PUSH;
+            // std::cout << "Memory second pointer: " << pnode->args[1] << " " << run->nodes[pnode->args[1]].pointer << std::endl;
+            //  obtain second value
+            stack[s_pointer++] = {pnode->args[1], run->nodes[pnode->args[1]].pointer};
+        }
+        break;
         case 187: // write memory
-            {
-            //std::cout << "Memory write: " << reg1 << " " << reg << std::endl;
+        {
+            // std::cout << "Memory write: " << reg1 << " " << reg << std::endl;
             int value = reg;
             POP;
             if (reg1 >= 0 && reg1 < 10)
             {
                 run->memory[reg1] = value;
-                //std::cout << run->memory[reg1] << std::endl;
+                // std::cout << run->memory[reg1] << std::endl;
             }
-            }
-            break;
+        }
+        break;
         case 104: // comparison
         {
             Node *pnode = &run->nodes[node->node_pointer];
@@ -1164,7 +1172,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             POP;
             reg = (value == reg1);
         }
-            break;
+        break;
         case 108: // bigger_than
         {
             // copy register
@@ -1183,7 +1191,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             POP;
             reg = (reg1 > value);
         }
-            break;
+        break;
         case 84: // testing_set_input_position
         {
             Node *pnode = &run->nodes[node->node_pointer];
@@ -1216,7 +1224,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
         }
-            break;
+        break;
         case 85: // testing_set_output_position
         {
             Node *pnode = &run->nodes[node->node_pointer];
@@ -1250,7 +1258,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             {
                 run->status = -1;
             }
-            //std:cout << run->output_x << "/" << run->output_y << std::endl;
+            // std:cout << run->output_x << "/" << run->output_y << std::endl;
 
             break;
         case 86: // testing_set_output_value
@@ -1295,7 +1303,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
         }
-            break;
+        break;
         case 87: // testing_get_input_value
         {
             Node *pnode = &run->nodes[node->node_pointer];
@@ -1345,7 +1353,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             POP;
             reg = value + reg1;
         }
-            break;
+        break;
         case 96: // sub
         {
             Node *pnode = &run->nodes[node->node_pointer];
@@ -1369,7 +1377,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
             POP;
             reg = value - reg1;
         }
-            break;
+        break;
 
         case 97: // testing_output_distance_to_input_x
             reg = abs(run->output_x - run->input_x);
@@ -1388,7 +1396,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
         break;
         case 128:
         {
-            int pos_y= reg;
+            int pos_y = reg;
             POP;
             if (reg1 >= 0 && reg1 < get_testing_length_input_x(run) && pos_y >= 0 && pos_y < get_testing_length_input_y(run))
             {
@@ -1399,7 +1407,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
         }
-            break;
+        break;
         case 88: // testing_get_output_value
         {
             Node *pnode = &run->nodes[node->node_pointer];
@@ -1443,7 +1451,7 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
                 run->status = -1;
             }
         }
-            break;
+        break;
         case 99:
             reg = get_max_color(run);
             break;
@@ -1497,7 +1505,9 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
     }
 
     if (top != -1)
-    { std::cout << "top:" << top << std::endl; }
+    {
+        std::cout << "top:" << top << std::endl;
+    }
 
     return 0;
 }
@@ -1804,20 +1814,20 @@ float run_problem(Node program[], Instances *problems, int p, int **output)
     }
 
     Run r = {
-        0,                      // input_x
-        0,                      // input_y
-        0,                      // output_x
-        0,                      // output_y
-        problems->instances[p], // problem
-        output,                 // output
-        0,                      // inner_loop
-        0,                      // status
-        {0,0,0,0,0,0,0,0,0,0},  // memory
-        0,                      // training_id
-        0,                      // training_input_x
-        0,                      // training_input_y
-        0,                      // training_output_x
-        0,                      // training_output_y
+        0,                              // input_x
+        0,                              // input_y
+        0,                              // output_x
+        0,                              // output_y
+        problems->instances[p],         // problem
+        output,                         // output
+        0,                              // inner_loop
+        0,                              // status
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, // memory
+        0,                              // training_id
+        0,                              // training_input_x
+        0,                              // training_input_y
+        0,                              // training_output_x
+        0,                              // training_output_y
         program};
 
     r.stack_pointer = -1;
@@ -1828,7 +1838,7 @@ float run_problem(Node program[], Instances *problems, int p, int **output)
 
         // status_end
         if (r.status == -2)
-             break;
+            break;
     }
 
     return accuracy_calculation(problems->instances[p], output);

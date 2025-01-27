@@ -44,7 +44,7 @@ std::vector<uint8_t> bytes_to_vector(const char *bytes, size_t length)
     return std::vector<uint8_t>(bytes, bytes + length);
 }
 
-inline void string2program(int start_index, int end_index, STRING ** programs, std::vector<std::vector<signed char>> *byte_buffers, MAP_TREENODE *nmap)
+inline void string2program(int start_index, int end_index, STRING **programs, std::vector<std::vector<signed char>> *byte_buffers, MAP_TREENODE *nmap)
 {
     for (int i = start_index; i < end_index; i++)
     {
@@ -182,7 +182,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         }
 
         std::cout << n_programs << " programs written" << std::endl;
-        //std::cout << programs[0][0] << std::endl;
+        // std::cout << programs[0][0] << std::endl;
 
         std::cout << "Ending program writing" << std::endl;
         accuracy = (float *)malloc(n_programs * sizeof(float));

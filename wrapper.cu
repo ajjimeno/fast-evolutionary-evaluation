@@ -41,7 +41,7 @@ static int wrapRunnerSimulatorConstructor(RunnerSimulatorWrapper *self, PyObject
         return 1;
     }
 
-    err = cudaThreadSetLimit(cudaLimitMallocHeapSize, stackSize/2);
+    err = cudaThreadSetLimit(cudaLimitMallocHeapSize, stackSize / 2);
     if (err != cudaSuccess)
     {
         // Handle error
@@ -91,9 +91,9 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             PyObject *str_method = PyObject_GetAttrString(py_item, "__str__");
             PyObject *str_obj = PyObject_CallObject(str_method, NULL);
             const char *str = PyUnicode_AsUTF8(str_obj);
-            char* copy = new char[strlen(str) + 1]; // Allocate memory
+            char *copy = new char[strlen(str) + 1]; // Allocate memory
             strcpy(copy, str);
-            STRING * string = new STRING(copy);
+            STRING *string = new STRING(copy);
             cpp_strings.push_back(string);
             Py_DECREF(str_obj);
             Py_DECREF(str_method);
@@ -101,9 +101,9 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         else if (!PyUnicode_Check(py_item))
         {
             const char *str = PyUnicode_AsUTF8(py_item);
-            char* copy = new char[strlen(str) + 1]; // Allocate memory
+            char *copy = new char[strlen(str) + 1]; // Allocate memory
             strcpy(copy, str);
-            STRING * string = new STRING(copy);
+            STRING *string = new STRING(copy);
             cpp_strings.push_back(string);
             // PyMem_Free(str);
         }
@@ -126,7 +126,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         delete s->data();
         delete s;
     }
-    
+
     PyObject *list = PyList_New(n_programs);
     if (!list)
     {

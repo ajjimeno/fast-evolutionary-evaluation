@@ -38,7 +38,6 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
         t.join();
     }
 
-
     std::cout << "Kernel finished" << std::endl;
 
     float total = 0.0;
