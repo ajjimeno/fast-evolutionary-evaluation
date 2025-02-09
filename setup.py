@@ -74,5 +74,6 @@ def install_cpu():
     )
 
 if __name__ == "__main__":
+    # To install for GPU, uncomment the line below and comment the one for CPU installation
     #install_gpu()
     install_cpu()
