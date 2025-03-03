@@ -8,8 +8,12 @@ __device__ float accuracy_calculation(Instance problem, int **output)
 float accuracy_calculation(Instance problem, int **output)
 #endif
 {
+  int total = problem.gt.y * problem.gt.x;
+
+  if (total == 0)
+  { return 0.0; }
+
   float tp = 0.0;
-  float total = 0.0;
 
   // Count number of equal entries
   for (int i = 0; i < problem.gt.y; i++) {
@@ -17,18 +21,10 @@ float accuracy_calculation(Instance problem, int **output)
       if (problem.gt.array[i][j] == output[i][j]) {
         tp++;
       }
-
-      total++;
     }
   }
 
-  // Total number of entries
-  // int total = problem.output.y * problem.output.x;
-  if (total == 0) {
-    return 0.0;
-  }
-
-  return tp / total;
+  return tp/total;
 }
 
 #ifndef SETUP_BUILDING_CPU
