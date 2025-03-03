@@ -14,7 +14,7 @@ float accuracy_calculation(Instance problem, int **output)
     return 0.0;
   }
 
-  float tp = 0.0;
+  int tp = 0.0;
 
   // Count number of equal entries
   for (int i = 0; i < problem.gt.y; i++) {
@@ -25,7 +25,7 @@ float accuracy_calculation(Instance problem, int **output)
     }
   }
 
-  return tp / total;
+  return (float)tp / total;
 }
 
 #ifndef SETUP_BUILDING_CPU
