@@ -10,8 +10,9 @@ float accuracy_calculation(Instance problem, int **output)
 {
   int total = problem.gt.y * problem.gt.x;
 
-  if (total == 0)
-  { return 0.0; }
+  if (total == 0) {
+    return 0.0;
+  }
 
   float tp = 0.0;
 
@@ -24,7 +25,7 @@ float accuracy_calculation(Instance problem, int **output)
     }
   }
 
-  return tp/total;
+  return tp / total;
 }
 
 #ifndef SETUP_BUILDING_CPU
