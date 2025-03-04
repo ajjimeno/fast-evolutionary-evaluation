@@ -18,11 +18,11 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
 {
     Programs *d_programs = copy_programs_to_gpu(n_programs, programs);
 
-    std::cout << "Starting kernel " << n_programs << std::endl;
+    //std::cout << "Starting kernel " << n_programs << std::endl;
 
     std::vector<std::thread> threads;
 
-    std::cout << "Num_cores " << cores() << std::endl;
+    //std::cout << "Num_cores " << cores() << std::endl;
     int n_threads = std::min(n_programs, cores());
     int chunk_size = n_programs / n_threads;
 
@@ -39,7 +39,7 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
         t.join();
     }
 
-    std::cout << "Kernel finished" << std::endl;
+    //std::cout << "Kernel finished" << std::endl;
 
     float total = 0.0;
 
@@ -48,7 +48,7 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
         total += accuracy[i];
     }
 
-    std::cout << "Total: " << total << " " << n_programs << std::endl;
+    //std::cout << "Total: " << total << " " << n_programs << std::endl;
 
     free_programs_from_gpu(d_programs);
 

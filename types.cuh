@@ -137,7 +137,7 @@ int cores() {
     int num_cores = std::thread::hardware_concurrency();
 
     if (num_cores != 0) {
-        std::cout << "Number of cores: " << num_cores << std::endl;
+        //std::cout << "Number of cores: " << num_cores << std::endl;
         return num_cores;
     } else {
         std::cout << "Could not determine number of cores.\n";
