@@ -76,7 +76,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
     }
 
     MAP_TREENODE nmap;
-    std::cout << "Collecting programs" << std::endl;
+    //std::cout << "Collecting programs" << std::endl;
     Py_ssize_t len = PyList_Size(py_list);
     for (Py_ssize_t i = 0; i < len; ++i)
     {
@@ -144,7 +144,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
         }
     }
 
-    std::cout << "Programs collected" << std::endl;
+    //std::cout << "Programs collected" << std::endl;
 
     float *accuracy = NULL;
     int n_programs = 0;
@@ -166,7 +166,7 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
 
         std::vector<std::thread> threads;
 
-        std::cout << "Starting program writing" << std::endl;
+        //std::cout << "Starting program writing" << std::endl;
 
         for (int i = 0; i < n_threads; ++i)
         {
@@ -181,10 +181,10 @@ static PyObject *wrapRun(RunnerSimulatorWrapper *self, PyObject *args)
             t.join();
         }
 
-        std::cout << n_programs << " programs written" << std::endl;
+        //std::cout << n_programs << " programs written" << std::endl;
         // std::cout << programs[0][0] << std::endl;
 
-        std::cout << "Ending program writing" << std::endl;
+        //std::cout << "Ending program writing" << std::endl;
         accuracy = (float *)malloc(n_programs * sizeof(float));
 
         execute_and_evaluate(n_programs, &programs[0], accuracy, self->data);
