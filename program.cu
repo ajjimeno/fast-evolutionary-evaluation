@@ -8,6 +8,8 @@
 #define N_BLOCKS 500
 #define N_THREADS 1024
 
+#define TEST_SPEED
+
 // Programs, Problems, split programs
 __global__ void create_and_run(Programs *programs, int n_programs, Instances *problems, float *accuracy, int blocks, int threads)
 {
@@ -26,6 +28,10 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
 {
 	cudaError_t err;
 	float *d_accuracy;
+	
+#ifdef TEST_SPEED
+auto start = std::chrono::high_resolution_clock::now();
+#endif
 
 	cudaMallocManaged(&d_accuracy, n_programs * sizeof(float));
 
@@ -67,6 +73,17 @@ int execute_and_evaluate(int n_programs, STRING **programs, float *accuracy, Ins
 		// Handle the error (e.g., exit the program)
 		return 1;
 	}
+
+#ifdef TEST_SPEED
+    // Record end time
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // Calculate duration
+    std::chrono::duration<double> elapsed = end - start;
+
+    // Output the elapsed time
+    std::cout << "Elapsed time: " << elapsed.count() << " seconds\n";
+#endif
 
 	float total = 0.0;
 
