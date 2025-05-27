@@ -23,3 +23,16 @@ n=300
 s = simulator.Runner("data/sorted/training")
 s.run(["testing_output_write(get9())"]*n)
 ```
+
+# Citation
+
+If you use this software, cite as follow:
+
+```
+@article{yepes2025evolutionary,
+  title={Evolutionary thoughts: integration of large language models and evolutionary algorithms},
+  author={Yepes, Antonio Jimeno and Barnard, Pieter},
+  journal={arXiv preprint arXiv:2505.05756},
+  year={2025}
+}
+```
