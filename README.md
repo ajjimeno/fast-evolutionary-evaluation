@@ -2,10 +2,14 @@
 
 Requirements `c++17`.
 
-After cloning the repository and entering into its folder run:
+After cloning the repository and entering its folder, run one of the following commands:
 
 ```
+# For CPU installation (default)
 pip install .
+
+# For GPU installation (requires CUDA 12 or newer and nvidia-smi to be available)
+BUILD_GPU=1 pip install .
 ```
 
 The `setup.py` has an option to compile a version that runs on GPU, check the script to set it up.
