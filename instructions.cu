@@ -1528,126 +1528,62 @@ FUNCTION_DEFINITION function_switch(int pointer, Run *run)
 
 #define MAP_INSTRUCTIONS std::unordered_map<STRING, int>
 
+struct Instruction {
+    const char* name;
+    int id;
+};
+
+// Using a static array to define all instructions
+// This makes it easier to see all instructions and their IDs
+static const Instruction instruction_definitions[] = {
+    {"get0", 0}, {"get1", 1}, {"get2", 2}, {"get3", 3}, {"get4", 4},
+    {"get5", 5}, {"get6", 6}, {"get7", 7}, {"get8", 8}, {"get9", 9},
+    {"input_end", 10}, {"input_beginning", 11}, {"input_down_end", 12},
+    {"output_end", 13}, {"output_beginning", 14}, {"output_down_end", 15},
+    {"output_move_left", 16}, {"output_move_right", 17}, {"output_move_down", 18},
+    {"output_move_up", 19}, {"get_input_position_x", 20}, {"get_input_position_y", 21},
+    {"get_output_position_x", 22}, {"get_output_position_y", 23}, {"get_length_input_x", 24},
+    {"get_length_input_y", 25}, {"get_length_output_x", 26}, {"get_length_output_y", 27},
+    {"input_next", 28}, {"input_previous", 29}, {"input_move_left", 30},
+    {"input_move_right", 31}, {"input_move_down", 32}, {"input_move_up", 33},
+    {"reset_input_position", 34}, {"reset_input_down_position", 35}, {"input_max", 36},
+    {"input_min", 37}, {"input_read", 38}, {"output_read", 39},
+    {"reset_output_position", 40}, {"reset_output_down_position", 41},
+    {"get_testing_length_input_x", 42}, {"get_testing_length_input_y", 43},
+    {"get_testing_length_output_x", 44}, {"get_testing_length_output_y", 45},
+    {"get_testing_input_position_y", 46}, {"get_testing_input_position_x", 47},
+    {"get_testing_output_position_y", 48}, {"get_testing_output_position_x", 49},
+    {"testing_input_max", 50}, {"testing_input_min", 51}, {"testing_input_read", 52},
+    {"testing_output_read_previous", 53}, {"testing_output_read", 54},
+    {"testing_reset_input_position", 55}, {"testing_reset_input_down_position", 56},
+    {"testing_output_write_previous", 57}, {"testing_output_write", 58},
+    {"testing_reset_output_position", 59}, {"testing_reset_output_down_position", 60},
+    {"testing_output_move_left", 61}, {"testing_output_move_right", 62},
+    {"testing_output_move_down", 63}, {"testing_output_move_up", 64},
+    {"testing_is_output_end", 65}, {"testing_is_output_down", 66},
+    {"testing_input_move_left", 67}, {"testing_input_move_right", 68},
+    {"testing_input_move_down", 69}, {"testing_input_move_up", 70},
+    {"comparison", 71}, {"bigger_than_output_next", 72},
+    {"bigger_than_testing_output_next", 73}, {"swap_testing_output_next", 74},
+    {"bigger_than", 75}, {"bigger_thanR", 75}, {"bigger_thanW", 75},
+    {"equal", 76}, {"equalR", 76}, {"equalW", 76}, {"no", 77},
+    {"prog2", 78}, {"prog3", 79}, {"dowhile", 80}, {"read_memory", 81},
+    {"write_memory", 82}, {"loop", 83}, {"testing_set_input_position", 84},
+    {"testing_set_output_position", 85}, {"testing_set_output_value", 86},
+    {"testing_get_input_value", 87}, {"testing_get_output_value", 88},
+    {"in_input_shape", 89}, {"aligned_above", 90}, {"aligned_below", 91},
+    {"aligned_left", 92}, {"aligned_right", 93}, {"add", 95}, {"sub", 96},
+    {"testing_output_distance_to_input_x", 97}, {"testing_output_distance_to_input_y", 98},
+    {"get_max_color", 99}, {"stack_push", 1000}, {"stack_pop", 1001},
+    {"stack_top", 1002}, {"status_end", 1004}
+};
+
 MAP_INSTRUCTIONS get_map()
 {
-
     MAP_INSTRUCTIONS map;
-
-    map["get0"] = 0;
-    map["get1"] = 1;
-    map["get2"] = 2;
-    map["get3"] = 3;
-    map["get4"] = 4;
-    map["get5"] = 5;
-    map["get6"] = 6;
-    map["get7"] = 7;
-    map["get8"] = 8;
-    map["get9"] = 9;
-    map["input_end"] = 10;
-    map["input_beginning"] = 11;
-    map["input_down_end"] = 12;
-    map["output_end"] = 13;
-    map["output_beginning"] = 14;
-    map["output_down_end"] = 15;
-    map["output_move_left"] = 16;
-    map["output_move_right"] = 17;
-    map["output_move_down"] = 18;
-    map["output_move_up"] = 19;
-    map["get_input_position_x"] = 20;
-    map["get_input_position_y"] = 21;
-    map["get_output_position_x"] = 22;
-    map["get_output_position_y"] = 23;
-    map["get_length_input_x"] = 24;
-    map["get_length_input_y"] = 25;
-    map["get_length_output_x"] = 26;
-    map["get_length_output_y"] = 27;
-    map["input_next"] = 28;
-    map["input_previous"] = 29;
-    map["input_move_left"] = 30;
-    map["input_move_right"] = 31;
-    map["input_move_down"] = 32;
-    map["input_move_up"] = 33;
-    map["reset_input_position"] = 34;
-    map["reset_input_down_position"] = 35;
-    map["input_max"] = 36;
-    map["input_min"] = 37;
-    map["input_read"] = 38;
-    map["output_read"] = 39;
-    map["reset_output_position"] = 40;
-    map["reset_output_down_position"] = 41;
-    map["get_testing_length_input_x"] = 42;
-    map["get_testing_length_input_y"] = 43;
-    map["get_testing_length_output_x"] = 44;
-    map["get_testing_length_output_y"] = 45;
-    map["get_testing_input_position_y"] = 46;
-    map["get_testing_input_position_x"] = 47;
-    map["get_testing_output_position_y"] = 48;
-    map["get_testing_output_position_x"] = 49;
-    map["testing_input_max"] = 50;
-    map["testing_input_min"] = 51;
-    map["testing_input_read"] = 52;
-    map["testing_output_read_previous"] = 53;
-    map["testing_output_read"] = 54;
-    map["testing_reset_input_position"] = 55;
-    map["testing_reset_input_down_position"] = 56;
-    map["testing_output_write_previous"] = 57;
-    map["testing_output_write"] = 58;
-    map["testing_reset_output_position"] = 59;
-    map["testing_reset_output_down_position"] = 60;
-    map["testing_output_move_left"] = 61;
-    map["testing_output_move_right"] = 62;
-    map["testing_output_move_down"] = 63;
-    map["testing_output_move_up"] = 64;
-    map["testing_is_output_end"] = 65;
-    map["testing_is_output_down"] = 66;
-    map["testing_input_move_left"] = 67;
-    map["testing_input_move_right"] = 68;
-    map["testing_input_move_down"] = 69;
-    map["testing_input_move_up"] = 70;
-    map["comparison"] = 71;
-    map["bigger_than_output_next"] = 72;
-    map["bigger_than_testing_output_next"] = 73;
-    map["swap_testing_output_next"] = 74;
-    map["bigger_than"] = 75;
-    map["bigger_thanR"] = 75;
-    map["bigger_thanW"] = 75;
-    map["equal"] = 76;
-    map["equalR"] = 76;
-    map["equalW"] = 76;
-    map["no"] = 77;
-    map["prog2"] = 78;
-    map["prog3"] = 79;
-    map["dowhile"] = 80;
-    map["read_memory"] = 81;
-    map["write_memory"] = 82;
-    map["loop"] = 83;
-
-    map["testing_set_input_position"] = 84;
-    map["testing_set_output_position"] = 85;
-    map["testing_set_output_value"] = 86;
-    map["testing_get_input_value"] = 87;
-    map["testing_get_output_value"] = 88;
-
-    map["in_input_shape"] = 89;
-
-    map["aligned_above"] = 90;
-    map["aligned_below"] = 91;
-    map["aligned_left"] = 92;
-    map["aligned_right"] = 93;
-
-    map["add"] = 95;
-    map["sub"] = 96;
-
-    map["testing_output_distance_to_input_x"] = 97;
-    map["testing_output_distance_to_input_y"] = 98;
-
-    map["get_max_color"] = 99;
-
-    map["stack_push"] = 1000;
-    map["stack_pop"] = 1001;
-    map["stack_top"] = 1002;
-    map["status_end"] = 1004;
-
+    for (const auto& def : instruction_definitions) {
+        map[def.name] = def.id;
+    }
     return map;
 }
 

@@ -26,7 +26,6 @@ def install_gpu():
                 "-finline-functions",
                 "--compiler-options",
                 "-std=c++17",
-                "-g",
             ],
         )
 
@@ -58,13 +57,13 @@ def install_gpu():
 
 def install_cpu():
     print("SimulatorCPU is being built!")
-    os.environ["CFLAGS"] = "-O -march=native"
-    os.environ["LDFLAGS"] = "-O -march=native"
+    os.environ["CFLAGS"] = "-O3 -march=native"
+    os.environ["LDFLAGS"] = "-O3 -march=native"
 
     moduleCPU = Extension(
             "SimulatorCPU",
             sources=["wrapper.cpp"],
-            extra_compile_args=["-g", "-O", "-march=native", "-std=c++17", "-DSETUP_BUILDING_CPU", "-Wsign-compare", "-finline-functions"],
+            extra_compile_args=["-g", "-O3", "-march=native", "-std=c++17", "-DSETUP_BUILDING_CPU", "-Wsign-compare", "-finline-functions"],
     )
     setup(
             name="SimulatorCPU",
@@ -74,6 +73,12 @@ def install_cpu():
     )
 
 if __name__ == "__main__":
-    # To install for GPU, uncomment the line below and comment the one for CPU installation
-    #install_gpu()
-    install_cpu()
+    if os.environ.get('BUILD_GPU'):
+        try:
+            subprocess.check_output(["nvidia-smi"])
+            install_gpu()
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("nvidia-smi check failed, GPU build not possible. Falling back to CPU build.")
+            install_cpu()
+    else:
+        install_cpu()
